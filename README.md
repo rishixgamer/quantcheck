@@ -1,34 +1,50 @@
-# QuantCheck Recovery Harness
+# QuantCheck
 
-This folder is a **rebuild harness**, not the completed QuantCheck source repository.
+QuantCheck is a deterministic Python framework for testing whether
+point-in-time financial research data can manufacture misleading results
+through timestamp leakage, unit corruption, duplicate observations, or
+revision-history failure. See `PROJECT_SCOPE.md` for the full problem
+statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
 
-The original source code was lost. The surviving documents under `reference/` describe the project concept, the intended architecture, the historical 0.1.0 behavior, and the prior release evidence. Treat them as specifications and historical evidence—not as proof that the new repository already implements those features.
+## Current implementation status
 
-## Start here
+**Recovery Milestone 0 (repository bootstrap) is complete.** The repository
+has a minimal, typed `quantcheck` package, a `uv`-managed toolchain (Ruff,
+MyPy, pytest, Hypothesis), an installed `quantcheck` CLI entry point that
+supports only `--help`/`--version`, and a CI workflow that runs the baseline
+quality gates.
 
-1. Copy this folder into a new empty `quantcheck` repository.
-2. Initialize Git immediately.
-3. Open Claude Code from the repository root.
-4. Paste `prompts/00_BOOTSTRAP_REPOSITORY.md` into Claude Code.
-5. Do not start the next milestone until all current milestone checks pass and `IMPLEMENT.md` is updated.
+**Not implemented yet:** financial schemas, canonical serialization, point-in-time
+snapshots, fixtures, the SEC adapter, fault injectors, detectors, scoring,
+benchmark artifacts, and the dashboard/HTML presentation layer. No benchmark
+metrics, hashes, or test counts from any prior implementation apply to this
+repository. `IMPLEMENT.md` is the authoritative record of current status and
+the next task.
 
-## Important recovery rule
+## Development setup
 
-Do not copy the historical release `README` or historical `IMPLEMENT` file to the repository root. They claim a completed 0.1.0 release, 645 passing tests, and generated benchmark hashes. In a blank rebuild, those claims are not yet true. They are stored under `reference/` so Claude can use them to reconstruct behavior without confusing historical state with current state.
+Requires [`uv`](https://docs.astral.sh/uv/) and Python `>=3.12,<3.13` (uv can
+install the interpreter for you).
 
-## Intended build sequence
+```bash
+uv python install 3.12
+uv sync --all-groups
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src tests
+uv run pytest
+uv run quantcheck --help
+```
 
-1. Repository/toolchain bootstrap
-2. Canonical schemas, serialization, hashing, and stable IDs
-3. Deterministic fixtures and point-in-time snapshots
-4. Look-ahead vertical slice
-5. Narrow SEC adapter
-6. Unit Drift
-7. Duplicate Observations
-8. Revision Overwrite
-9. Benchmark runner and public/private artifacts
-10. CLI
-11. Read-only dashboard and deterministic HTML
-12. Release evidence and packaging
+## Repository layout
 
-The exact behavioral target is summarized in `RECOVERY_SEQUENCE.md` and supported by the historical files under `reference/`.
+- `src/quantcheck/` — the package.
+- `tests/` — unit and smoke tests.
+- `docs/` — current architecture and process documents, starting with
+  `docs/AUTHORITY_AND_READING_ORDER.md`.
+- `reference/` — historical documents describing the project concept and a
+  prior 0.1.0 implementation. They are specifications and historical
+  evidence only; they do not describe the current state of this repository.
+- `AGENTS.md`, `PROJECT_SCOPE.md`, `MVP_ACCEPTANCE_CRITERIA.md`,
+  `IMPLEMENT.md` — governing instructions, scope, acceptance criteria, and
+  the operational implementation log for agents working in this repository.

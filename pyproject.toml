@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "quantcheck"
+version = "0.1.0.dev0"
+description = "Deterministic point-in-time financial data reliability auditing framework."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+authors = [{ name = "QuantCheck maintainers" }]
+dependencies = []
+
+[project.scripts]
+quantcheck = "quantcheck.cli:main"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14,<0.15",
+    "mypy>=1.14,<2",
+    "pytest>=8,<9",
+    "hypothesis>=6,<7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/quantcheck"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/pyproject.toml",
+    "/uv.lock",
+    "/README.md",
+    "/.python-version",
+    "/.gitignore",
+]
+exclude = [
+    "/reference",
+    "/prompts",
+    "/START_HERE.txt",
+    "/RECOVERY_SEQUENCE.md",
+    "/AGENTS.md",
+    "/PROJECT_SCOPE.md",
+    "/MVP_ACCEPTANCE_CRITERIA.md",
+    "/IMPLEMENT.md",
+    "/docs",
+    "/.claude",
+    "/.serena",
+    "/.venv",
+    "/dist",
+    "**/__pycache__",
+    "**/*.py[cod]",
+    "/.mypy_cache",
+    "/.ruff_cache",
+    "/.pytest_cache",
+    "/.hypothesis",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
