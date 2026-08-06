@@ -1,0 +1,13 @@
+1. Download and extract this folder.
+2. Rename it to quantcheck (or copy its contents into an empty quantcheck repository).
+3. In Terminal:
+
+   cd /path/to/quantcheck
+   git init
+   git add .
+   git commit -m "Initialize QuantCheck recovery harness"
+
+4. Start Claude Code from this repository root.
+5. Paste the contents of prompts/00_BOOTSTRAP_REPOSITORY.md.
+6. Review Claude's diff and command results before committing Milestone 0.
+7. Commit every verified milestone so the project cannot be lost again.

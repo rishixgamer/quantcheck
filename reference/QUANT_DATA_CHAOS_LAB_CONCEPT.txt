@@ -1,0 +1,1150 @@
+# Quant Data Chaos Lab, explained simply
+
+The project is a **crash-testing laboratory for financial data**.
+
+A car company intentionally crashes cars to discover safety problems. Your project intentionally damages financial datasets to discover whether a research system can detect the damage **before someone trusts a misleading investment result**.
+
+Instead of building another project that claims to predict stock prices, you build a system that answers:
+
+> “Can I trust the data behind this financial analysis?”
+
+That is a much more unusual and credible quant-finance project.
+
+---
+
+## 1. The problem you are solving
+
+Quantitative researchers use historical data to test strategies.
+
+For example, someone might test this strategy:
+
+> At the beginning of every month, buy companies with the strongest recent revenue growth.
+
+The backtest might report:
+
+- 18% annual return
+- Sharpe ratio of 1.8
+- Low drawdown
+- Strong performance over ten years
+
+It looks impressive. But the result could be completely false because the dataset accidentally gave the strategy information that was not available at the time.
+
+The strategy may be profitable only because the data “cheated.”
+
+Your project identifies and demonstrates these kinds of problems.
+
+---
+
+# 2. The most important concept: point-in-time data
+
+Suppose a company’s quarter ends on **March 31**.
+
+The company reports its revenue on **May 5**.
+
+These dates mean different things:
+
+| Date | Meaning |
+|---|---|
+| March 31 | The period the financial number describes |
+| May 5 | The date investors actually learned the number |
+
+A correct historical dataset should say:
+
+```text id="xydjf2"
+Revenue period ended: March 31
+Information available: May 5
+```
+
+But a bad dataset might say:
+
+```text id="itf775"
+Revenue period ended: March 31
+Information available: March 31
+```
+
+Now imagine that your backtest makes a trading decision on April 15.
+
+The bad dataset allows the strategy to use the company’s revenue even though the revenue was not announced until May 5.
+
+That is **look-ahead bias**.
+
+Your backtest has effectively traveled into the future.
+
+## Clean version
+
+```text id="29hh2n"
+Decision date: April 15
+Revenue filing date: May 5
+Can strategy use revenue? No
+```
+
+## Corrupted version
+
+```text id="zsgnbj"
+Decision date: April 15
+Revenue availability incorrectly changed to March 31
+Can strategy use revenue? Yes
+```
+
+The corrupted version may produce an excellent backtest, but its performance is imaginary.
+
+---
+
+# 3. What your program will do
+
+Your program will follow this pipeline:
+
+```text id="g2cpty"
+Financial data
+      ↓
+Create clean point-in-time dataset
+      ↓
+Intentionally inject realistic defects
+      ↓
+Run data-quality detectors
+      ↓
+Measure which defects were detected
+      ↓
+Measure how the defects changed the research result
+      ↓
+Produce an audit report
+```
+
+The system has two sides:
+
+### Chaos side
+
+This part intentionally damages the data.
+
+Examples:
+
+- Change filing dates
+- Duplicate rows
+- Delete observations
+- Change millions into thousands
+- Replace one company’s data with another company’s data
+- Replace historically available values with later revised values
+
+### Audit side
+
+This part attempts to detect the damage.
+
+Examples:
+
+- Find data used before its publication date
+- Detect unexpected unit changes
+- Identify duplicate observations
+- Detect suspiciously large jumps
+- Find inconsistent company identifiers
+- Identify values that changed without revision history
+
+Because your program secretly knows what it corrupted, it can objectively measure how well the auditor performed.
+
+---
+
+# 4. A concrete example
+
+Imagine your clean dataset contains:
+
+| Company | Period end | Filed date | Revenue |
+|---|---:|---:|---:|
+| Alpha Corp | March 31 | May 5 | $500M |
+| Beta Corp | March 31 | April 28 | $450M |
+
+You want to rank companies using information available on April 30.
+
+The correct result is:
+
+| Company | Revenue available April 30? |
+|---|---|
+| Alpha Corp | No |
+| Beta Corp | Yes |
+
+Alpha’s revenue should not appear in the ranking because it was filed on May 5.
+
+Your fault injector changes Alpha’s availability date:
+
+```text id="2rwwil"
+Original available date: May 5
+Corrupted available date: March 31
+```
+
+The bad backtest now uses Alpha’s future revenue.
+
+Your detector should produce something like:
+
+```text id="34ywj0"
+LOOK_AHEAD_VIOLATION
+
+Company: Alpha Corp
+Financial concept: Revenue
+Research date: 2025-04-30
+Actual filing date: 2025-05-05
+Days of leaked information: 5
+Affected experiments: revenue_growth_strategy
+Severity: High
+```
+
+That explanation is more useful than simply saying:
+
+```text id="qqr9zr"
+Error found on row 384
+```
+
+---
+
+# 5. What is a fault injector?
+
+A **fault injector** is a Python function that intentionally introduces one kind of error.
+
+For example:
+
+```python id="28v1vv"
+def inject_lookahead_error(data, days_shifted):
+    corrupted = data.copy()
+    corrupted["available_at"] = (
+        corrupted["available_at"]
+        - pd.to_timedelta(days_shifted, unit="D")
+    )
+    return corrupted
+```
+
+The real version should not corrupt every row. It might:
+
+1. Randomly select 5% of observations.
+2. Move their availability dates backward.
+3. Record exactly which rows were changed.
+4. Save those changes in a fault manifest.
+
+---
+
+# 6. What is the fault manifest?
+
+The **fault manifest** is the hidden answer key.
+
+It records every intentional defect.
+
+Example:
+
+```json id="en2grh"
+{
+  "experiment_id": "run_0042",
+  "seed": 42,
+  "faults": [
+    {
+      "fault_id": "fault_001",
+      "fault_type": "lookahead_timestamp",
+      "company": "Alpha Corp",
+      "row_id": 384,
+      "original_available_at": "2025-05-05",
+      "corrupted_available_at": "2025-03-31",
+      "severity": "medium"
+    }
+  ]
+}
+```
+
+The auditor does not receive the manifest when it runs.
+
+After the audit finishes, your scoring system compares:
+
+```text id="5avjml"
+Defects that actually existed
+versus
+Defects reported by the auditor
+```
+
+That lets you measure whether your detector is genuinely effective.
+
+---
+
+# 7. The six defects you should implement
+
+For a one-month beginner project, these six provide a strong balance between sophistication and feasibility.
+
+## 1. Look-ahead timestamp
+
+Move the availability date backward so that information appears to have been known earlier.
+
+**Real-world cause:** A researcher uses the financial period-end date instead of the actual filing date.
+
+**Detector:** Verify that a data value was not used before its filing or publication date.
+
+---
+
+## 2. Restatement overwrite
+
+Companies occasionally revise previously reported financial information.
+
+A poorly designed dataset might replace the old value with the revised value everywhere in history.
+
+Example:
+
+```text id="z9v9i1"
+Originally reported revenue: $500M
+Later revised revenue: $460M
+```
+
+A backtest conducted as of the original filing should use $500 million because that was what investors knew then. It should not silently use the later $460 million revision.
+
+**Detector:** Check whether later values have overwritten earlier vintages.
+
+ALFRED is especially useful for understanding this concept because it lets developers retrieve economic information as it was known at an earlier date. Its API also provides vintage dates showing when values were released or revised. ([fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/fred/))
+
+---
+
+## 3. Unit drift
+
+Change a value’s units.
+
+Example:
+
+```text id="kfd716"
+Correct value: $500 million
+Corrupted value: $500 thousand
+```
+
+Or:
+
+```text id="nm79js"
+Correct unit: USD
+Corrupted unit: USD millions
+```
+
+This could create a 1,000-times error.
+
+**Detector:**
+
+- Compare units across periods.
+- Detect extremely large percentage changes.
+- Verify that the expected unit matches the financial concept.
+
+---
+
+## 4. Duplicate observations
+
+Insert the same financial observation multiple times.
+
+Duplicates can cause:
+
+- Incorrect averages
+- Double-counted revenue
+- Incorrect company rankings
+- Inflated sample sizes
+- Misleading statistical confidence
+
+**Detector:** Search for repeated combinations such as:
+
+```text id="w25ifq"
+company + concept + period_end + filing_date + value
+```
+
+---
+
+## 5. Missing observations
+
+Delete selected rows.
+
+The danger is not only missing data. The danger is that the missingness may not be random.
+
+For example, imagine deleting observations primarily from companies that later failed. The remaining dataset would make historical performance look much better.
+
+**Detector:**
+
+- Check expected reporting frequency.
+- Identify gaps between quarters.
+- Compare missingness across companies, industries and time periods.
+
+---
+
+## 6. Entity swap
+
+Replace one company’s data with another company’s identifier.
+
+Example:
+
+```text id="hnfg8u"
+Apple revenue accidentally assigned to another company
+```
+
+This can happen when systems rely on ticker symbols. Tickers can change or be reused, while stable identifiers are safer for historical data.
+
+**Detector:**
+
+- Validate identifier mappings.
+- Check company name, CIK and ticker consistency.
+- Detect implausible changes in scale.
+- Compare entity metadata across periods.
+
+---
+
+# 8. Why SEC Company Facts is a good starting source
+
+The SEC provides JSON APIs through `data.sec.gov`. The APIs do not require an API key and include company filing histories and extracted XBRL financial-statement data. The Company Facts endpoint retrieves a company’s standardized XBRL concepts in one request. The SEC also publishes bulk archives for larger downloads. ([sec.gov](https://www.sec.gov/search-filings/edgar-application-programming-interfaces))
+
+A simplified SEC fact can contain information such as:
+
+```python id="r1fc7c"
+{
+    "company": "Example Company",
+    "concept": "Revenue",
+    "unit": "USD",
+    "period_end": "2025-03-31",
+    "filed": "2025-05-05",
+    "form": "10-Q",
+    "accession_number": "..."
+}
+```
+
+The important fields for your first experiment are:
+
+- Company identifier
+- Financial concept
+- Value
+- Unit
+- Period start and end
+- Filing date
+- Filing form
+- Filing accession number
+
+The accession number helps trace a value back to a specific filing.
+
+The SEC says its submissions and XBRL APIs update as filings are disseminated, and it republishes bulk JSON archives nightly. ([sec.gov](https://www.sec.gov/search-filings/edgar-application-programming-interfaces))
+
+Your downloader should also:
+
+- Cache downloaded responses.
+- Identify itself with a proper user-agent.
+- Avoid repeatedly downloading the same data.
+- Remain below the SEC’s current guideline of ten requests per second. ([sec.gov](https://www.sec.gov/about/developer-resources))
+
+---
+
+# 9. The main parts of the application
+
+## Part 1: Data ingestion
+
+This module downloads and normalizes SEC data.
+
+```text id="7j0k2p"
+SEC JSON
+   ↓
+Python downloader
+   ↓
+Normalized pandas DataFrame
+   ↓
+Parquet or CSV file
+```
+
+A useful normalized schema would be:
+
+```text id="k5qiu2"
+entity_id
+entity_name
+concept
+value
+unit
+period_start
+period_end
+filed_at
+available_at
+form
+accession_number
+source
+```
+
+At first:
+
+```text id="bfq0j3"
+available_at = filed_at
+```
+
+Later, you can make availability more sophisticated.
+
+---
+
+## Part 2: Point-in-time dataset builder
+
+This function answers:
+
+> “What information was available on a particular date?”
+
+Conceptually:
+
+```python id="svggqy"
+def information_available_as_of(data, research_date):
+    return data[data["available_at"] <= research_date]
+```
+
+This is one of the most important functions in the entire project.
+
+---
+
+## Part 3: Fault injectors
+
+Each injector should:
+
+1. Accept clean data.
+2. Accept a random seed.
+3. Accept a severity level.
+4. Select certain rows.
+5. Modify the rows.
+6. Return corrupted data.
+7. Return a manifest describing the changes.
+
+Example interface:
+
+```python id="55iy5z"
+corrupted, manifest = inject_lookahead(
+    clean_data,
+    fraction=0.05,
+    days_shifted=30,
+    seed=42,
+)
+```
+
+The seed makes the corruption reproducible. Running seed `42` again should produce the same faults.
+
+---
+
+## Part 4: Detectors
+
+Each detector returns findings in a standardized format:
+
+```python id="lvws04"
+{
+    "detector": "lookahead_detector",
+    "row_id": 384,
+    "fault_type": "lookahead_timestamp",
+    "severity": "high",
+    "explanation": "...",
+    "evidence": {...}
+}
+```
+
+Every detector should explain:
+
+- What looks wrong
+- Why it looks wrong
+- Which rows are affected
+- How serious it is
+- How to correct it
+
+---
+
+## Part 5: Scoring engine
+
+The manifest tells you the true faults. The audit report tells you the predicted faults.
+
+You can calculate:
+
+### True positive
+
+A real defect was correctly detected.
+
+### False positive
+
+The program reported a defect where no injected defect existed.
+
+### False negative
+
+A real defect existed, but the program missed it.
+
+### Precision
+
+Of everything the auditor flagged, how much was actually wrong?
+
+```text id="w1f836"
+precision = true positives / all reported defects
+```
+
+### Recall
+
+Of all the defects that existed, how many did the auditor find?
+
+```text id="l2cp6s"
+recall = true positives / all actual defects
+```
+
+A useful report might say:
+
+```text id="dfgypx"
+Injected faults: 100
+Detected correctly: 87
+Missed: 13
+Incorrect warnings: 8
+
+Precision: 91.6%
+Recall: 87.0%
+```
+
+This gives you defensible results for a résumé and demonstration.
+
+---
+
+## Part 6: Downstream-damage measurement
+
+Finding defects is only half the project.
+
+You also want to prove that the defects matter.
+
+Run the same analysis three times:
+
+```text id="rueqxg"
+Clean dataset
+Corrupted dataset
+Repaired dataset
+```
+
+Then compare results such as:
+
+- Company-ranking changes
+- Portfolio composition changes
+- Return inflation
+- Sharpe-ratio inflation
+- Maximum-drawdown changes
+- Statistical-significance changes
+- Number of affected research dates
+
+Example:
+
+```text id="q9r4a9"
+Clean strategy Sharpe ratio:       0.74
+Corrupted strategy Sharpe ratio:   1.62
+Repaired strategy Sharpe ratio:    0.76
+
+False Sharpe inflation: +0.88
+```
+
+The central lesson is not that the strategy is good. It is that one data problem made a mediocre strategy appear excellent.
+
+---
+
+# 10. What the dashboard should show
+
+Your Streamlit dashboard should tell a story rather than display dozens of unrelated charts.
+
+## Screen 1: Select experiment
+
+```text id="yqmruu"
+Dataset: SEC fundamentals
+Fault type: Look-ahead bias
+Severity: Medium
+Random seed: 42
+```
+
+## Screen 2: The convincing result
+
+Show the corrupted research result first.
+
+```text id="3ohked"
+Annual return: 17.8%
+Sharpe ratio: 1.62
+```
+
+The viewer initially thinks the strategy works.
+
+## Screen 3: Reveal the fault
+
+Show:
+
+- Rows that were corrupted
+- Original dates
+- Corrupted dates
+- How many days of future information leaked
+- Which trading decisions were affected
+
+## Screen 4: Corrected result
+
+```text id="bxmmj4"
+Correct annual return: 8.1%
+Correct Sharpe ratio: 0.74
+```
+
+## Screen 5: Auditor score
+
+```text id="f92rvn"
+Precision: 92%
+Recall: 87%
+False-positive rate: 3%
+Damage identified: 0.88 Sharpe points
+```
+
+This creates a strong three-minute demonstration:
+
+```text id="2o05s1"
+Impressive result
+      ↓
+Hidden defect revealed
+      ↓
+Auditor catches defect
+      ↓
+Correct result shown
+```
+
+---
+
+# 11. What the command-line tool could look like
+
+A user might create a corrupted benchmark with:
+
+```bash id="axvap3"
+quantcheck inject \
+  --input clean.parquet \
+  --fault lookahead \
+  --severity medium \
+  --seed 42
+```
+
+Then audit it:
+
+```bash id="zi4b67"
+quantcheck audit corrupted.parquet
+```
+
+Then score the audit:
+
+```bash id="db8num"
+quantcheck score \
+  --findings findings.json \
+  --manifest manifest.json
+```
+
+Possible output:
+
+```text id="sw2oxf"
+QuantCheck Audit Report
+
+Rows analyzed: 14,382
+Warnings found: 47
+Critical findings: 8
+
+Look-ahead violations: 6
+Unit inconsistencies: 2
+Duplicate observations: 31
+Missing-quarter warnings: 8
+
+Overall reliability score: 72/100
+```
+
+You do not need to finish an enterprise-quality CLI during the first week. First make the Python functions work. Add the CLI after the vertical slice works.
+
+---
+
+# 12. Recommended Python technology stack
+
+Keep the first version relatively small.
+
+| Purpose | Tool |
+|---|---|
+| Data manipulation | `pandas` |
+| SEC requests | `requests` or `httpx` |
+| Data validation | `pydantic` |
+| File storage | Parquet using `pyarrow` |
+| CLI | `typer` |
+| Tests | `pytest` |
+| Dashboard | `streamlit` |
+| Charts | `plotly` or `matplotlib` |
+| Packaging | `pyproject.toml` |
+| Automated testing | GitHub Actions |
+
+You do not need:
+
+- Deep learning
+- Complex machine learning
+- High-frequency market data
+- Options pricing
+- Real-money trading
+- A large cloud architecture
+- A React frontend
+- Twenty different data sources
+
+The project’s strength comes from **careful methodology**, not technical clutter.
+
+---
+
+# 13. Suggested repository structure
+
+```text id="bivqd2"
+quant-data-chaos-lab/
+│
+├── pyproject.toml
+├── README.md
+├── LICENSE
+│
+├── src/
+│   └── quantcheck/
+│       ├── __init__.py
+│       ├── cli.py
+│       │
+│       ├── ingestion/
+│       │   ├── sec_client.py
+│       │   └── normalize.py
+│       │
+│       ├── point_in_time/
+│       │   └── builder.py
+│       │
+│       ├── injectors/
+│       │   ├── lookahead.py
+│       │   ├── restatement.py
+│       │   ├── unit_drift.py
+│       │   ├── duplicates.py
+│       │   ├── missing_rows.py
+│       │   └── entity_swap.py
+│       │
+│       ├── detectors/
+│       │   ├── lookahead.py
+│       │   ├── units.py
+│       │   ├── duplicates.py
+│       │   ├── missingness.py
+│       │   └── entities.py
+│       │
+│       ├── scoring/
+│       │   ├── detection_metrics.py
+│       │   └── research_damage.py
+│       │
+│       └── schemas/
+│           ├── facts.py
+│           ├── manifest.py
+│           └── findings.py
+│
+├── dashboard/
+│   └── app.py
+│
+├── tests/
+│   ├── test_lookahead.py
+│   ├── test_unit_drift.py
+│   └── test_scoring.py
+│
+├── examples/
+│   └── false_alpha_demo.ipynb
+│
+└── data/
+    ├── raw/
+    ├── clean/
+    └── corrupted/
+```
+
+You do not have to create all these files on the first day. This structure shows where the project can grow.
+
+---
+
+# 14. A realistic one-month plan
+
+## Week 1: Build one complete vertical slice
+
+Do only one defect: **look-ahead bias**.
+
+Your target pipeline:
+
+```text id="shtzch"
+Download SEC data
+      ↓
+Normalize it
+      ↓
+Build point-in-time table
+      ↓
+Corrupt filing dates
+      ↓
+Detect the corruption
+      ↓
+Show affected rows
+```
+
+Use approximately:
+
+- 5–10 companies
+- One or two financial concepts
+- Several quarterly filings
+- One research-ranking example
+
+By the end of the week, you should be able to demonstrate the complete idea, even if the interface is basic.
+
+### Week 1 success condition
+
+This should work:
+
+```python id="d2ubuj"
+clean = load_sec_facts(...)
+corrupted, manifest = inject_lookahead(clean, seed=42)
+findings = detect_lookahead(corrupted)
+score = evaluate(findings, manifest)
+```
+
+---
+
+## Week 2: Build the benchmark
+
+Add:
+
+- Unit drift
+- Duplicate observations
+- Missing observations
+- Entity swaps
+- Restatement overwrites
+
+Each injector needs:
+
+- Deterministic random seed
+- Severity settings
+- Fault manifest
+- Unit tests
+- Corresponding detector
+
+Possible severity design:
+
+```text id="ib6xo4"
+Low:     1% of rows affected
+Medium:  5% of rows affected
+High:   15% of rows affected
+```
+
+Severity can also control how subtle the change is.
+
+---
+
+## Week 3: Turn it into a product
+
+Build:
+
+- `quantcheck` CLI
+- Streamlit dashboard
+- Standardized JSON audit reports
+- Pytest-compatible checks
+- GitHub Actions test workflow
+
+Example CI behavior:
+
+```text id="blw3m1"
+Pull request opened
+      ↓
+Financial-data tests run
+      ↓
+Look-ahead violation detected
+      ↓
+Build fails
+      ↓
+Developer sees affected rows
+```
+
+That begins to resemble a real B2B product rather than a school notebook.
+
+---
+
+## Week 4: Produce evidence
+
+Run at least 100 seeded experiments.
+
+For example:
+
+```text id="l91x4v"
+6 fault types
+× 3 severity levels
+× multiple random seeds
+```
+
+Analyze:
+
+- Which defects are easiest to detect?
+- Which are hardest?
+- When do false positives occur?
+- Which defects create the greatest research distortion?
+- Does detection performance decline for subtle faults?
+- Which detector needs improvement?
+
+Then produce:
+
+1. A polished README
+2. A public dashboard
+3. A three-minute video
+4. A technical report
+5. Reproducible benchmark results
+6. Architecture diagram
+7. Example notebook
+
+This final evidence is more valuable than adding several unfinished features.
+
+---
+
+# 15. The most important scope decision
+
+Do **not** begin by building all six injectors.
+
+Start with this exact experiment:
+
+> A financial fact describes a quarter ending March 31, but it was not filed until May 5. Corrupt the dataset so it appears available on March 31. Detect the leak and show which research decisions improperly used it.
+
+That single vertical slice teaches you:
+
+- Calling an API
+- Working with JSON
+- Using pandas
+- Date manipulation
+- Financial filings
+- Point-in-time research
+- Data validation
+- Testing
+- Benchmark scoring
+- Dashboard development
+
+After that works, additional fault injectors become variations of a known pattern.
+
+---
+
+# 16. Why this is a quant-finance project
+
+It is not merely a data-cleaning tool.
+
+Quantitative finance depends on:
+
+- Correct historical timestamps
+- Reproducible backtests
+- Reliable security identifiers
+- Proper handling of revisions
+- Survivorship-free datasets
+- Corporate-action adjustments
+- Statistical validity
+- Research auditability
+
+Your system connects data defects directly to:
+
+- Investment rankings
+- Portfolio decisions
+- Return calculations
+- Risk estimates
+- Statistical confidence
+- Apparent alpha
+
+The project demonstrates that you understand an important quant principle:
+
+> A sophisticated model cannot rescue an invalid dataset.
+
+---
+
+# 17. Why this can become a startup
+
+The open-source project is the testing laboratory.
+
+The potential startup is a **financial-data reliability platform**.
+
+A professional version could connect to a firm’s research pipeline and provide:
+
+```text id="pcciih"
+Vendor data feeds
+      ↓
+Automated validation
+      ↓
+Revision and timestamp monitoring
+      ↓
+Research-impact analysis
+      ↓
+Approval or blocked deployment
+      ↓
+Audit evidence
+```
+
+Potential customers could include:
+
+- Quantitative investment teams
+- Fintech companies
+- Financial-data vendors
+- Risk-management teams
+- Research organizations
+- Universities and trading clubs
+
+Possible paid features:
+
+- Hosted dataset monitoring
+- Vendor-feed comparisons
+- Data-lineage tracking
+- Revision alerts
+- Point-in-time validation
+- CI integration
+- Incident replay
+- Compliance reports
+- Team dashboards
+- Historical audit storage
+
+The one-month project does not need to prove the entire business. It needs to prove the core capability:
+
+> Realistic financial-data defects can be injected, detected, explained and measured.
+
+---
+
+# 18. What makes the project impressive
+
+A common student project says:
+
+> “I trained a machine-learning model that achieved 78% stock-prediction accuracy.”
+
+Interviewers may immediately question:
+
+- Was there leakage?
+- Were transaction costs included?
+- Was the test set truly unseen?
+- Did the dataset contain survivorship bias?
+- Was the result overfit?
+
+Your project begins with those questions.
+
+It demonstrates:
+
+- Intellectual maturity
+- Skepticism about backtests
+- Financial-data knowledge
+- Software engineering
+- Statistical evaluation
+- Reproducibility
+- Testing
+- Product thinking
+- Startup potential
+
+It also gives you a strong transfer-application story:
+
+> I originally wanted to build a model that predicted financial markets. While learning about backtesting, I discovered that incorrect timestamps, revisions and identifiers could make an unsuccessful strategy appear successful. I therefore built a framework that deliberately introduces realistic financial-data failures and measures whether research systems can detect them.
+
+---
+
+# 19. A strong minimum viable product
+
+Your project is complete enough to present when it can do the following:
+
+1. Download and normalize SEC financial facts.
+2. Build a point-in-time dataset.
+3. Inject at least four realistic defect types.
+4. Save a machine-readable fault manifest.
+5. Detect the injected defects.
+6. Calculate precision, recall and false-positive rate.
+7. Show how corruption changed a financial analysis.
+8. Run from Python and a CLI.
+9. Include automated tests.
+10. Present one polished interactive demonstration.
+11. Run at least 100 reproducible benchmark cases.
+12. Explain failures honestly.
+
+The application does not need to consistently detect 100% of defects. In fact, documenting where the system fails makes the project more credible.
+
+---
+
+# 20. Your first coding milestone
+
+Build only this:
+
+```text id="bjozlo"
+Input:
+SEC facts for several companies
+
+Clean rule:
+A fact cannot be used before its filed date
+
+Injected fault:
+Move selected filed dates backward by 30–90 days
+
+Detector:
+Flag facts available before their true filing dates
+
+Output:
+Affected rows, leaked days, precision and recall
+```
+
+Once this works from beginning to end, you have the foundation of the complete Quant Data Chaos Lab.
