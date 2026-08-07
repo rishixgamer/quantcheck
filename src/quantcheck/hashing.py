@@ -36,6 +36,7 @@ __all__ = [
     "AUDIT_INPUT_SNAPSHOT_NAMESPACE",
     "CASE_CONFIG_NAMESPACE",
     "DATASET_SNAPSHOT_NAMESPACE",
+    "REVISION_NAMESPACE",
     "SOURCE_RECORD_NAMESPACE",
     "STABLE_ID_DIGEST_LENGTH",
     "STABLE_ID_SCHEME",
@@ -47,6 +48,7 @@ __all__ = [
     "case_config_identity_matches",
     "dataset_snapshot_id",
     "dataset_snapshot_identity_matches",
+    "revision_id",
     "sha256_hex_of_bytes",
     "source_record_id",
     "stable_id",
@@ -64,6 +66,7 @@ SOURCE_RECORD_NAMESPACE = "quantcheck/source-record/v1"
 DATASET_SNAPSHOT_NAMESPACE = "quantcheck/dataset-snapshot/v1"
 AUDIT_INPUT_SNAPSHOT_NAMESPACE = "quantcheck/audit-input-snapshot/v1"
 CASE_CONFIG_NAMESPACE = "quantcheck/case-config/v1"
+REVISION_NAMESPACE = "quantcheck/revision/v1"
 
 _PREFIX_PATTERN = re.compile(r"^[a-z][a-z0-9]{0,15}$")
 _MIN_DIGEST_LENGTH = 8
@@ -135,6 +138,29 @@ def source_record_id(*, source_name: str, source_locator: str, source_row_key: s
         "source_row_key": source_row_key,
     }
     return stable_id(prefix="rec", namespace=SOURCE_RECORD_NAMESPACE, payload=payload)
+
+
+def revision_id(*, lineage_id: str, sequence: int) -> str:
+    """Return the ``rev_`` identifier for one entry of a declared revision lineage.
+
+    The payload is the source-declared lineage key and its sequence number —
+    never a list position, never a value comparison. Two records only belong
+    to the same revision history when a source explicitly says so; this
+    helper never infers that from matching business-key fields.
+
+    This identifier is not stored on any schema field: :class:`FinancialFact`
+    is frozen by the Milestone 1 golden vectors, so adding a field would
+    change every fact's canonical bytes. Point-in-time revision ordering
+    instead reads the lineage and sequence directly from the declared
+    ``source_row_key`` (see ``quantcheck.point_in_time``); this helper exists
+    so that lineage/sequence pairs have their own stable, testable identity.
+    """
+    if isinstance(sequence, bool) or not isinstance(sequence, int):
+        raise CanonicalizationError(f"sequence must be an integer, got {type(sequence).__name__}")
+    if sequence < 1:
+        raise CanonicalizationError("sequence must be a positive integer")
+    payload = {"lineage_id": lineage_id, "sequence": sequence}
+    return stable_id(prefix="rev", namespace=REVISION_NAMESPACE, payload=payload)
 
 
 class _RecordLike(Protocol):

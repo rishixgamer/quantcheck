@@ -126,6 +126,19 @@ envelope = {
 | `dataset_snapshot_id` | `snap` | `quantcheck/dataset-snapshot/v1` | dataset name, as-of date, records sorted by `record_id` |
 | `audit_input_snapshot_id` | `audit` | `quantcheck/audit-input-snapshot/v1` | dataset name, as-of date, records sorted by `record_id` |
 | `case_config_id` | `case` | `quantcheck/case-config/v1` | case name, dataset name, as-of date, seed, spec version |
+| `revision_id` | `rev` | `quantcheck/revision/v1` | a declared revision lineage's id and its sequence number |
+
+`revision_id` (Milestone 2) is not stored on any schema field: `FinancialFact`
+is frozen by the Milestone 1 golden vectors below, so adding a field to it
+would change every fact's canonical bytes. A record's membership in a
+revision lineage is instead declared directly inside its own
+`SourceReference.source_row_key`, using the `"<lineage_id>#r<sequence>"`
+marker documented in `quantcheck.point_in_time`. `revision_id` gives that
+declared `(lineage_id, sequence)` pair its own stable, testable identity —
+it is used for identifier-stability tests, not persisted in any artifact.
+Because `AuditInputRecord` never carries `source_row_key`, this marker (and
+therefore the revision lineage and sequence) never crosses the
+`sanitize_for_audit` boundary.
 
 Later milestones will need further identifiers (modified records, duplicate
 occurrences, manifests, findings, reports). Their payloads are **not**

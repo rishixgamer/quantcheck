@@ -2,15 +2,31 @@
 
 The canonical contract layer — strict JSON value types, immutable domain
 schemas, one canonical serialization path, SHA-256 hashing, and deterministic
-stable identifiers — is implemented. Fixtures, point-in-time snapshot
-selection, the SEC adapter, fault injectors, detectors, scoring, benchmark
-artifacts, and presentation are not.
+stable identifiers — is implemented. The deterministic reviewed fixture,
+point-in-time snapshot construction with explicit revision ordering, and the
+``sanitize_for_audit`` trust boundary are implemented. The SEC adapter, fault
+injectors, detectors, scoring, benchmark artifacts, and presentation are not.
 """
 
+from quantcheck.audit_boundary import sanitize_for_audit
+from quantcheck.fixtures import (
+    DEFAULT_FIXTURE_SEED,
+    EXPECTED_FIXTURE_RECORD_COUNT,
+    FIXTURE_NAME,
+    FIXTURE_SOURCE_LOCATOR,
+    FIXTURE_SPEC_VERSION,
+    RowSpec,
+    build_fixture_records,
+    canonical_reviewed_fixture_bytes,
+    default_row_specs,
+    generate_reviewed_fixture,
+    reviewed_fixture_payload,
+)
 from quantcheck.hashing import (
     AUDIT_INPUT_SNAPSHOT_NAMESPACE,
     CASE_CONFIG_NAMESPACE,
     DATASET_SNAPSHOT_NAMESPACE,
+    REVISION_NAMESPACE,
     SOURCE_RECORD_NAMESPACE,
     STABLE_ID_DIGEST_LENGTH,
     STABLE_ID_SCHEME,
@@ -22,6 +38,7 @@ from quantcheck.hashing import (
     case_config_identity_matches,
     dataset_snapshot_id,
     dataset_snapshot_identity_matches,
+    revision_id,
     sha256_hex_of_bytes,
     source_record_id,
     stable_id,
@@ -35,6 +52,12 @@ from quantcheck.json_types import (
     parse_canonical_date,
     parse_canonical_datetime,
     parse_canonical_decimal,
+)
+from quantcheck.point_in_time import (
+    AmbiguousRevisionHistoryError,
+    RevisionLineage,
+    build_dataset_snapshot,
+    parse_declared_revision_lineage,
 )
 from quantcheck.schemas import (
     ArtifactIdentity,
@@ -62,9 +85,16 @@ __all__ = [
     "AUDIT_INPUT_SNAPSHOT_NAMESPACE",
     "CASE_CONFIG_NAMESPACE",
     "DATASET_SNAPSHOT_NAMESPACE",
+    "DEFAULT_FIXTURE_SEED",
+    "EXPECTED_FIXTURE_RECORD_COUNT",
+    "FIXTURE_NAME",
+    "FIXTURE_SOURCE_LOCATOR",
+    "FIXTURE_SPEC_VERSION",
+    "REVISION_NAMESPACE",
     "SOURCE_RECORD_NAMESPACE",
     "STABLE_ID_DIGEST_LENGTH",
     "STABLE_ID_SCHEME",
+    "AmbiguousRevisionHistoryError",
     "ArtifactIdentity",
     "AuditInputRecord",
     "AuditInputSnapshot",
@@ -76,26 +106,37 @@ __all__ = [
     "FinancialFact",
     "JsonValue",
     "PeriodType",
+    "RevisionLineage",
+    "RowSpec",
     "RuntimeMetadata",
     "SourceReference",
     "__version__",
     "audit_input_snapshot_id",
     "audit_input_snapshot_identity_matches",
     "build_artifact_identity",
+    "build_dataset_snapshot",
+    "build_fixture_records",
     "canonical_date_string",
     "canonical_datetime_string",
     "canonical_decimal_string",
     "canonical_json_bytes",
     "canonical_json_text",
+    "canonical_reviewed_fixture_bytes",
     "canonical_sha256",
     "case_config_id",
     "case_config_identity_matches",
     "dataset_snapshot_id",
     "dataset_snapshot_identity_matches",
+    "default_row_specs",
+    "generate_reviewed_fixture",
     "parse_canonical_date",
     "parse_canonical_datetime",
     "parse_canonical_decimal",
     "parse_canonical_json",
+    "parse_declared_revision_lineage",
+    "revision_id",
+    "reviewed_fixture_payload",
+    "sanitize_for_audit",
     "sha256_hex_of_bytes",
     "source_record_id",
     "stable_id",
