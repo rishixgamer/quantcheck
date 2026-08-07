@@ -8,18 +8,31 @@ statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
 
 ## Current implementation status
 
-**Recovery Milestone 0 (repository bootstrap) is complete.** The repository
-has a minimal, typed `quantcheck` package, a `uv`-managed toolchain (Ruff,
-MyPy, pytest, Hypothesis), an installed `quantcheck` CLI entry point that
-supports only `--help`/`--version`, and a CI workflow that runs the baseline
-quality gates.
+**Milestone 0 (repository bootstrap) and Milestone 1 (canonical contract
+layer) are complete.** The repository has a typed `quantcheck` package, a
+`uv`-managed toolchain (Ruff, MyPy, pytest, Hypothesis), an installed
+`quantcheck` CLI entry point that supports only `--help`/`--version`, and a CI
+workflow that runs the baseline quality gates.
 
-**Not implemented yet:** financial schemas, canonical serialization, point-in-time
-snapshots, fixtures, the SEC adapter, fault injectors, detectors, scoring,
-benchmark artifacts, and the dashboard/HTML presentation layer. No benchmark
-metrics, hashes, or test counts from any prior implementation apply to this
-repository. `IMPLEMENT.md` is the authoritative record of current status and
-the next task.
+Milestone 1 provides the deterministic layer everything else will depend on:
+
+- strict JSON-domain value types and exact `Decimal`/`date`/UTC-timestamp encodings;
+- immutable, strictly validated Pydantic v2 schemas (`FinancialFact`,
+  `SourceReference`, `Dimension`, `DatasetSnapshot`, `AuditInputRecord`,
+  `AuditInputSnapshot`, `CaseConfig`, `RuntimeMetadata`, `ArtifactIdentity`);
+- one canonical serialization path producing deterministic UTF-8 bytes;
+- SHA-256 content hashes and prefixed, row-order-independent stable identifiers.
+
+The rules are documented in [`docs/SERIALIZATION_AND_HASHING.md`](docs/SERIALIZATION_AND_HASHING.md)
+and frozen by static golden vectors in `tests/`.
+
+**Not implemented yet:** fixtures, point-in-time snapshot selection, revision
+ordering, sanitized audit-input conversion, the SEC adapter, fault injectors,
+detectors, manifests, scoring, benchmark artifacts, and the dashboard/HTML
+presentation layer. No benchmark metrics, hashes, or test counts from any prior
+implementation apply to this repository; the original serialization contract did
+not survive, so no historical digest is reproduced or claimed. `IMPLEMENT.md` is
+the authoritative record of current status and the next task.
 
 ## Development setup
 
