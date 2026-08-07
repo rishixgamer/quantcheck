@@ -54,3 +54,29 @@ The seed only ever changes one documented field — entity 1's `entity_name`
 ("Aster Analytics Corp" vs. "Aster Analytics Corporation") — so that
 different-seed variation is deterministic, small, and does not depend on
 `random`.
+
+## Curated SEC Company Facts field shapes
+
+`sec_companyfacts_curated.json` is a separate 12-entry **curated public
+field-shape fixture** for the narrow SEC adapter. It uses the public Apple CIK
+and standard SEC taxonomy/concept names, but its compact values and selection
+are purpose-built for tests. It is not claimed to be a verbatim downloaded
+response, and no live SEC request was used to create it.
+
+The reviewed allowlist accepts seven entries across `us-gaap:Assets`,
+`us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax`, and
+`us-gaap:SalesRevenueNet`, using `USD`, forms `10-K`/`10-Q`, and filing dates
+from 2022-01-01 through 2024-12-31. Five other entries exercise one exclusion
+each for taxonomy, concept, unit, form, and filing-date range. Accepted data
+covers instant and duration periods, zero and negative values, exact
+accessions, and duplicate-looking independent occurrences. Tests derive
+malformed allowlisted and unsupported-segment variants from these bytes and
+assert explicit rejection; invalid data is not silently accepted in the
+reviewed successful result.
+
+Regenerate or verify this fixture with:
+
+```bash
+uv run python scripts/generate_reviewed_sec_fixture.py
+uv run python scripts/generate_reviewed_sec_fixture.py --check
+```

@@ -395,7 +395,8 @@ def test_public_export_is_available(name: str) -> None:
 def test_importing_quantcheck_pulls_in_no_heavy_dependency() -> None:
     import sys
 
-    forbidden = {"pandas", "numpy", "httpx", "streamlit", "pyarrow", "matplotlib"}
+    # HTTPX is the intentionally introduced Milestone 4 runtime dependency.
+    forbidden = {"pandas", "numpy", "streamlit", "pyarrow", "matplotlib", "typer"}
     assert forbidden.isdisjoint(sys.modules)
 
 

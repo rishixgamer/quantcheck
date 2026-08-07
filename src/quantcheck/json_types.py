@@ -75,7 +75,13 @@ def canonical_decimal_string(value: Decimal) -> str:
         raise CanonicalizationError(f"expected Decimal, got {type(value).__name__}")
     if not value.is_finite():
         raise CanonicalizationError(f"non-finite Decimal is not serializable: {value!s}")
-    text = format(value.normalize(), "f")
+    # ``Decimal.normalize()`` applies the active arithmetic context and can
+    # silently round values whose coefficient exceeds that context precision.
+    # Fixed-point formatting itself is exact; remove only insignificant
+    # fractional zeroes afterward so numeric equality still maps to one form.
+    text = format(value, "f")
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
     if text.startswith("-") and set(text[1:]) <= {"0", "."}:
         text = text[1:]
     return text
