@@ -27,6 +27,7 @@ __all__ = [
     "PRIVATE_CASE_ARTIFACT_NAMES",
     "PRIVATE_ROOT_NAME",
     "PUBLIC_CASE_ARTIFACT_NAMES",
+    "PUBLIC_ROOT_ARTIFACT_NAMES",
     "PUBLIC_ROOT_NAME",
     "REQUIRED_PUBLIC_CASE_ARTIFACTS",
     "SEED_CLASSES",
@@ -55,6 +56,17 @@ SEED_CLASSES: tuple[BenchmarkSeedClass, ...] = ("development", "validation")
 
 PUBLIC_ROOT_NAME = "public"
 PRIVATE_ROOT_NAME = "private"
+
+#: Public artifacts stored at the root of the public tree. The runner owns the
+#: writing of these; the public reader owns the reading. Both address them
+#: through this single mapping so a role name can never mean two paths.
+PUBLIC_ROOT_ARTIFACT_NAMES: dict[str, str] = {
+    "benchmark_config": "benchmark_config.json",
+    "case_matrix": "case_matrix.json",
+    "runtime_metadata": "runtime_metadata.json",
+    "aggregate_report": "aggregate_report.json",
+    "public_index": "index.json",
+}
 
 #: Public per-case artifacts. ``status.json`` is written last and is the only
 #: terminal success marker, but its presence alone never proves success.

@@ -4,7 +4,7 @@ This is the operational handoff between Claude Code sessions. Keep it concise, f
 
 ## Current phase
 
-**Milestone 9 complete — CLI and saved-stage workflow**
+**Milestone 10 complete — Public-only presentation**
 
 The original source repository was lost. Historical 0.1.0 documentation survives under
 `reference/`, but no historical implementation claim is considered current until rebuilt and
@@ -45,8 +45,16 @@ same order, so a staged run and a direct dispatch produce byte-identical artifac
 fault families. It changes no injector, detector, matcher, scorer, replay rule, or research
 calculation, and adds no second serializer or persistence path; `benchmark_dispatch.py`'s five
 single-case helpers were renamed to public names (no behavior change) specifically to make that
-reuse possible without duplicating logic. The presentation layer and release evidence remain
-unimplemented.
+reuse possible without duplicating logic. Milestone 10 adds the public-only presentation layer
+over the artifacts Milestone 8 already writes: a strict `public_artifact_reader` trust boundary
+(role allowlist, layered path security, schema validation, SHA-256 verification, identity
+linkage), one immutable shared `presentation` model, a deterministic self-contained
+`html_summary` renderer, and a standalone read-only Streamlit dashboard in `dashboard/` (outside
+the package, so `import quantcheck` never pulls in Streamlit). Both surfaces render the same
+model, execute no scientific logic, recompute no metric, and work with the entire `private/`
+tree deleted. It changes no injector, detector, threshold, matcher, scorer, denominator,
+severity, replay rule, research calculation, benchmark identity, expansion, or aggregation
+semantic, and adds no CLI root command. Release evidence remains unimplemented.
 
 ## Milestone 0 verification
 
@@ -1553,6 +1561,179 @@ already present.
 - No environmental retries were needed.
 
 
+## Milestone 10 verification
+
+### Scope and contracts
+
+- `RECOVERY_SEQUENCE.md` fixes Phase 10's scope in one sentence and names no artifact format,
+  path rule, null policy, or launch command. ADR-008 in `docs/DECISIONS.md` and the new
+  `docs/DASHBOARD_AND_HTML.md` freeze the rebuilt v1 presentation contract. Historical evidence
+  under `reference/` (a lost `public_artifact_reader.py`/`presentation.py`/`html_summary.py`/
+  `dashboard/app.py` set keyed on `public/artifact_index.json`, and a `streamlit>=1.60,<2`
+  runtime range) is design evidence only: the rebuilt public tree's actual index is
+  `public/index.json`, and no historical byte, hash, metric, test count, or dependency version
+  is claimed or reproduced.
+- Presentation only. No fault family, injector, detector, threshold, matching rule, scoring rule,
+  false-positive denominator, severity semantic, research calculation, replay rule, benchmark
+  case identity, expansion, or aggregation semantic changed. No CLI root command was added: the
+  surface is still exactly `ingest`, `inject`, `audit`, `evaluate`, `explain`, `benchmark`
+  (verified directly against the Typer app). No force-overwrite path exists. Reserved final
+  seeds `1000-1009` remain rejected and none was executed. Package version stays `0.1.0.dev0`.
+
+### Strict public artifact reader
+
+- Added `src/quantcheck/public_artifact_reader.py`. It reuses the existing public Pydantic
+  schemas, the existing canonical parser, the existing `AtomicArtifactStore`, and the existing
+  SHA-256 identity; it defines no second artifact format and no loose-dictionary path. It reads
+  either an output root containing `public/` or a copied-out public tree, the same convention
+  `aggregate_from_public_root` already uses.
+- Root artifact filenames moved into `benchmark_contract.PUBLIC_ROOT_ARTIFACT_NAMES` so the
+  runner and the reader share one mapping; `benchmark_runner`'s five `BENCHMARK_*_PATH`
+  constants now reference it. Behaviour-preserving: the full pre-existing benchmark and CLI
+  suites pass unchanged.
+- Role allowlist is exactly `PUBLIC_ROOT_ARTIFACT_NAMES` + `PUBLIC_CASE_ARTIFACT_NAMES`. An
+  unknown role is rejected, never skipped or guessed.
+- Path security is layered and never repairs: the existing `PUBLIC_RELATIVE_PATH_PATTERN` makes
+  `..`, absolute POSIX paths, backslashes, drive letters, and `~` unrepresentable; a `private`
+  segment is refused separately; and the resolved location must stay under the resolved root,
+  which catches symlink escapes and symlinks into the private tree.
+- Tree-level integrity raises `PublicArtifactError` (missing/malformed root artifact, bad index
+  hash, missing indexed artifact, unknown or mispathed role, cross-case reference, benchmark
+  identity disagreement, status naming a different case). A case whose *success claim* is
+  unsubstantiated becomes `incomplete` - exactly what `benchmark_aggregate` independently does -
+  so the reader can never contradict the saved aggregate about a case outcome. A new check also
+  refuses a tree whose saved `aggregate_report.json` status counts disagree with its saved case
+  statuses.
+- The reader's result carries no filesystem root, destination, or temporary path at all.
+
+### Shared presentation model, HTML, and dashboard
+
+- Added `src/quantcheck/presentation.py`: `BenchmarkPresentation` and its parts, built on the
+  existing `CanonicalModel` (frozen, `extra="forbid"`, strict), so the whole model serializes
+  through the existing canonical serializer and privacy scans run against real bytes. Overall
+  and grouped metrics are the saved aggregate's own numbers copied across, never recomputed;
+  case order follows the saved matrix. `schemas.py` was not touched (its golden vectors are
+  frozen).
+- Metrics stay `Decimal | None` end to end, never through binary `float`. An undefined metric
+  stays `None` in the model - never `0`, `NaN`, `""`, or `"n/a"`; only rendered text says `n/a`.
+- Added `src/quantcheck/html_summary.py`: UTF-8, embedded CSS only, no JavaScript, no remote or
+  CDN resource, no render timestamp, no random identifier, no environment path, every
+  artifact-derived string escaped. Output reuses the existing persistence conventions - atomic
+  write, identical existing bytes reused untouched, conflicting bytes rejected as
+  `ArtifactIntegrityError`, no partial file on failure, and no force option.
+- Added `dashboard/app.py` and `dashboard/__init__.py`: a thin standalone read-only Streamlit
+  app requiring an explicit `--artifacts` root, using Streamlit-native components only, with
+  overview, status counts, overall metrics, saved group summaries, case filters, selected-case
+  summary/score/sanitized research, findings with evidence and explanations, failure and
+  incomplete information, methodology, privacy boundary, and known limitations. Every filter
+  defaults to showing everything. `.streamlit/config.toml` disables usage telemetry.
+- Added `scripts/render_html_summary.py`, matching the existing `scripts/` pattern. Neither
+  surface is wired into the CLI.
+
+### Privacy and isolation evidence
+
+- The presentation code's transitive `quantcheck` import closure is exactly
+  `benchmark_contract`, `benchmark_store`, `hashing`, `json_types`, `schemas`, `serialization`,
+  and `unit_drift_math` - no manifest, injector, detector, scorer, replay, or research module.
+  That closure is pinned by test, so a future import cannot widen it unnoticed.
+- Reader, model, HTML, and dashboard all succeed against a copy of `public/` with the entire
+  private tree physically absent (0 manifests, 0 private artifacts, 73 public files), producing
+  a byte-identical model and byte-identical HTML.
+- Serialized model, rendered HTML, and sanitized Streamlit text contain no manifest id, fault id,
+  or injector selection digest; no manifest/injector field name; no private exception message or
+  class; and no local filesystem path.
+- **Pre-injection record identity is checked per case, not page-wide, and this was verified
+  rather than assumed.** An initial page-wide scan flagged six `rec_*` ids. Tracing each one
+  showed Look-Ahead never leaks its originals; `duplicate_observation` legitimately publishes
+  its original (its injector *adds* a copy, so the original is one half of the real duplicate
+  pair - the same documented exception as `docs/CLI_CONTRACT.md`); and each Unit Drift original
+  appeared only in the *clean control* (where that record is genuinely clean and public) and in
+  the *other seed's* case (where it was never a target and is an ordinary neighbour). Neither
+  appeared in its own case. The test now asserts the property that actually matters: the record
+  a case's own injector replaced never appears in that case's own output.
+
+### Smoke and public-only demonstration
+
+Ran the existing committed 12-case offline smoke configuration (development seed `0`, validation
+seed `100` only) into a fresh temporary root via `quantcheck benchmark smoke`:
+
+- benchmark id `bench_654c76bb7eea251a`, aggregate report id `agg_1dedb2ca9aec9240`;
+- 12 configured, 12 succeeded, 0 failed, 0 incomplete; 8 fault cases, 4 clean controls;
+- precision `0.5`, recall `1`, F1 `0.66666666666666666666666666666666666666666666666667`,
+  false-positive rate `0.084745762711864406779661016949152542372881355932203`.
+
+The presentation model's headline numbers were asserted equal to the saved aggregate field by
+field. Copying only `public/` to a separate location (private tree absent, 0 manifests) and
+repeating reader, model, HTML, and dashboard validation produced an identical aggregate, a
+byte-identical model, and identical HTML. HTML SHA-256
+`d3e433c80a79de47fd3566788938db7497c98fe4a2acd449abbd2b6a3d926107` was produced identically from
+both trees, into two different destinations, under `PYTHONHASHSEED` `0`, `1`, and `987654` (six
+combinations, one hash), and again from a clean wheel install with Streamlit absent entirely.
+No metric is hard-coded from historical 0.1.0 documentation; these are this implementation's own.
+
+### Files added and changed
+
+- Runtime added: `src/quantcheck/public_artifact_reader.py`, `src/quantcheck/presentation.py`,
+  `src/quantcheck/html_summary.py`.
+- Outside the package, added: `dashboard/__init__.py`, `dashboard/app.py`,
+  `scripts/render_html_summary.py`, `.streamlit/config.toml`.
+- Changed: `src/quantcheck/benchmark_contract.py` (new `PUBLIC_ROOT_ARTIFACT_NAMES` mapping),
+  `src/quantcheck/benchmark_runner.py` (five path constants now reference that mapping),
+  `src/quantcheck/__init__.py` (new exports, updated docstring), `pyproject.toml` (new
+  `dashboard` dependency group; sdist exclude widened to `/dashboard`, `/scripts`, `/.streamlit`),
+  `uv.lock`, `README.md`, `docs/DECISIONS.md` (ADR-008), `IMPLEMENT.md`.
+- Docs added: `docs/DASHBOARD_AND_HTML.md`.
+- Tests added: `tests/presentation_helpers.py`, `tests/test_public_artifact_reader.py`,
+  `tests/test_presentation.py`, `tests/test_html_summary.py`, `tests/test_dashboard.py`,
+  `tests/test_presentation_isolation.py`.
+
+### Tests and commands
+
+- Added **145 tests**: reader/path-security/integrity 48, presentation model 17, HTML
+  determinism/escaping/privacy/output 36, Streamlit AppTest 21, isolation/privacy 23. Full
+  suite: **1,391 passed** (1,246 prior + 145 new). No prior test was weakened or removed.
+- Every required command exited 0: `uv sync --all-groups`, `uv sync --frozen --all-groups`,
+  `uv run ruff check .`, `uv run ruff format --check .` (142 files), `uv run mypy src tests`
+  (137 source files, no issues), `MYPYPATH=src uv run mypy --explicit-package-bases dashboard
+  scripts` (5 source files, no issues), `uv run pytest` (1,391 passed), `uv lock --check`,
+  `uv run quantcheck --help`, `uv build --offline`, `git diff --check`.
+- Focused re-runs all passed independently: schema/serialization/golden/hashing 285;
+  fixtures/point-in-time/audit-boundary 93; Look-Ahead 85; Unit Drift 103; Duplicate 96;
+  Revision Overwrite 104; SEC 97; benchmark layer 167; CLI 96; packaging 1; all determinism
+  subprocess suites 61; new presentation suite 145. Both reviewed-fixture `--check` scripts
+  (synthetic and SEC) report byte-identical regeneration.
+- `PYTHONHASHSEED=1` and `PYTHONHASHSEED=987654` each ran the full 124-test presentation
+  determinism/privacy subset green.
+- A real headless Streamlit startup succeeded on the first attempt: Uvicorn bound to
+  `127.0.0.1:8765` and `/_stcore/health` returned `ok`. No browser was opened.
+
+### Packaging and dependencies
+
+- Added the `dashboard` dependency group `streamlit>=1.40,<2`; the lock selects Streamlit
+  `1.61.1` plus its transitive packages. The `uv.lock` diff is purely additive (490 insertions,
+  0 deletions): no previously locked package was upgraded, downgraded, or removed.
+- Streamlit is deliberately **not** a runtime dependency (ADR-008): `dashboard/` is excluded from
+  the wheel and sdist under the same rule already documented for `scripts/`, so declaring it at
+  runtime would burden every consumer with ~35 packages (pandas, NumPy, PyArrow, Tornado) for
+  code the distribution does not ship. This diverges from the historical release's direct runtime
+  range; the divergence is recorded rather than hidden.
+- `uv build --offline` produced a 60-entry wheel containing the 56 runtime modules (53 prior plus
+  `public_artifact_reader.py`, `presentation.py`, `html_summary.py`) and dist-info, and an sdist
+  containing only `src/`, `tests/`, `pyproject.toml`, `uv.lock`, `README.md`, `.python-version`,
+  and `.gitignore`. Scans of both archives found no `reference/`, prompts, `.claude`, `.serena`,
+  `.venv`, `dist/`, caches, bytecode, `docs/`, `dashboard/`, `scripts/`, `.streamlit`, generated
+  artifact tree, private manifest, SEC cache, secret, credential, real checkout path, or
+  username. The only `manifest`-named wheel entries are the four legitimate `*_manifest.py`
+  source modules; the only `/Users/` occurrences in the sdist are literal marker strings inside
+  privacy assertions in test sources (a pre-existing pattern).
+- A clean `uv venv --python 3.12` install of the wheel pulled only the Pydantic/HTTPX/Typer
+  families - **Streamlit is not installed at all** - and `import quantcheck` imported no
+  Streamlit, pandas, NumPy, PyArrow, matplotlib, or Altair. From that clean environment the
+  reader, model, and HTML renderer reproduced the identical HTML SHA-256, and
+  `quantcheck --help` exited 0.
+- No environmental retries were needed at any point.
+
+
 ## Decisions
 
 - **Milestone 1 identifier scheme.** `stable_id` hashes a versioned envelope
@@ -1657,16 +1838,25 @@ already present.
   `0/2/3/4/5/10` exit-code taxonomy, and the `no_args_is_help` no-argument/help behavior. No
   historical CLI flag syntax, JSON field name, or exit-code assignment is claimed byte-identical to
   the lost release.
+- **Public-only presentation boundary, shared model, HTML determinism, and the Streamlit
+  dependency are rebuilt v1 contracts.** ADR-008 freezes the reader's role allowlist and layered
+  path rules, the strict-tree/preserved-incomplete split (tree-level integrity raises; an
+  unsubstantiated success claim becomes `incomplete`, matching `benchmark_aggregate` exactly), the
+  aggregate-versus-status consistency check, the single immutable presentation model both surfaces
+  render, exact `Decimal`/null semantics, the deterministic self-contained HTML contract and its
+  reuse/conflict output behaviour, the standalone read-only dashboard shape, and the decision to
+  carry Streamlit as a `dashboard` dependency group rather than a runtime dependency. No
+  historical presentation byte, hash, metric, or dependency version is claimed.
 
 ## Known limitations
 
 - Only the narrow Look-Ahead `period_end_substitution` subtype, narrow Unit Drift
   `value_scaled_unit_unchanged` subtype, narrow Duplicate Observations `exact_occurrence_copy`
   subtype, narrow Revision Overwrite `later_vintage_in_earlier_state` subtype, narrow SEC
-  adapter, the Milestone 8 benchmark layer, and the Milestone 9 CLI exist. The public presentation
-  layer (Streamlit dashboard, deterministic HTML) and release evidence remain absent. None of the
-  historical 0.1.0 metrics, hashes, or test totals is reproduced or claimed; the smoke figures above
-  are this implementation's own.
+  adapter, the Milestone 8 benchmark layer, the Milestone 9 CLI, and the Milestone 10 public-only
+  presentation layer exist. Release evidence remains absent. None of the historical 0.1.0 metrics,
+  hashes, or test totals is reproduced or claimed; the smoke figures above are this
+  implementation's own.
 - The CLI's `audit --case/--snapshot/--output` standalone form always runs every one of the four
   manifest-blind detectors and brands the combined report with one caller-chosen `fault_profile`'s
   identity, exactly like the benchmark dispatcher's own combined-report convention. There is no
@@ -1773,7 +1963,9 @@ already present.
   a later attempt succeeds. They are forensic history, never read back as case state.
 - Benchmark execution is sequential and local by design. There is no parallelism, no HTML or
   dashboard rendering, no database or cloud persistence, and no force-overwrite path anywhere,
-  including through the Milestone 9 CLI.
+  including through the Milestone 9 CLI. Milestone 10 adds dashboard and HTML rendering as
+  separate, standalone, read-only surfaces over already-saved artifacts; neither runs inside the
+  benchmark, and neither is reachable from the CLI.
 - `CHECKSUMS.md` does not exist in this rebuilt repository and was not created. It is named only
   in the historical `reference/IMPLEMENT_RELEASE_0.1.0.md` describing the lost 0.1.0 tree; no
   Milestone 0-7 work introduced it, no current contract defines its format, and no verifier script
@@ -1781,17 +1973,30 @@ already present.
   conflict with a later contract. Artifact integrity is instead verified by the reviewed-fixture
   and SEC-fixture `--check` scripts, the Milestone 1 golden vectors, and the benchmark's own
   content-hash validation.
+- The dashboard is a local, read-only, single-user Streamlit app: no authentication, accounts,
+  web backend, hosted deployment, or browser-level automation beyond Streamlit's official
+  `AppTest` and a local headless health startup. There is no general artifact browser, no
+  manifest browsing, and no private-value browsing.
+- The public reader deliberately raises on a status file that exists but does not validate,
+  where `benchmark_aggregate` records the case as incomplete. Aggregation must never crash
+  mid-run; the reader is a verification tool and is loud instead. The two agree on every
+  non-tampered tree, and the reader additionally refuses a tree whose saved aggregate
+  contradicts its saved statuses.
+- Case filters use only public dimensions the saved artifacts already carry (fault profile,
+  severity, status, seed class). No new scientific category was invented for the UI.
+- No benchmark truth is committed to the repository for the presentation surfaces to display;
+  both require artifacts produced locally.
+- `dashboard/` and `scripts/` are intentionally outside the wheel and sdist, so an installed
+  distribution ships neither the dashboard nor Streamlit. The installed package still provides
+  the reader, model, and HTML renderer.
 
 ## Exact next task
 
-Implement Recovery Phase 10 — **public-only presentation**: a strict public reader over the existing
-public benchmark/saved-stage artifacts, a shared immutable presentation model, a read-only Streamlit
-app, and deterministic self-contained HTML, as defined in `RECOVERY_SEQUENCE.md`. Reuse the existing
-public schemas (`AuditReport`, `Finding`, `BenchmarkCaseScore`, `BenchmarkResearchSummary`,
-`BenchmarkAggregateReport`, `BenchmarkCaseStatus`) and the CLI's own public-only reading conventions
-(`AtomicArtifactStore`, `docs/CLI_CONTRACT.md`'s privacy rules) rather than inventing a second way to
-read saved artifacts. Do not begin Phase 11 release-evidence work, and do not authorize the reserved
-final seeds `1000-1009`.
+Implement Recovery Phase 11 - **final evidence and release**, as defined in
+`RECOVERY_SEQUENCE.md`: run the rehearsal, freeze the release candidate, authorize the reserved
+final seeds `1000-1009` only through the release path, generate public evidence, verify privacy
+and reproducibility, build packages, and document external gates honestly. Nothing in Milestone
+10 authorized, executed, or prepared a final seed, and no release evidence exists yet.
 
 ## Fixed implementation choices
 
@@ -1806,7 +2011,8 @@ final seeds `1000-1009`.
 - CLI: Typer, introduced at the Milestone 9 CLI milestone (`typer>=0.12,<1`, resolved `0.27.1`)
 - HTTP: HTTPX, introduced with the SEC adapter
 - Tabular processing: pandas and PyArrow, introduced only when required
-- Dashboard: Streamlit, introduced only after benchmark and CLI stability
+- Dashboard: Streamlit, introduced at the Milestone 10 presentation milestone as the
+  optional `dashboard` dependency group (`streamlit>=1.40,<2`, resolved `1.61.1`)
 
 ## Historical target
 
@@ -1825,4 +2031,4 @@ Record:
 
 ## Last updated
 
-2026-08-08 (Milestone 9 complete — CLI and saved-stage workflow)
+2026-08-08 (Milestone 10 complete — public-only presentation)

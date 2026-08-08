@@ -26,6 +26,7 @@ from quantcheck.benchmark_contract import (
     PRIVATE_CASE_ARTIFACT_NAMES,
     PRIVATE_ROOT_NAME,
     PUBLIC_CASE_ARTIFACT_NAMES,
+    PUBLIC_ROOT_ARTIFACT_NAMES,
     PUBLIC_ROOT_NAME,
     REQUIRED_PUBLIC_CASE_ARTIFACTS,
     BenchmarkSeedClassError,
@@ -114,11 +115,13 @@ __all__ = [
     "run_benchmark",
 ]
 
-BENCHMARK_CONFIG_PATH = "benchmark_config.json"
-BENCHMARK_MATRIX_PATH = "case_matrix.json"
-BENCHMARK_RUNTIME_PATH = "runtime_metadata.json"
-BENCHMARK_AGGREGATE_PATH = "aggregate_report.json"
-BENCHMARK_INDEX_PATH = "index.json"
+#: The runner writes these; ``public_artifact_reader`` reads them. Both address
+#: them through one mapping so a role name can never mean two paths.
+BENCHMARK_CONFIG_PATH = PUBLIC_ROOT_ARTIFACT_NAMES["benchmark_config"]
+BENCHMARK_MATRIX_PATH = PUBLIC_ROOT_ARTIFACT_NAMES["case_matrix"]
+BENCHMARK_RUNTIME_PATH = PUBLIC_ROOT_ARTIFACT_NAMES["runtime_metadata"]
+BENCHMARK_AGGREGATE_PATH = PUBLIC_ROOT_ARTIFACT_NAMES["aggregate_report"]
+BENCHMARK_INDEX_PATH = PUBLIC_ROOT_ARTIFACT_NAMES["public_index"]
 
 #: Ordered exception classification. The first matching entry wins, so the
 #: narrow "no eligible target" subclasses must precede their injection bases.

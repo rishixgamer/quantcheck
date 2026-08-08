@@ -8,11 +8,13 @@ statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
 
 ## Current implementation status
 
-**Recovery Phases 0–9 are complete.** The repository has a typed `quantcheck`
+**Recovery Phases 0–10 are complete.** The repository has a typed `quantcheck`
 package, a `uv`-managed toolchain (Ruff, MyPy, pytest, Hypothesis), a
 deterministic benchmark layer over the four completed fault families, an
 installed `quantcheck` CLI (Typer) exposing `ingest sec`, `inject`, `audit`,
-`evaluate`, `benchmark run`, `benchmark smoke`, and `explain`, and a CI
+`evaluate`, `benchmark run`, `benchmark smoke`, and `explain`, a public-only
+presentation layer (strict reader, one shared immutable model, a read-only
+Streamlit dashboard, and a deterministic self-contained HTML summary), and a CI
 workflow that runs the baseline quality gates.
 
 The implemented deterministic foundation includes:
@@ -74,8 +76,17 @@ structured failures, safe resume, and public-only aggregation) and a saved-stage
 `inject`/`audit`/`evaluate` CLI workflow over it are documented in
 `docs/DECISIONS.md` (ADR-006, ADR-007) and `docs/CLI_CONTRACT.md`.
 
-**Not implemented yet:** the dashboard/HTML presentation layer and release
-evidence. No benchmark metrics, hashes, or test counts from any prior
+A public-only presentation layer reads those saved artifacts and nothing else:
+a strict reader with a role allowlist, path security, schema validation, and
+SHA-256 verification; one immutable model shared by both surfaces; a read-only
+Streamlit forensic dashboard; and a deterministic self-contained HTML summary.
+Both surfaces work with the entire `private/` tree deleted and execute no
+scientific logic. See [`docs/DASHBOARD_AND_HTML.md`](docs/DASHBOARD_AND_HTML.md)
+and ADR-008.
+
+**Not implemented yet:** release evidence (Recovery Phase 11). The reserved
+final seeds `1000–1009` remain prohibited, and no final held-out benchmark has
+been run. No benchmark metrics, hashes, or test counts from any prior
 implementation apply to this repository; no historical digest is reproduced
 or claimed. `IMPLEMENT.md` is the authoritative operational record and
 next-task handoff.
@@ -98,6 +109,33 @@ uv run quantcheck explain --dir /tmp/qc-case --finding <finding_id>
 See [`docs/CLI_CONTRACT.md`](docs/CLI_CONTRACT.md) for the full command
 surface, exit-code taxonomy, and privacy rules.
 
+## Reviewing saved results
+
+Both presentation surfaces read saved **public** artifacts only. Neither is a
+`quantcheck` CLI command — the root command surface stays exactly six.
+
+```bash
+# 1. Produce artifacts with the existing offline smoke benchmark.
+uv run quantcheck benchmark smoke --output artifacts/smoke
+
+# 2. Launch the local read-only forensic dashboard.
+uv run --group dashboard streamlit run dashboard/app.py -- --artifacts artifacts/smoke
+
+# 3. Render the deterministic self-contained HTML summary.
+uv run python scripts/render_html_summary.py artifacts/smoke \
+  --output artifacts/smoke/summary.html
+```
+
+The `--` separator is required so the arguments reach the app rather than
+Streamlit. Both surfaces work against a copy of `public/` alone, with the entire
+`private/` tree deleted, and neither runs injection, detection, scoring, replay,
+or private research logic. Streamlit lives in the optional `dashboard`
+dependency group, so an ordinary `import quantcheck` never imports it.
+
+[`docs/DASHBOARD_AND_HTML.md`](docs/DASHBOARD_AND_HTML.md) documents the reader
+trust boundary, path-security rules, privacy and determinism guarantees, the
+null-metric display policy, and how failed and incomplete cases are handled.
+
 ## Development setup
 
 Requires [`uv`](https://docs.astral.sh/uv/) and Python `>=3.12,<3.13` (uv can
@@ -116,6 +154,8 @@ uv run quantcheck --help
 ## Repository layout
 
 - `src/quantcheck/` — the package.
+- `dashboard/` — the standalone read-only Streamlit app (not distributed).
+- `scripts/` — repository development tools (not distributed).
 - `tests/` — unit and smoke tests.
 - `docs/` — current architecture and process documents, starting with
   `docs/AUTHORITY_AND_READING_ORDER.md`.

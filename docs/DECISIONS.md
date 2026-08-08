@@ -618,3 +618,121 @@ public-only boundary, adversarial privacy scans (manifest field names,
 manifest IDs, pre-injection record identity, local paths), subprocess
 execution (console script and `python -m`), and `PYTHONHASHSEED`
 determinism across the full saved-stage workflow all freeze the decision.
+
+## ADR-008 — Public-only presentation: reader boundary, shared model, HTML determinism, and the Streamlit dependency
+
+**Status:** accepted for Recovery Phase 10
+
+**Context.** `RECOVERY_SEQUENCE.md` fixes Phase 10's scope in one sentence —
+"Add a strict public reader, shared immutable presentation model, read-only
+Streamlit app, and deterministic self-contained HTML" — and names no artifact
+format, path rule, null policy, or launch command. `PROJECT_SCOPE.md` lists
+the dashboard and HTML summary as v0.1 surfaces, and
+`MVP_ACCEPTANCE_CRITERIA.md` item 10 requires that both "read public artifacts
+only and do not execute scientific logic". Historical evidence under
+`reference/` describes a lost `public_artifact_reader.py` /
+`presentation.py` / `html_summary.py` / `dashboard/app.py` set keyed on a
+`public/artifact_index.json` entry point and a `streamlit>=1.60,<2` runtime
+range. Per the repository's authority order that is evidence of shape and
+intent only: the rebuilt public tree's actual index is `public/index.json`
+(`benchmark_runner.BENCHMARK_INDEX_PATH`), and no historical byte, hash,
+metric, or dependency version is claimed. This ADR freezes the rebuilt v1
+presentation contract, recorded in full in `docs/DASHBOARD_AND_HTML.md`.
+
+**Decision.**
+
+- **One reader, reusing the existing artifact contract.** `public_artifact_reader`
+  reads the public tree the benchmark already writes, through the existing
+  `AtomicArtifactStore`, the existing canonical parser, the existing Pydantic
+  schemas, and the existing SHA-256 identity. It defines no second artifact
+  format and no loose-dictionary path. Root artifact filenames moved into
+  `benchmark_contract.PUBLIC_ROOT_ARTIFACT_NAMES` so the runner and the reader
+  share one mapping; `benchmark_runner`'s five `BENCHMARK_*_PATH` constants now
+  reference it, a behaviour-preserving change.
+- **Role allowlist.** Exactly the keys of `PUBLIC_ROOT_ARTIFACT_NAMES` and
+  `PUBLIC_CASE_ARTIFACT_NAMES` are readable. An unknown role is rejected, never
+  skipped or guessed, so a future private artifact kind cannot become readable
+  merely by being named in an index.
+- **Path security is layered, and never repairs.** The existing
+  `PUBLIC_RELATIVE_PATH_PATTERN` supplies the grammar, which makes `..`, a
+  leading `/`, a backslash, a drive letter, and `~` *unrepresentable*; a
+  `private` segment is refused separately; and the resolved location must stay
+  under the resolved root, which is what catches symlink escapes and symlinks
+  into the private tree. An unsafe path is rejected, never normalized into a
+  safe-looking one.
+- **Tree-level integrity is strict; case-level outcome mirrors aggregation.**
+  A missing/malformed root artifact, a bad index hash, a missing indexed
+  artifact, an unknown role, a cross-case reference, an unsafe path, a
+  benchmark-identity disagreement, or a status naming a different case raises
+  `PublicArtifactError`. A case whose *success claim* is unsubstantiated
+  becomes `incomplete`, which is exactly what `benchmark_aggregate` already
+  does independently — so the reader can never contradict the saved aggregate
+  about a case's outcome. A case is never dropped and never inferred
+  successful.
+- **The saved aggregate must describe the saved statuses.** The reader refuses
+  a tree whose `aggregate_report.json` status counts disagree with its case
+  statuses, because a rendered page built from a stale aggregate would be
+  quietly self-contradictory.
+- **The reader result carries no filesystem path.** A path that is never
+  carried cannot later be rendered.
+- **One shared immutable model.** `presentation.BenchmarkPresentation` is the
+  single interpretation both surfaces render. Overall and grouped metrics are
+  the saved aggregate's own numbers copied across, never recomputed. Case
+  order follows the saved matrix. Finding evidence is flattened through the
+  existing `to_canonical_json`, so exposing it introduces no new judgment about
+  what is publishable — the evidence models are already public artifacts.
+- **Decimal and null semantics are exact.** Metrics stay `Decimal | None` end
+  to end and never pass through binary `float`. An undefined metric stays
+  `None` in the model; only rendered text says `n/a`. It is never turned into
+  `0`, `NaN`, or an empty string inside the model.
+- **Deterministic HTML.** UTF-8, embedded CSS only, no JavaScript, no remote
+  resource, no render timestamp, no random identifier, no environment path;
+  every artifact-derived string escaped. Identical logical artifacts render
+  byte-identical output regardless of destination, process, or
+  `PYTHONHASHSEED`. Output reuses the existing persistence conventions:
+  atomic write, identical existing bytes reused untouched, conflicting bytes
+  rejected as `ArtifactIntegrityError`. There is no force-overwrite option,
+  matching the rest of the repository.
+- **The dashboard is standalone and read-only.** It lives in `dashboard/`,
+  outside the package, so ordinary `import quantcheck` can never import
+  Streamlit. It requires an explicit `--artifacts` root, uses Streamlit-native
+  components only, adds no CLI command, and every case filter defaults to
+  showing everything — a default that hid failures, incomplete cases, clean
+  controls, or weak results would make a broken benchmark look healthy.
+- **Streamlit is a `dashboard` dependency group, not a runtime dependency.**
+  Range `streamlit>=1.40,<2`; the lock selects `1.61.1` plus its transitive
+  packages, and no previously locked package was upgraded or removed. The
+  dashboard is a repository-local surface: `dashboard/` is excluded from the
+  wheel and sdist under the same rule already documented for `scripts/`, so
+  declaring Streamlit as a runtime dependency would burden every consumer of
+  the distribution with ~35 packages (including pandas, NumPy, and PyArrow) for
+  code the distribution does not ship. This deliberately diverges from the
+  historical release's direct runtime range; the divergence is recorded rather
+  than hidden. A clean wheel install therefore has no Streamlit at all and the
+  reader, model, and HTML renderer still work.
+
+**Consequences.** Presentation cannot become a second access path into private
+truth: its transitive `quantcheck` import closure is exactly
+`benchmark_contract`, `benchmark_store`, `hashing`, `json_types`, `schemas`,
+`serialization`, and `unit_drift_math` — no manifest, injector, detector,
+scorer, replay, or research module — and that closure is pinned by test. No
+fault family, detector, threshold, matching rule, denominator, severity,
+research calculation, replay rule, benchmark identity, expansion, aggregation
+semantic, or CLI root command changed. The six-command CLI surface is
+unchanged and reserved final seeds `1000–1009` remain prohibited.
+
+**Verification.** Strict-reader positive/negative/adversarial cases (unsafe
+paths of every documented shape, symlink escapes into and out of the tree, bad
+hashes, malformed and schema-invalid JSON, wrong benchmark and case identity,
+unknown and mispathed roles, cross-case references, missing indexed artifacts,
+unindexed extras, hostile working directory); exact-aggregate,
+Decimal-precision, null-preservation, group-preservation, and ordering checks
+on the model; HTML determinism across two destinations, three
+`PYTHONHASHSEED` values, a fresh subprocess, and a separate output root;
+escaping of `<`, `>`, `&`, `"`, and `'`; no-JavaScript, no-remote-resource,
+no-timestamp, no-local-path, and no-answer-key scans; output reuse,
+conflict rejection, invalid destinations, and no-partial-file-on-failure;
+official Streamlit `AppTest` startup, overview, counts, metrics, filtering,
+findings, failed/incomplete/null rendering, sanitized errors, and read-only
+verification; and end-to-end runs of reader, model, HTML, and dashboard
+against a copied public tree with the entire private tree absent.

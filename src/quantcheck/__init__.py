@@ -20,7 +20,12 @@ Phase 9 adds the contracted Typer CLI and a saved-stage
 ``inject``/``audit``/``evaluate`` workflow (``quantcheck.saved_case_workflow``)
 over the same benchmark case type and dispatch functions, reachable only
 through ``quantcheck.cli`` so that a bare ``import quantcheck`` never pulls in
-Typer. Presentation and release evidence are not implemented.
+Typer. Recovery Phase 10 adds the public-only presentation layer: the strict
+``public_artifact_reader``, one immutable ``presentation`` model, and the
+deterministic ``html_summary`` renderer over it. The read-only Streamlit
+dashboard lives outside this package (``dashboard/app.py``) so that a bare
+``import quantcheck`` never pulls in Streamlit either. Release evidence is not
+implemented.
 """
 
 from quantcheck.audit_boundary import sanitize_for_audit
@@ -35,6 +40,7 @@ from quantcheck.benchmark_contract import (
     PRIVATE_CASE_ARTIFACT_NAMES,
     PRIVATE_ROOT_NAME,
     PUBLIC_CASE_ARTIFACT_NAMES,
+    PUBLIC_ROOT_ARTIFACT_NAMES,
     PUBLIC_ROOT_NAME,
     REQUIRED_PUBLIC_CASE_ARTIFACTS,
     SEED_CLASSES,
@@ -263,6 +269,12 @@ from quantcheck.hashing import (
     unit_drift_research_result_id,
     unit_drift_score_report_id,
 )
+from quantcheck.html_summary import (
+    HTML_SUMMARY_SUFFIX,
+    HtmlSummaryError,
+    render_html_summary,
+    write_html_summary,
+)
 from quantcheck.json_types import (
     CanonicalizationError,
     JsonValue,
@@ -322,6 +334,27 @@ from quantcheck.point_in_time import (
     RevisionLineage,
     build_dataset_snapshot,
     parse_declared_revision_lineage,
+)
+from quantcheck.presentation import (
+    BenchmarkPresentation,
+    PresentationCase,
+    PresentationEvidenceItem,
+    PresentationFailure,
+    PresentationFinding,
+    PresentationGroup,
+    PresentationMetrics,
+    PresentationResearch,
+    build_presentation,
+    metric_text,
+)
+from quantcheck.public_artifact_reader import (
+    PUBLIC_ARTIFACT_ROLES,
+    PublicArtifactError,
+    PublicBenchmarkArtifacts,
+    PublicCaseArtifacts,
+    read_public_benchmark,
+    resolve_public_path,
+    validate_public_relative_path,
 )
 from quantcheck.revision_overwrite_contract import (
     REVISION_OVERWRITE_DETECTOR_ID,
@@ -633,6 +666,7 @@ __all__ = [
     "BenchmarkResearchSummary",
     "BenchmarkRevisionOverwriteProfile",
     "BenchmarkRevisionOverwriteResearch",
+    "BenchmarkPresentation",
     "BenchmarkRunResult",
     "BenchmarkRuntimeMetadata",
     "BenchmarkSeedClassError",
@@ -640,11 +674,25 @@ __all__ = [
     "BenchmarkUnitDriftResearch",
     "DEVELOPMENT_SEED_RANGE",
     "FINAL_SEED_RANGE",
+    "HTML_SUMMARY_SUFFIX",
+    "HtmlSummaryError",
     "PRIVATE_CASE_ARTIFACT_NAMES",
     "PRIVATE_ROOT_NAME",
+    "PUBLIC_ARTIFACT_ROLES",
     "PUBLIC_CASE_ARTIFACT_NAMES",
     "PUBLIC_RELATIVE_PATH_PATTERN",
+    "PUBLIC_ROOT_ARTIFACT_NAMES",
     "PUBLIC_ROOT_NAME",
+    "PresentationCase",
+    "PresentationEvidenceItem",
+    "PresentationFailure",
+    "PresentationFinding",
+    "PresentationGroup",
+    "PresentationMetrics",
+    "PresentationResearch",
+    "PublicArtifactError",
+    "PublicBenchmarkArtifacts",
+    "PublicCaseArtifacts",
     "REQUIRED_PUBLIC_CASE_ARTIFACTS",
     "REVIEWED_FIXTURE_ID",
     "SEED_CLASSES",
@@ -666,6 +714,7 @@ __all__ = [
     "benchmark_fault_case_id",
     "benchmark_fixture_records",
     "build_benchmark_config",
+    "build_presentation",
     "classify_benchmark_seed",
     "classify_case_exception",
     "clean_snapshot_for_case",
@@ -678,16 +727,22 @@ __all__ = [
     "inject_for_case",
     "is_final_seed",
     "lookahead_research_date",
+    "metric_text",
     "public_case_directory",
+    "read_public_benchmark",
     "redacted_failure_message",
+    "render_html_summary",
     "replay_for_case",
     "research_for_case",
     "research_summary_for_case",
+    "resolve_public_path",
     "run_all_detectors",
     "run_benchmark",
     "score_for_case",
     "smoke_benchmark_config",
     "unit_drift_series_records",
+    "validate_public_relative_path",
+    "write_html_summary",
     "AuditResult",
     "EvaluateResult",
     "InjectResult",

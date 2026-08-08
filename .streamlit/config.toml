@@ -1,0 +1,10 @@
+# Repository-local Streamlit configuration for the read-only forensic dashboard.
+#
+# The dashboard is an offline, local, read-only view of saved public artifacts.
+# It gathers nothing and reports nothing anywhere, so usage telemetry is off.
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
