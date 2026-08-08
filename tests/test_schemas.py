@@ -393,11 +393,25 @@ def test_public_export_is_available(name: str) -> None:
 
 
 def test_importing_quantcheck_pulls_in_no_heavy_dependency() -> None:
+    """Checked in a fresh subprocess so another test file's own legitimate
+    ``quantcheck.cli`` import (which does need Typer) cannot contaminate this
+    process's shared ``sys.modules`` and produce an unrelated false failure.
+    """
+    import subprocess
     import sys
 
-    # HTTPX is the intentionally introduced Milestone 4 runtime dependency.
-    forbidden = {"pandas", "numpy", "streamlit", "pyarrow", "matplotlib", "typer"}
-    assert forbidden.isdisjoint(sys.modules)
+    # HTTPX and Typer are the intentionally introduced Milestone 4/9 runtime
+    # dependencies; neither is imported merely by ``import quantcheck``.
+    script = (
+        "import quantcheck\n"
+        "import sys\n"
+        "forbidden = {'pandas', 'numpy', 'streamlit', 'pyarrow', 'matplotlib', 'typer'}\n"
+        "assert forbidden.isdisjoint(sys.modules), sorted(forbidden & set(sys.modules))\n"
+    )
+    result = subprocess.run(  # noqa: S603
+        [sys.executable, "-c", script], capture_output=True, text=True, timeout=30
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_support_builders_accept_arbitrary_overrides() -> None:

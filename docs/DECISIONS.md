@@ -354,3 +354,267 @@ unchanged.
 negative, audit-isolation, exact scoring/cross-detector, replay/research,
 reviewed integration, bounded property, subprocess, full regression,
 packaging, and clean-wheel tests freeze the decision.
+
+## ADR-006 — Benchmark identity, artifact tree, resume, and aggregate conventions
+
+**Status:** accepted for Recovery Phase 8
+
+**Context.** Recovery Phase 8 requires deterministic benchmark configuration and
+expansion, four-family/all-detector dispatch, public/private atomic artifact
+persistence, structured failures, safe resume, and public-only aggregation.
+Surviving evidence fixes the seed partitions, the twelve-case offline smoke
+shape, and the requirement that a benchmark identity exclude runtime facts. It
+does not define the rebuilt v1 benchmark identity payloads, the combined
+report's identity, the artifact tree, resume validation, the failure taxonomy,
+or the aggregate-level null conventions. Two facts about the *current* rebuilt
+implementation also force configuration choices that no historical document
+anticipated, and both are recorded here rather than resolved by changing
+science.
+
+**Decision.** The smallest deterministic rebuilt-v1 completion:
+
+- **Identity.** `benchmark_id` (`bench_`, namespace
+  `quantcheck/benchmark-config/v1`) is the SHA-256 stable ID of the fully
+  normalized logical configuration. Expanded cases use `bcase_` with two
+  namespaces — `quantcheck/benchmark-fault-case/v1` and
+  `quantcheck/benchmark-clean-control-case/v1` — so a control can never collide
+  with its fault sibling. The aggregate uses `agg_` /
+  `quantcheck/benchmark-aggregate-report/v1`. A case identity covers the
+  benchmark, fixture configuration, injector and detector *component* versions,
+  detector configuration, severity, seed, seed class, target cap, and research
+  configuration. The package version is deliberately **not** in any identity: it
+  is an execution fact and lives in `RuntimeMetadata`, consistent with hard
+  invariant 3, which already treats code version as separate from configuration.
+- **Normalization.** Severities sort by `low < medium < high`, seeds sort
+  ascending, profiles sort by fault profile, and duplicates in any dimension are
+  rejected. Cases execute in lexicographic `benchmark_case_id` order.
+- **Combined report identity.** Every case runs all four detectors on one
+  sanitized input and finalizes exactly one `AuditReport` carrying the *primary*
+  family's `detector_id`, `detector_version`, and audit-report namespace. This
+  is what lets the existing family scorers — three of which assert the report's
+  detector identity — accept the combined report with no change to their code.
+  Findings from the other three detectors are retained verbatim and are counted
+  as false positives under strict primary-class precision.
+- **Clean controls carry their sibling's full configuration.** A control is the
+  same logical case with injection omitted, so its eligible-clean denominator is
+  computed by the *same* frozen eligibility function the injector uses and is
+  directly comparable. A control has no manifest, so it has no `ScoreReport`;
+  `BenchmarkCaseScore` carries the identical `DetectionMetrics` for both kinds
+  and embeds the untouched family `ScoreReport` for fault cases only.
+- **Artifact tree.** `public/` holds the configuration, case matrix, runtime
+  metadata, aggregate report, public index, and per-case configuration,
+  sanitized audit input, audit report, score, sanitized research summary, and
+  terminal status. `private/` holds the clean snapshot, corrupted snapshot,
+  manifest, repaired snapshot, full research impact, a private index, and
+  failure diagnostics. A public artifact reference is a validated relative POSIX
+  path whose segment grammar cannot express `..`, a leading `/`, a backslash, or
+  `~`, and which rejects `private` as a segment — so a public index is
+  structurally incapable of addressing private storage.
+- **Persistence.** Writes are canonical, then temp-file/flush/`fsync`/
+  `os.replace` in the destination directory. Case artifacts are immutable:
+  identical bytes are reused, conflicting bytes raise an integrity error, and no
+  force-overwrite option exists. Runtime metadata, the aggregate report, and the
+  public index are per-run derived artifacts and are replaced, because they are
+  rebuilt from immutable evidence rather than being evidence. The terminal
+  status is written last and is never written over a prior *successful* status.
+- **Resume.** A prior success is reused only after revalidating the status
+  schema, case identity, every referenced path and content hash, the stored case
+  configuration's bytes, the audit-input/report/score linkage, the research
+  summary, and the private index's artifacts and hashes. A prior failure is
+  retried; a case that never reached terminal success is completed; a success
+  whose evidence does not support it becomes an integrity failure and its
+  conflicting artifacts are left untouched.
+- **Failures.** Stages are fixture load, expansion, dispatch, injection, audit
+  sanitization, detection, scoring, repair, research, serialization,
+  persistence, and aggregation. Categories are configuration, no-eligible-
+  targets, integrity, persistence, and internal. Public failures carry a stage,
+  a category, a normalized code, and a **fixed constant** message per category,
+  so no exception text, value, or path can reach a public artifact through
+  formatting. Private diagnostics keep the exception class and a
+  whitespace-collapsed message and no stack trace.
+- **Aggregate null conventions.** Counts micro-sum; metrics are computed once
+  from the summed counts and are never macro-averaged. Precision is
+  `TP / findings`; with no findings it is `1` for a successful fault-free group
+  and null for a fault-bearing group. Recall is null with no injected faults.
+  F1 is null whenever precision or recall is null. False-positive rate is null
+  with no eligible-clean denominator. Failed and incomplete cases stay in the
+  status totals and are excluded from pooled detection metrics.
+- **Sanitized public research summary.** Only the research method, whether the
+  controlled output changed, and whether exact replay restored it. Controlled
+  counts and deltas stay private, because a Look-Ahead availability delta or a
+  Duplicate record-count delta *is* the injected target count.
+- **A second benchmark fixture exists, and Revision Overwrite runs at `low`.**
+  Unit Drift eligibility requires a comparable series of at least three
+  observations; the reviewed fixture has two periods per series and is a
+  documented insufficient-history control with no eligible Unit Drift target at
+  any severity or horizon. The benchmark therefore adds one deterministic
+  offline five-observation series fixture
+  (`quantcheck/benchmark-unit-drift-series/v1`) and refuses any other
+  profile/fixture pairing. Separately, the reviewed fixture's only
+  source-supported adjacent history has a 2% relative revision, which clears
+  `low` (1%) but not `medium` (5%), so the smoke's Revision Overwrite profile
+  runs at `low` while the other three run at `medium`.
+
+**Rejected alternatives.** Relaxing the Unit Drift three-observation
+comparability rule, or the Revision Overwrite relative-size thresholds, to make
+one fixture and one severity cover everything would retune completed science to
+suit orchestration. Suppressing cross-detector findings would inflate precision
+by hiding real detector behavior. Publishing controlled research counts would
+disclose target counts. Minting the combined report in a new benchmark namespace
+would force edits to three completed scorers. Reusing `CaseConfig` for expanded
+benchmark cases would have required adding fields to a Milestone 1 schema frozen
+by golden vectors. Treating file existence as proof of success, or overwriting a
+conflicting prior success, would destroy evidence. A generic plugin registry was
+rejected in favor of an explicit closed four-family dispatcher.
+
+**Compatibility.** Benchmark configuration, case, and aggregate namespaces are
+rebuilt v1 contracts, not historical recovery. Changing identity payloads,
+normalization, the artifact layout, resume validation, the failure taxonomy, or
+the null conventions requires a new specification version. No injector,
+detector, matcher, scorer, replay rule, research calculation, existing schema
+field, identifier, reviewed fixture byte, or golden vector changed; the
+Milestone 8 diff to pre-existing source files is purely additive.
+
+**Verification.** Configuration/expansion, seed-class, dispatch/all-detector,
+cross-detector, artifact/privacy, failure/resume, aggregation, offline smoke,
+property, and subprocess hash-seed tests freeze the decision.
+
+## ADR-007 — CLI command surface, saved-stage workflow, JSON envelope, and exit codes
+
+**Status:** accepted for Recovery Phase 9
+
+**Context.** `RECOVERY_SEQUENCE.md` fixes Phase 9's scope in one sentence —
+"Add the contracted command surface and saved-stage workflow with canonical
+JSON output, stable exit codes, and privacy-safe rendering" — and names no
+concrete command, flag, or exit code. No current `docs/CLI_CONTRACT.md`
+exists, and none of `PROJECT_SCOPE.md`, `MVP_ACCEPTANCE_CRITERIA.md`, or the
+prior ADRs fixes CLI syntax. Historical evidence under `reference/` describes
+a lost six-command Typer CLI (`ingest`, `inject`, `audit`, `evaluate`,
+`benchmark`, `explain`) with exit codes `0/2/3/4/5/10`, but per the repo's
+authority order this is evidence of scale and intent only, not a byte- or
+syntax-identity target. This ADR freezes the rebuilt v1 CLI contract,
+recorded in full in `docs/CLI_CONTRACT.md`.
+
+**Decision.** The smallest deliberate completion of the one-sentence contract:
+
+- **Command surface.** Six root commands: `ingest sec`, `inject`, `audit`,
+  `evaluate`, `benchmark run`, `benchmark smoke`, plus `explain`. No other
+  root command, no `--version` flag, and no separate `python -m quantcheck`
+  behavior — v0.1 does not need them and the historical release's inclusion of
+  a `--version` flag is not itself authority to add one now. The installed
+  console script keeps pointing at `quantcheck.cli:main`, a plain function
+  (unchanged from the Milestone 0 placeholder's entry point), which now wraps
+  a Typer `app` object rather than `argparse`.
+- **Saved-stage workflow.** `inject`/`audit`/`evaluate` operate over the
+  existing `BenchmarkCaseConfig` — the same fully expanded case type
+  `expand_benchmark_cases` already produces — rather than a second,
+  CLI-specific case-definition schema. `quantcheck.saved_case_workflow` is new
+  glue, not new science: it calls the exact functions
+  `dispatch_benchmark_case` calls (`clean_snapshot_for_case`,
+  `inject_for_case`, `sanitize_for_audit`, `run_all_detectors`,
+  `combined_audit_report`, `score_for_case`, `replay_for_case`,
+  `research_for_case`, `fault_score`, `research_summary_for_case`) in the same
+  order over the same persisted evidence, so a staged
+  `inject -> audit -> evaluate` run and one `dispatch_benchmark_case` call
+  produce byte-identical public and private artifacts for all four fault
+  families (verified directly by test). `benchmark_dispatch`'s five
+  single-case helper functions (`_clean_snapshot`, `_inject`, `_score`,
+  `_replay`, `_research`, plus `_eligible_clean_denominator`,
+  `_control_score`, `_fault_score`, `_research_summary`,
+  `_lookahead_research_date`) were renamed to their public forms (dropping the
+  leading underscore, no behavior change) and `run_all_detectors` now takes
+  `detector_configs` directly instead of a full case, specifically so this
+  reuse would not require a second implementation or reaching into another
+  module's private names. `audit` additionally accepts a standalone
+  `--case`/`--snapshot`/`--output` form for auditing an arbitrary canonical
+  `DatasetSnapshot` (for example one built by `ingest sec`) that was never
+  produced by `inject`. A clean control has no manifest and therefore no
+  `evaluate` stage: its `audit` stage is terminal, matching
+  `dispatch_benchmark_case`'s own clean-control branch, which never touches a
+  manifest either.
+- **Artifact layout.** Saved-stage output reuses the exact
+  `public/`/`private/` `AtomicArtifactStore` split and the
+  `cases/<benchmark_case_id>/<artifact>.json` relative path convention the
+  benchmark runner already uses, so a saved-stage tree and a benchmark-run
+  tree are laid out identically and existing artifact-name constants
+  (`PUBLIC_CASE_ARTIFACT_NAMES`, `PRIVATE_CASE_ARTIFACT_NAMES`,
+  `public_case_directory`) are reused rather than duplicated.
+- **SEC ingestion.** `ingest sec` wraps `SecCompanyFactsAdapter` exactly:
+  `fetch`/`replay`/`normalize`/`build_snapshot`, unchanged. `SecNormalizationConfig`
+  is a plain dataclass, not a Pydantic schema, so its CLI-input JSON shape is
+  validated by an explicit exact-field-set check before construction — this
+  is the one place the CLI enforces strictness itself rather than delegating
+  to a schema, and it widens nothing the adapter did not already accept.
+  `--replay-only` is a thin, explicit wrapper over the adapter's own
+  `.replay()`, added so a test (or an operator) can assert zero network
+  access at the CLI boundary without relying on cache-hit behavior alone.
+- **Machine output.** Exactly one `canonical_json_bytes(payload)` call per
+  command, where `payload` is a plain `dict[str, object]` of primitives, IDs,
+  and (for `audit`) public `Finding` models — reusing the single canonical
+  serializer rather than `json.dumps`. Every payload is an explicit finite
+  allowlist of fields (verified by test for `inject` and `evaluate`); nothing
+  a command did not explicitly choose to include can appear.
+- **Exit codes.** `0` success; `2` user/configuration input (bad path, bad
+  JSON, schema/enum/seed rejection, broken artifact identity); `3`
+  saved-artifact/integrity/persistence problems
+  (`SavedStageError`/`ArtifactIntegrityError`/`ArtifactPersistenceError`); `4`
+  SEC source/cache/normalization (`SecAdapterError` and its subclasses); `5`
+  a structured failed-or-incomplete benchmark outcome (`benchmark run`/
+  `benchmark smoke` only, decided from the returned aggregate's counts, never
+  from a raised exception); `10` an unexpected internal error, reported with
+  the fixed generic sentence "an unexpected internal error occurred" and never
+  the exception's own message. This mirrors the shape of the historical
+  evidence's `0/2/3/4/5/10` mapping because it is a reasonable, complete
+  partition of the failure categories Recovery Phase 9 itself lists, not
+  because the historical numbers are binding.
+- **No-argument and help behavior.** `--help` exits `0`. Invoking any command
+  group with no subcommand (including bare `quantcheck`) shows the same help
+  text but exits `2` — this is Click/Typer's own `no_args_is_help` semantics,
+  a missing-command usage error, not a bespoke choice, and is recorded here so
+  it is not mistaken for an inconsistency.
+- **Privacy.** `audit` (both the `--dir` and `--snapshot` forms) calls only
+  `sanitize_for_audit` plus the four manifest-blind `detect_*` functions and
+  never imports or constructs a manifest type; `evaluate` is the first CLI
+  stage that reads a manifest, and only after a finalized public
+  `AuditReport` already exists on disk. `explain` reads only `public/`,
+  never `private/`, and never reruns a detector.
+
+**Rejected alternatives.** A second, CLI-only case-configuration format was
+rejected because `BenchmarkCaseConfig` already is a fully expanded, strictly
+validated, identity-checked case — inventing another one would duplicate
+Milestone 8's schema for no gain. Reaching into `benchmark_dispatch`'s
+underscore-prefixed helpers from `saved_case_workflow` (instead of renaming
+them to public names) was rejected as an avoidable code smell once the same
+functions were going to be called from two modules. A generic `--config`
+positional-JSON-blob CLI parser (accepting arbitrary loosely-typed dictionaries)
+was rejected in favor of handing parsed JSON straight to the existing strict
+Pydantic models, per the hard invariant that CLI parsing must not weaken
+schema validation. `--held-out`, `--release`, `--force`, and any other
+seed-authorization or overwrite bypass flag were rejected outright: Milestone
+8 deliberately has no override path for final seeds or for `write_immutable`,
+and the CLI must not become the place one is quietly added.
+
+**Compatibility.** This is a rebuilt v1 CLI contract, not a recovery of the
+lost historical one: command names happen to match historical evidence where
+that evidence was a reasonable design, but no flag syntax, exit-code
+assignment, or JSON field name is claimed to be byte- or behavior-identical to
+the lost release. Changing the command surface, the JSON envelope shape, or
+the exit-code mapping requires a new specification version recorded here. No
+injector, detector, matcher, scorer, replay rule, research calculation,
+existing schema field, identifier, benchmark runner/aggregator/store behavior,
+or SEC adapter behavior changed; the `benchmark_dispatch` diff is a
+behavior-preserving rename plus one signature widening
+(`run_all_detectors(audit_input, detector_configs)` instead of
+`run_all_detectors(audit_input, case)`), and every other Milestone 0–8 file is
+either unchanged or additive.
+
+**Verification.** Saved-stage equivalence (all four fault families, byte-for-
+byte against `dispatch_benchmark_case`), strict config loading (malformed
+JSON, invalid UTF-8, wrong suffix, unknown fields, invalid enums, broken
+identity, every reserved final seed 1000–1009), exit-code taxonomy (every
+class, human and `--json`), benchmark run/smoke (including resume and a
+tampered-prior-success exit-5 case), hermetic offline SEC ingestion, `explain`
+public-only boundary, adversarial privacy scans (manifest field names,
+manifest IDs, pre-injection record identity, local paths), subprocess
+execution (console script and `python -m`), and `PYTHONHASHSEED`
+determinism across the full saved-stage workflow all freeze the decision.

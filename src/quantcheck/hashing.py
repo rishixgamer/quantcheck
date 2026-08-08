@@ -34,6 +34,14 @@ from quantcheck.serialization import canonical_json_bytes, to_canonical_json
 
 __all__ = [
     "AUDIT_INPUT_SNAPSHOT_NAMESPACE",
+    "BENCHMARK_AGGREGATE_REPORT_NAMESPACE",
+    "BENCHMARK_CLEAN_CONTROL_CASE_NAMESPACE",
+    "BENCHMARK_CONFIG_NAMESPACE",
+    "BENCHMARK_FAULT_CASE_NAMESPACE",
+    "benchmark_aggregate_report_id",
+    "benchmark_clean_control_case_id",
+    "benchmark_config_id",
+    "benchmark_fault_case_id",
     "CASE_CONFIG_NAMESPACE",
     "DATASET_SNAPSHOT_NAMESPACE",
     "DUPLICATE_AUDIT_REPORT_NAMESPACE",
@@ -169,6 +177,10 @@ REVISION_OVERWRITE_AUDIT_REPORT_NAMESPACE = "quantcheck/revision-overwrite-audit
 REVISION_OVERWRITE_SCORE_REPORT_NAMESPACE = "quantcheck/revision-overwrite-score-report/v1"
 REVISION_OVERWRITE_RESEARCH_RESULT_NAMESPACE = "quantcheck/revision-overwrite-research-result/v1"
 REVISION_OVERWRITE_IMPACT_NAMESPACE = "quantcheck/revision-overwrite-impact/v1"
+BENCHMARK_CONFIG_NAMESPACE = "quantcheck/benchmark-config/v1"
+BENCHMARK_FAULT_CASE_NAMESPACE = "quantcheck/benchmark-fault-case/v1"
+BENCHMARK_CLEAN_CONTROL_CASE_NAMESPACE = "quantcheck/benchmark-clean-control-case/v1"
+BENCHMARK_AGGREGATE_REPORT_NAMESPACE = "quantcheck/benchmark-aggregate-report/v1"
 
 _PREFIX_PATTERN = re.compile(r"^[a-z][a-z0-9]{0,15}$")
 _MIN_DIGEST_LENGTH = 8
@@ -753,4 +765,49 @@ def build_artifact_identity(
         kind=kind,
         stable_id=stable_identifier,
         content_hash=canonical_sha256(content),
+    )
+
+
+def benchmark_config_id(*, config_body: object) -> str:
+    """Return the ``bench_`` identifier for a normalized logical benchmark.
+
+    ``config_body`` is the complete normalized configuration without its own
+    identifier. It must never contain an output root, a temporary directory, a
+    working directory, a clock reading, a hostname, or a username.
+    """
+    return stable_id(
+        prefix="bench",
+        namespace=BENCHMARK_CONFIG_NAMESPACE,
+        payload=config_body,
+    )
+
+
+def benchmark_fault_case_id(*, case_body: object) -> str:
+    """Return the ``bcase_`` identifier for one expanded fault case."""
+    return stable_id(
+        prefix="bcase",
+        namespace=BENCHMARK_FAULT_CASE_NAMESPACE,
+        payload=case_body,
+    )
+
+
+def benchmark_clean_control_case_id(*, case_body: object) -> str:
+    """Return the ``bcase_`` identifier for one expanded clean control.
+
+    Controls use their own namespace so a control can never collide with a
+    fault case that happens to normalize to the same body.
+    """
+    return stable_id(
+        prefix="bcase",
+        namespace=BENCHMARK_CLEAN_CONTROL_CASE_NAMESPACE,
+        payload=case_body,
+    )
+
+
+def benchmark_aggregate_report_id(*, report_body: object) -> str:
+    """Return the ``agg_`` identifier for one rebuilt aggregate report."""
+    return stable_id(
+        prefix="agg",
+        namespace=BENCHMARK_AGGREGATE_REPORT_NAMESPACE,
+        payload=report_body,
     )

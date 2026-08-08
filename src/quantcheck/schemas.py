@@ -32,8 +32,49 @@ from quantcheck.unit_drift_math import decimal_divide, symmetric_absolute_ratio
 __all__ = [
     "AUDIT_INPUT_SNAPSHOT_ID_PATTERN",
     "AUDIT_REPORT_ID_PATTERN",
+    "BENCHMARK_AGGREGATE_ID_PATTERN",
+    "BENCHMARK_CASE_ID_PATTERN",
+    "BENCHMARK_ID_PATTERN",
     "CASE_CONFIG_ID_PATTERN",
     "CONTENT_HASH_PATTERN",
+    "DEVELOPMENT_SEED_RANGE",
+    "FINAL_SEED_RANGE",
+    "PUBLIC_RELATIVE_PATH_PATTERN",
+    "VALIDATION_SEED_RANGE",
+    "BenchmarkAggregateGroup",
+    "BenchmarkAggregateReport",
+    "BenchmarkArtifactReference",
+    "BenchmarkCaseConfig",
+    "BenchmarkCaseKind",
+    "BenchmarkCaseMatrix",
+    "BenchmarkCaseScore",
+    "BenchmarkCaseStatus",
+    "BenchmarkCaseStatusKind",
+    "BenchmarkCleanControl",
+    "BenchmarkConfig",
+    "BenchmarkDetectorConfigs",
+    "BenchmarkDuplicateProfile",
+    "BenchmarkDuplicateResearch",
+    "BenchmarkFailureCategory",
+    "BenchmarkFailureStage",
+    "BenchmarkFaultProfile",
+    "BenchmarkFixtureConfig",
+    "BenchmarkFixtureId",
+    "BenchmarkGrouping",
+    "BenchmarkLookAheadProfile",
+    "BenchmarkLookAheadResearch",
+    "BenchmarkPrivateDiagnostics",
+    "BenchmarkProfile",
+    "BenchmarkPublicFailure",
+    "BenchmarkPublicIndex",
+    "BenchmarkResearchConfig",
+    "BenchmarkResearchSummary",
+    "BenchmarkRevisionOverwriteProfile",
+    "BenchmarkRevisionOverwriteResearch",
+    "BenchmarkRuntimeMetadata",
+    "BenchmarkSeedClass",
+    "BenchmarkUnitDriftProfile",
+    "BenchmarkUnitDriftResearch",
     "DATASET_SNAPSHOT_ID_PATTERN",
     "FAULT_ID_PATTERN",
     "FINDING_ID_PATTERN",
@@ -124,6 +165,22 @@ RESEARCH_RESULT_ID_PATTERN = re.compile(r"^rsch_[0-9a-f]{16}$")
 IMPACT_ID_PATTERN = re.compile(r"^impact_[0-9a-f]{16}$")
 REVISION_ID_PATTERN = re.compile(r"^rev_[0-9a-f]{16}$")
 REVISION_UNIT_ID_PATTERN = re.compile(r"^runit_[0-9a-f]{16}$")
+BENCHMARK_ID_PATTERN = re.compile(r"^bench_[0-9a-f]{16}$")
+BENCHMARK_CASE_ID_PATTERN = re.compile(r"^bcase_[0-9a-f]{16}$")
+BENCHMARK_AGGREGATE_ID_PATTERN = re.compile(r"^agg_[0-9a-f]{16}$")
+
+#: One path segment of a public artifact reference. Segments must start with an
+#: alphanumeric character, which is what makes ``.``, ``..``, absolute paths,
+#: Windows drive letters, and ``~`` unrepresentable rather than merely rejected.
+_PUBLIC_PATH_SEGMENT = r"[A-Za-z0-9][A-Za-z0-9._-]*"
+PUBLIC_RELATIVE_PATH_PATTERN = re.compile(rf"^{_PUBLIC_PATH_SEGMENT}(?:/{_PUBLIC_PATH_SEGMENT})*$")
+
+#: The seed partitions for ordinary benchmark execution. Final/release seeds
+#: exist so that held-out evidence stays held out: they are rejected here and
+#: are authorized only through the later release milestone's own path.
+DEVELOPMENT_SEED_RANGE = range(0, 10)
+VALIDATION_SEED_RANGE = range(100, 110)
+FINAL_SEED_RANGE = range(1000, 1010)
 
 PeriodType = Literal["instant", "duration"]
 LookAheadSeverity = Literal["low", "medium", "high"]
@@ -132,6 +189,42 @@ DuplicateSeverity = Literal["low", "medium", "high"]
 RevisionOverwriteSeverity = Literal["low", "medium", "high"]
 FindingSeverity = Literal["low", "medium", "high"]
 FindingConfidence = Literal["proven_by_contract", "suspicious", "strong"]
+
+BenchmarkFaultProfile = Literal[
+    "lookahead_timestamp",
+    "unit_drift",
+    "duplicate_observation",
+    "revision_overwrite",
+]
+BenchmarkFixtureId = Literal[
+    "quantcheck/reviewed-fixture/v1",
+    "quantcheck/benchmark-unit-drift-series/v1",
+]
+BenchmarkSeedClass = Literal["development", "validation"]
+BenchmarkCaseKind = Literal["fault", "clean_control"]
+BenchmarkCaseStatusKind = Literal["succeeded", "failed", "incomplete"]
+BenchmarkGrouping = Literal["overall", "fault_profile", "severity", "seed_class", "seed"]
+BenchmarkFailureStage = Literal[
+    "fixture_load",
+    "expansion",
+    "dispatch",
+    "injection",
+    "audit_sanitization",
+    "detection",
+    "scoring",
+    "repair",
+    "research",
+    "serialization",
+    "persistence",
+    "aggregation",
+]
+BenchmarkFailureCategory = Literal[
+    "configuration",
+    "no_eligible_targets",
+    "integrity",
+    "persistence",
+    "internal",
+]
 
 
 class CanonicalModel(BaseModel):
@@ -274,6 +367,30 @@ ResearchResultId = Annotated[
 ImpactId = Annotated[str, _pattern_validator(IMPACT_ID_PATTERN, "impact_id")]
 RevisionId = Annotated[str, _pattern_validator(REVISION_ID_PATTERN, "revision_id")]
 RevisionUnitId = Annotated[str, _pattern_validator(REVISION_UNIT_ID_PATTERN, "eligibility_unit_id")]
+BenchmarkId = Annotated[str, _pattern_validator(BENCHMARK_ID_PATTERN, "benchmark_id")]
+BenchmarkCaseId = Annotated[str, _pattern_validator(BENCHMARK_CASE_ID_PATTERN, "benchmark_case_id")]
+BenchmarkAggregateId = Annotated[
+    str, _pattern_validator(BENCHMARK_AGGREGATE_ID_PATTERN, "aggregate_report_id")
+]
+
+
+def _validate_public_relative_path(value: object) -> str:
+    """Accept only a relative POSIX path that stays inside the public tree.
+
+    This is the mechanism that makes a public index structurally incapable of
+    addressing private storage: ``private`` is refused as a segment, and the
+    segment pattern cannot express ``..``, a leading ``/``, a backslash, or a
+    home-directory reference at all.
+    """
+    text = _validate_token(value)
+    if PUBLIC_RELATIVE_PATH_PATTERN.fullmatch(text) is None:
+        raise ValueError(f"malformed public relative path: {text!r}")
+    if any(segment == "private" for segment in text.split("/")):
+        raise ValueError("a public artifact reference must not address private storage")
+    return text
+
+
+PublicRelativePath = Annotated[str, BeforeValidator(_validate_public_relative_path)]
 
 
 class Dimension(CanonicalModel):
@@ -2128,4 +2245,644 @@ class GrowthRankingImpact(CanonicalModel):
             raise ValueError("changed must reflect controlled growth output changes")
         if self.exact_restoration != (self.repaired == self.clean):
             raise ValueError("exact_restoration must reflect exact repaired/clean equality")
+        return self
+
+
+# --- Recovery Phase 8: benchmark configuration, artifact, and aggregate ------
+#
+# Milestone 8 is an orchestration and artifact milestone. Nothing below changes
+# an injector, detector, matcher, scorer, replay rule, or research calculation;
+# these models only describe the logical experiment, the artifacts it persists,
+# and the aggregate rebuilt from the public ones.
+
+
+class BenchmarkFixtureConfig(CanonicalModel):
+    """The exact clean source a benchmark case starts from.
+
+    ``fixture_id`` names an in-package deterministic offline factory, never a
+    path on this machine. ``as_of_date`` is the end-of-day source horizon used
+    to build the clean :class:`DatasetSnapshot`.
+    """
+
+    fixture_id: BenchmarkFixtureId
+    dataset_name: Token
+    as_of_date: FinancialDate
+
+
+class BenchmarkDetectorConfigs(CanonicalModel):
+    """Every detector configuration a benchmark case runs, named explicitly.
+
+    All four detectors run on every case, so their configuration belongs to the
+    benchmark rather than to one fault profile. The Look-Ahead and Duplicate
+    detectors take no public configuration; their contracted versions are still
+    pinned here so an unsupported component is rejected rather than guessed.
+    """
+
+    lookahead_detector_version: Literal["quantcheck/lookahead-detector/v1"] = (
+        "quantcheck/lookahead-detector/v1"
+    )
+    unit_drift_detector_version: Literal["quantcheck/unit-drift-detector/v1"] = (
+        "quantcheck/unit-drift-detector/v1"
+    )
+    unit_drift_detector: UnitDriftDetectorConfig = UnitDriftDetectorConfig()
+    duplicate_detector_version: Literal["quantcheck/duplicate-detector/v1"] = (
+        "quantcheck/duplicate-detector/v1"
+    )
+    revision_overwrite_detector_version: Literal["quantcheck/revision-overwrite-detector/v1"] = (
+        "quantcheck/revision-overwrite-detector/v1"
+    )
+    revision_overwrite_detector: RevisionOverwriteDetectorConfig = RevisionOverwriteDetectorConfig()
+
+
+class BenchmarkLookAheadResearch(CanonicalModel):
+    """Controlled ``availability_count_v0_1`` context for one case."""
+
+    method: Literal["availability_count_v0_1"] = "availability_count_v0_1"
+    research_as_of_date: FinancialDate
+
+
+class BenchmarkUnitDriftResearch(CanonicalModel):
+    """Controlled ``aggregate_value_v0_1`` cutoff for one case.
+
+    The exact comparable series is the injected target's own series, which is
+    private manifest truth and therefore resolved after the audit report is
+    finalized — never guessed here and never expanded into a public case id.
+    """
+
+    method: Literal["aggregate_value_v0_1"] = "aggregate_value_v0_1"
+    research_as_of_date: FinancialDate
+
+
+class BenchmarkDuplicateResearch(CanonicalModel):
+    """Controlled ``record_count_v0_1`` context; it needs no extra parameters."""
+
+    method: Literal["record_count_v0_1"] = "record_count_v0_1"
+
+
+class BenchmarkRevisionOverwriteResearch(CanonicalModel):
+    """Controlled frozen-vintage ``growth_ranking_v0_1`` context for one case."""
+
+    method: Literal["growth_ranking_v0_1"] = "growth_ranking_v0_1"
+    growth_ranking_config: GrowthRankingConfig
+
+
+BenchmarkResearchConfig = (
+    BenchmarkLookAheadResearch
+    | BenchmarkUnitDriftResearch
+    | BenchmarkDuplicateResearch
+    | BenchmarkRevisionOverwriteResearch
+)
+
+_RESEARCH_METHOD_BY_PROFILE: dict[str, str] = {
+    "lookahead_timestamp": "availability_count_v0_1",
+    "unit_drift": "aggregate_value_v0_1",
+    "duplicate_observation": "record_count_v0_1",
+    "revision_overwrite": "growth_ranking_v0_1",
+}
+
+_SEVERITY_VALUES = frozenset({"low", "medium", "high"})
+_SEVERITY_ORDER = {"low": 0, "medium": 1, "high": 2}
+
+
+def _normalize_severities(value: tuple[str, ...]) -> tuple[str, ...]:
+    if not value:
+        raise ValueError("severities must not be empty")
+    if len(set(value)) != len(value):
+        raise ValueError("severities must not contain duplicates")
+    unsupported = sorted(set(value) - _SEVERITY_VALUES)
+    if unsupported:
+        raise ValueError(f"unsupported severity values: {unsupported}")
+    return tuple(sorted(value, key=_SEVERITY_ORDER.__getitem__))
+
+
+BenchmarkSeverities = Annotated[
+    tuple[Token, ...],
+    BeforeValidator(_to_tuple),
+    AfterValidator(_normalize_severities),
+]
+
+
+def _normalize_seeds(value: tuple[int, ...]) -> tuple[int, ...]:
+    if not value:
+        raise ValueError("seeds must not be empty")
+    if len(set(value)) != len(value):
+        raise ValueError("seeds must not contain duplicates")
+    for seed in value:
+        if seed in FINAL_SEED_RANGE:
+            raise ValueError(
+                f"final/release seed {seed} is not authorized for ordinary benchmark execution"
+            )
+        if seed not in DEVELOPMENT_SEED_RANGE and seed not in VALIDATION_SEED_RANGE:
+            raise ValueError(f"unclassified benchmark seed: {seed}")
+    return tuple(sorted(value))
+
+
+BenchmarkSeeds = Annotated[
+    tuple[NonNegativeInteger, ...],
+    BeforeValidator(_to_tuple),
+    AfterValidator(_normalize_seeds),
+]
+
+
+class BenchmarkCleanControl(CanonicalModel):
+    """Which configured cell of a profile also runs as an uncorrupted control.
+
+    A clean control is the same logical case as its fault sibling — same
+    fixture, severity, seed, target cap, and research context — with injection
+    omitted. Keeping the configuration identical is what makes the control's
+    eligible-clean denominator the *same* population the fault case is scored
+    against, so their false-positive evidence is directly comparable.
+    """
+
+    severity: Token
+    seed: NonNegativeInteger
+
+    @model_validator(mode="after")
+    def _check_control(self) -> BenchmarkCleanControl:
+        if self.severity not in _SEVERITY_VALUES:
+            raise ValueError(f"unsupported severity value: {self.severity!r}")
+        if self.seed in FINAL_SEED_RANGE:
+            raise ValueError("final/release seeds are not authorized for ordinary execution")
+        if self.seed not in DEVELOPMENT_SEED_RANGE and self.seed not in VALIDATION_SEED_RANGE:
+            raise ValueError(f"unclassified benchmark seed: {self.seed}")
+        return self
+
+
+class BenchmarkLookAheadProfile(CanonicalModel):
+    """One logical Look-Ahead dimension of the benchmark matrix."""
+
+    fault_profile: Literal["lookahead_timestamp"] = "lookahead_timestamp"
+    injector_spec_version: Literal["quantcheck/lookahead-period-end/v1"] = (
+        "quantcheck/lookahead-period-end/v1"
+    )
+    fixture: BenchmarkFixtureConfig
+    severities: BenchmarkSeverities
+    seeds: BenchmarkSeeds
+    max_targets: PositiveInteger = 100
+    research: BenchmarkLookAheadResearch
+    clean_control: BenchmarkCleanControl | None = None
+
+
+class BenchmarkUnitDriftProfile(CanonicalModel):
+    """One logical Unit Drift dimension of the benchmark matrix."""
+
+    fault_profile: Literal["unit_drift"] = "unit_drift"
+    injector_spec_version: Literal["quantcheck/unit-drift-value-scale/v1"] = (
+        "quantcheck/unit-drift-value-scale/v1"
+    )
+    fixture: BenchmarkFixtureConfig
+    severities: BenchmarkSeverities
+    seeds: BenchmarkSeeds
+    max_targets: PositiveInteger = 100
+    research: BenchmarkUnitDriftResearch
+    clean_control: BenchmarkCleanControl | None = None
+
+
+class BenchmarkDuplicateProfile(CanonicalModel):
+    """One logical Duplicate Observations dimension of the benchmark matrix."""
+
+    fault_profile: Literal["duplicate_observation"] = "duplicate_observation"
+    injector_spec_version: Literal["quantcheck/duplicate-exact-occurrence-copy/v1"] = (
+        "quantcheck/duplicate-exact-occurrence-copy/v1"
+    )
+    fixture: BenchmarkFixtureConfig
+    severities: BenchmarkSeverities
+    seeds: BenchmarkSeeds
+    max_targets: PositiveInteger = 100
+    research: BenchmarkDuplicateResearch
+    clean_control: BenchmarkCleanControl | None = None
+
+
+class BenchmarkRevisionOverwriteProfile(CanonicalModel):
+    """One logical Revision Overwrite dimension of the benchmark matrix."""
+
+    fault_profile: Literal["revision_overwrite"] = "revision_overwrite"
+    injector_spec_version: Literal["quantcheck/revision-overwrite-later-vintage/v1"] = (
+        "quantcheck/revision-overwrite-later-vintage/v1"
+    )
+    fixture: BenchmarkFixtureConfig
+    severities: BenchmarkSeverities
+    seeds: BenchmarkSeeds
+    max_targets: PositiveInteger = 100
+    research: BenchmarkRevisionOverwriteResearch
+    clean_control: BenchmarkCleanControl | None = None
+
+
+BenchmarkProfile = (
+    BenchmarkLookAheadProfile
+    | BenchmarkUnitDriftProfile
+    | BenchmarkDuplicateProfile
+    | BenchmarkRevisionOverwriteProfile
+)
+
+
+def _normalize_profiles(value: tuple[BenchmarkProfile, ...]) -> tuple[BenchmarkProfile, ...]:
+    if not value:
+        raise ValueError("a benchmark matrix must configure at least one fault profile")
+    profiles = [profile.fault_profile for profile in value]
+    if len(set(profiles)) != len(profiles):
+        raise ValueError("fault profiles must not be configured twice")
+    return tuple(sorted(value, key=lambda profile: profile.fault_profile))
+
+
+BenchmarkProfiles = Annotated[
+    tuple[BenchmarkProfile, ...],
+    BeforeValidator(_to_tuple),
+    AfterValidator(_normalize_profiles),
+]
+
+
+class BenchmarkConfig(CanonicalModel):
+    """The complete normalized logical benchmark experiment.
+
+    Everything here changes what the benchmark *means*. Output roots, working
+    directories, temporary directories, clocks, hostnames, usernames, and
+    environment variables are deliberately absent and must never be added:
+    :class:`RuntimeMetadata` records execution facts instead.
+    """
+
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    benchmark_name: Token
+    detector_configs: BenchmarkDetectorConfigs = BenchmarkDetectorConfigs()
+    profiles: BenchmarkProfiles
+
+    @model_validator(mode="after")
+    def _check_profile_research_and_controls(self) -> BenchmarkConfig:
+        for profile in self.profiles:
+            expected = _RESEARCH_METHOD_BY_PROFILE[profile.fault_profile]
+            if profile.research.method != expected:
+                raise ValueError(f"{profile.fault_profile} requires the {expected} research method")
+            control = profile.clean_control
+            if control is not None:
+                if control.severity not in profile.severities:
+                    raise ValueError(
+                        "a clean control must use one of its profile's configured severities"
+                    )
+                if control.seed not in profile.seeds:
+                    raise ValueError(
+                        "a clean control must use one of its profile's configured seeds"
+                    )
+        return self
+
+
+class BenchmarkCaseConfig(CanonicalModel):
+    """One immutable expanded benchmark case.
+
+    ``benchmark_case_id`` covers every input that affects scientific behavior
+    and nothing that does not. A clean control carries the same configuration
+    as its fault sibling and differs only in ``case_kind``; the two identifiers
+    stay distinct because they are minted in different namespaces.
+    """
+
+    benchmark_case_id: BenchmarkCaseId
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    case_kind: BenchmarkCaseKind
+    fault_profile: BenchmarkFaultProfile
+    injector_spec_version: Token
+    fixture: BenchmarkFixtureConfig
+    detector_configs: BenchmarkDetectorConfigs
+    severity: Token
+    seed: NonNegativeInteger
+    seed_class: BenchmarkSeedClass
+    max_targets: PositiveInteger
+    research: BenchmarkResearchConfig
+
+    @model_validator(mode="after")
+    def _check_case_shape(self) -> BenchmarkCaseConfig:
+        if self.severity not in _SEVERITY_VALUES:
+            raise ValueError(f"unsupported severity value: {self.severity!r}")
+        expected = _RESEARCH_METHOD_BY_PROFILE[self.fault_profile]
+        if self.research.method != expected:
+            raise ValueError(f"{self.fault_profile} requires the {expected} research method")
+        if self.seed in FINAL_SEED_RANGE:
+            raise ValueError("final/release seeds are not authorized for ordinary execution")
+        expected_class = "development" if self.seed in DEVELOPMENT_SEED_RANGE else "validation"
+        if self.seed not in DEVELOPMENT_SEED_RANGE and self.seed not in VALIDATION_SEED_RANGE:
+            raise ValueError(f"unclassified benchmark seed: {self.seed}")
+        if self.seed_class != expected_class:
+            raise ValueError("seed_class must match the seed's documented partition")
+        return self
+
+
+def _normalize_cases(value: tuple[BenchmarkCaseConfig, ...]) -> tuple[BenchmarkCaseConfig, ...]:
+    if not value:
+        raise ValueError("an expanded benchmark matrix must contain at least one case")
+    identifiers = [case.benchmark_case_id for case in value]
+    if len(set(identifiers)) != len(identifiers):
+        raise ValueError("expanded benchmark case identifiers must be unique")
+    return tuple(sorted(value, key=lambda case: case.benchmark_case_id))
+
+
+class BenchmarkCaseMatrix(CanonicalModel):
+    """The deterministic expansion of one benchmark configuration."""
+
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    cases: Annotated[
+        tuple[BenchmarkCaseConfig, ...],
+        BeforeValidator(_to_tuple),
+        AfterValidator(_normalize_cases),
+    ]
+    case_count: NonNegativeInteger
+
+    @model_validator(mode="after")
+    def _check_matrix(self) -> BenchmarkCaseMatrix:
+        if self.case_count != len(self.cases):
+            raise ValueError("case_count must equal the number of expanded cases")
+        for case in self.cases:
+            if case.benchmark_id != self.benchmark_id:
+                raise ValueError("every expanded case must belong to its benchmark")
+        return self
+
+
+class BenchmarkRuntimeMetadata(CanonicalModel):
+    """Execution facts for one benchmark run. Never part of logical identity."""
+
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    runtime: RuntimeMetadata
+    case_count: NonNegativeInteger
+
+
+class BenchmarkArtifactReference(CanonicalModel):
+    """One public artifact, addressed relative to the public tree root."""
+
+    kind: Token
+    relative_path: PublicRelativePath
+    content_hash: ContentHash
+
+
+def _normalize_artifact_references(
+    value: tuple[BenchmarkArtifactReference, ...],
+) -> tuple[BenchmarkArtifactReference, ...]:
+    paths = [reference.relative_path for reference in value]
+    if len(set(paths)) != len(paths):
+        raise ValueError("public artifact references must have unique relative paths")
+    return tuple(sorted(value, key=lambda reference: reference.relative_path))
+
+
+BenchmarkArtifactReferences = Annotated[
+    tuple[BenchmarkArtifactReference, ...],
+    BeforeValidator(_to_tuple),
+    AfterValidator(_normalize_artifact_references),
+]
+
+
+class BenchmarkPublicFailure(CanonicalModel):
+    """Stable, redacted public description of one failure.
+
+    It carries no stack trace, no exception message, no private value, and no
+    local path: only a stage, a category, a normalized code, and a fixed
+    human-safe sentence.
+    """
+
+    stage: BenchmarkFailureStage
+    category: BenchmarkFailureCategory
+    error_code: Token
+    message: Token
+
+
+class BenchmarkPrivateDiagnostics(CanonicalModel):
+    """Developer-facing failure detail kept out of every public artifact."""
+
+    benchmark_case_id: BenchmarkCaseId
+    stage: BenchmarkFailureStage
+    category: BenchmarkFailureCategory
+    error_code: Token
+    exception_class: Token
+    exception_message: Token
+
+
+class BenchmarkResearchSummary(CanonicalModel):
+    """The sanitized public view of one case's controlled research comparison.
+
+    It answers exactly two questions — did the corruption change the controlled
+    output, and did exact manifest-assisted replay restore it — plus the method
+    identifier. Counts and values stay in the private research impact, because
+    a controlled count delta would disclose the injected target count.
+    """
+
+    benchmark_case_id: BenchmarkCaseId
+    method: Token
+    changed: bool
+    exact_restoration: bool
+
+
+class BenchmarkCaseScore(CanonicalModel):
+    """The uniform public score the aggregator reads for any case kind.
+
+    Fault cases embed the authoritative fault-family :class:`ScoreReport`
+    unchanged; clean controls have no manifest and therefore no score report,
+    only the same exact :class:`DetectionMetrics` counts.
+    """
+
+    benchmark_case_id: BenchmarkCaseId
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    case_kind: BenchmarkCaseKind
+    fault_profile: BenchmarkFaultProfile
+    severity: Token
+    seed: NonNegativeInteger
+    seed_class: BenchmarkSeedClass
+    metrics: DetectionMetrics
+    f1: UnitIntervalDecimal | None
+    score_report: ScoreReport | None = None
+
+    @model_validator(mode="after")
+    def _check_score_shape(self) -> BenchmarkCaseScore:
+        is_fault = self.case_kind == "fault"
+        if is_fault != (self.score_report is not None):
+            raise ValueError("exactly fault cases carry a fault-family score report")
+        if self.score_report is not None:
+            if self.score_report.metrics != self.metrics:
+                raise ValueError("benchmark metrics must be the score report's own metrics")
+            if self.score_report.f1 != self.f1:
+                raise ValueError("benchmark F1 must be the score report's own F1")
+        else:
+            if self.metrics.injected_faults != 0:
+                raise ValueError("a clean control must not report injected faults")
+        expected_null = self.metrics.precision is None or self.metrics.recall is None
+        if (self.f1 is None) != expected_null:
+            raise ValueError("F1 is null exactly when precision or recall is null")
+        return self
+
+
+class BenchmarkCaseStatus(CanonicalModel):
+    """The terminal public status of one benchmark case.
+
+    This artifact is written last. Its presence alone is not proof of success:
+    resume revalidates every referenced artifact's schema and content hash
+    before reusing a case.
+    """
+
+    benchmark_case_id: BenchmarkCaseId
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    status: BenchmarkCaseStatusKind
+    case_kind: BenchmarkCaseKind
+    fault_profile: BenchmarkFaultProfile
+    severity: Token
+    seed: NonNegativeInteger
+    seed_class: BenchmarkSeedClass
+    artifacts: BenchmarkArtifactReferences = ()
+    failure: BenchmarkPublicFailure | None = None
+
+    @model_validator(mode="after")
+    def _check_status_shape(self) -> BenchmarkCaseStatus:
+        if self.status == "succeeded":
+            if self.failure is not None:
+                raise ValueError("a succeeded case must not carry a failure")
+            if not self.artifacts:
+                raise ValueError("a succeeded case must reference its public artifacts")
+        elif self.failure is None:
+            raise ValueError("a failed or incomplete case must carry a public failure")
+        if self.severity not in _SEVERITY_VALUES:
+            raise ValueError(f"unsupported severity value: {self.severity!r}")
+        return self
+
+
+class BenchmarkPublicIndex(CanonicalModel):
+    """The public navigation surface. It can never address the private tree."""
+
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    entries: BenchmarkArtifactReferences = ()
+
+
+class BenchmarkAggregateGroup(CanonicalModel):
+    """Micro-summed counts and exact Decimal metrics for one group.
+
+    Counts are summed across cases; metrics are computed once from the summed
+    counts. Per-case precision/recall values are never averaged.
+    """
+
+    grouping: BenchmarkGrouping
+    key: Token
+    configured_case_count: NonNegativeInteger
+    successful_case_count: NonNegativeInteger
+    failed_case_count: NonNegativeInteger
+    incomplete_case_count: NonNegativeInteger
+    injected_faults: NonNegativeInteger
+    findings: NonNegativeInteger
+    true_positive_faults: NonNegativeInteger
+    false_negative_faults: NonNegativeInteger
+    true_positive_findings: NonNegativeInteger
+    false_positive_findings: NonNegativeInteger
+    eligible_clean_denominator: NonNegativeInteger
+    precision: UnitIntervalDecimal | None
+    recall: UnitIntervalDecimal | None
+    f1: UnitIntervalDecimal | None
+    false_positive_rate: CanonicalDecimal | None
+    research_summary_count: NonNegativeInteger
+    research_changed_count: NonNegativeInteger
+    replay_restored_count: NonNegativeInteger
+
+    @model_validator(mode="after")
+    def _check_group(self) -> BenchmarkAggregateGroup:
+        statuses = self.successful_case_count + self.failed_case_count + self.incomplete_case_count
+        if statuses != self.configured_case_count:
+            raise ValueError("case statuses must partition the configured case count")
+        if self.true_positive_faults + self.false_negative_faults != self.injected_faults:
+            raise ValueError("fault outcomes must partition injected_faults")
+        if self.true_positive_findings + self.false_positive_findings != self.findings:
+            raise ValueError("finding outcomes must partition findings")
+        if self.true_positive_faults != self.true_positive_findings:
+            raise ValueError("exact one-to-one matching requires equal true-positive counts")
+        if self.research_changed_count > self.research_summary_count:
+            raise ValueError("research_changed_count must not exceed research_summary_count")
+        if self.replay_restored_count > self.research_summary_count:
+            raise ValueError("replay_restored_count must not exceed research_summary_count")
+        with localcontext() as context:
+            context.prec = 50
+            if self.findings:
+                expected_precision = Decimal(self.true_positive_findings) / Decimal(self.findings)
+            elif self.injected_faults == 0 and self.successful_case_count > 0:
+                expected_precision = Decimal(1)
+            else:
+                expected_precision = None
+            expected_recall = (
+                Decimal(self.true_positive_faults) / Decimal(self.injected_faults)
+                if self.injected_faults
+                else None
+            )
+            expected_fpr = (
+                Decimal(self.false_positive_findings) / Decimal(self.eligible_clean_denominator)
+                if self.eligible_clean_denominator
+                else None
+            )
+            if expected_precision is None or expected_recall is None:
+                expected_f1 = None
+            elif expected_precision + expected_recall == 0:
+                expected_f1 = Decimal(0)
+            else:
+                expected_f1 = (Decimal(2) * expected_precision * expected_recall) / (
+                    expected_precision + expected_recall
+                )
+        if self.precision != expected_precision:
+            raise ValueError("precision must follow the documented aggregate convention")
+        if self.recall != expected_recall:
+            raise ValueError("recall must equal true_positive_faults / injected_faults")
+        if self.f1 != expected_f1:
+            raise ValueError("F1 must follow the documented null convention")
+        if self.false_positive_rate != expected_fpr:
+            raise ValueError("false_positive_rate must follow the documented null convention")
+        return self
+
+
+def _normalize_groups(
+    value: tuple[BenchmarkAggregateGroup, ...],
+) -> tuple[BenchmarkAggregateGroup, ...]:
+    keys = [group.key for group in value]
+    if len(set(keys)) != len(keys):
+        raise ValueError("aggregate group keys must be unique within a grouping")
+    return tuple(sorted(value, key=lambda group: group.key))
+
+
+BenchmarkAggregateGroups = Annotated[
+    tuple[BenchmarkAggregateGroup, ...],
+    BeforeValidator(_to_tuple),
+    AfterValidator(_normalize_groups),
+]
+
+
+class BenchmarkAggregateReport(CanonicalModel):
+    """The benchmark result rebuilt exclusively from public saved artifacts."""
+
+    aggregate_report_id: BenchmarkAggregateId
+    benchmark_id: BenchmarkId
+    spec_version: Literal["quantcheck/benchmark/v1"] = "quantcheck/benchmark/v1"
+    overall: BenchmarkAggregateGroup
+    by_fault_profile: BenchmarkAggregateGroups = ()
+    by_severity: BenchmarkAggregateGroups = ()
+    by_seed_class: BenchmarkAggregateGroups = ()
+    by_seed: BenchmarkAggregateGroups = ()
+
+    @model_validator(mode="after")
+    def _check_report(self) -> BenchmarkAggregateReport:
+        if self.overall.grouping != "overall" or self.overall.key != "overall":
+            raise ValueError("the overall group must use the overall grouping and key")
+        expected = {
+            "fault_profile": self.by_fault_profile,
+            "severity": self.by_severity,
+            "seed_class": self.by_seed_class,
+            "seed": self.by_seed,
+        }
+        for grouping, groups in expected.items():
+            for group in groups:
+                if group.grouping != grouping:
+                    raise ValueError(f"group {group.key!r} is not a {grouping} group")
+        # Every case has exactly one fault profile, severity, seed class, and
+        # seed, so each grouping is a total partition of the matrix. A grouping
+        # that does not add up means a case was dropped somewhere.
+        for groups in (
+            self.by_fault_profile,
+            self.by_severity,
+            self.by_seed_class,
+            self.by_seed,
+        ):
+            total = sum(group.configured_case_count for group in groups)
+            if groups and total != self.overall.configured_case_count:
+                raise ValueError("partitioning groups must cover every configured case")
         return self

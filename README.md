@@ -8,9 +8,11 @@ statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
 
 ## Current implementation status
 
-**Recovery Phases 0–7 are complete.** The repository has a typed `quantcheck`
-package, a `uv`-managed toolchain (Ruff, MyPy, pytest, Hypothesis), an installed
-`quantcheck` CLI entry point that supports only `--help`/`--version`, and a CI
+**Recovery Phases 0–9 are complete.** The repository has a typed `quantcheck`
+package, a `uv`-managed toolchain (Ruff, MyPy, pytest, Hypothesis), a
+deterministic benchmark layer over the four completed fault families, an
+installed `quantcheck` CLI (Typer) exposing `ingest sec`, `inject`, `audit`,
+`evaluate`, `benchmark run`, `benchmark smoke`, and `explain`, and a CI
 workflow that runs the baseline quality gates.
 
 The implemented deterministic foundation includes:
@@ -66,11 +68,35 @@ currencies or scale, infer segments/amendments/revisions/duplicates, look up
 tickers, download multiple CIKs, expire caches, or make intraday availability
 claims.
 
-**Not implemented yet:** full benchmark artifacts, contracted Typer CLI, or
-the dashboard/HTML presentation layer. No benchmark metrics, hashes, or test
-counts from any prior implementation apply to this repository; no historical
-digest is reproduced or claimed. `IMPLEMENT.md` is the authoritative
-operational record and next-task handoff.
+A deterministic benchmark layer (strict configuration/expansion, an
+all-four-detector dispatcher, public/private atomic artifact persistence,
+structured failures, safe resume, and public-only aggregation) and a saved-stage
+`inject`/`audit`/`evaluate` CLI workflow over it are documented in
+`docs/DECISIONS.md` (ADR-006, ADR-007) and `docs/CLI_CONTRACT.md`.
+
+**Not implemented yet:** the dashboard/HTML presentation layer and release
+evidence. No benchmark metrics, hashes, or test counts from any prior
+implementation apply to this repository; no historical digest is reproduced
+or claimed. `IMPLEMENT.md` is the authoritative operational record and
+next-task handoff.
+
+## CLI usage
+
+```bash
+# Run the deterministic offline smoke benchmark.
+uv run quantcheck benchmark smoke --output /tmp/qc-smoke --json
+
+# Inject, audit, and evaluate one saved, fully expanded benchmark case.
+uv run quantcheck inject --case case.json --output /tmp/qc-case
+uv run quantcheck audit --dir /tmp/qc-case
+uv run quantcheck evaluate --dir /tmp/qc-case
+
+# Explain one saved public finding.
+uv run quantcheck explain --dir /tmp/qc-case --finding <finding_id>
+```
+
+See [`docs/CLI_CONTRACT.md`](docs/CLI_CONTRACT.md) for the full command
+surface, exit-code taxonomy, and privacy rules.
 
 ## Development setup
 
