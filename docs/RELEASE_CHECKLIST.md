@@ -29,28 +29,32 @@ Status recorded against release candidate `relc_2c6e945a71b85b39`.
 | 21 | `IMPLEMENT.md` updated factually | PASS |
 | 22 | Release checksums current | PASS — `scripts/release_checksums.py --check` |
 
-## External gates — NOT satisfied, and not claimed
+## External gates
 
-These cannot be performed from this environment. None is simulated, and no
-evidence for any of them is fabricated.
+Nothing below is simulated, and no evidence for any of it is fabricated. Gates
+recorded as satisfied name the run or object that satisfies them.
 
 | Gate | Status |
 | --- | --- |
-| GitHub Actions CI | **NOT RUN.** The workflow was validated only by running its constituent commands locally. |
-| Git tag `v0.1.0` | **NOT CREATED.** No tag exists. |
-| GitHub release | **NOT CREATED.** |
-| PyPI / registry publication | **NOT PUBLISHED.** No upload was attempted or authorized. |
+| GitHub Actions CI | **RUN AND GREEN.** Run `31293937904` on commit `5e02c9f`, all eight steps, `success` in 1m44s. One non-blocking annotation: `actions/checkout@v4` and `astral-sh/setup-uv@v4` still target the deprecated Node.js 20. |
+| Git tag `v0.1.0` | **CREATED.** Annotated tag on the release-preparation commit that adds this row. |
+| GitHub release | **CREATED.** Published from the `v0.1.0` tag, with the wheel and sdist attached as assets. |
+| PyPI / registry publication | **NOT PUBLISHED.** No upload was attempted or authorized. Attached release assets are not a package index; `pip install quantcheck` does not resolve. |
 | Hosted dashboard / public URL | **DOES NOT EXIST.** |
 | DOI | **DOES NOT EXIST.** |
 | Recorded demonstration video | **NOT RECORDED.** A storyboard is below; no recording was made. |
 | Third-party attestation / security audit | **NONE.** |
-| Cross-platform verification (Linux, Windows) | **NOT PERFORMED.** Released from macOS arm64 only. |
+| Cross-platform verification (Linux, Windows) | **PARTIAL.** CI covers Ubuntu `x86_64`; the release was produced on macOS `arm64`. Windows is untested. |
 
 ## Commit and publication
 
-Nothing has been committed, staged, tagged, pushed, or published. The working
-tree holds the release for review. `git diff --check` is clean and no generated
-artifact tree, cache, or secret is staged — `release_evidence/` is gitignored.
+The release is committed on `main` and tagged `v0.1.0`. `git diff --check` is
+clean and no generated artifact tree, cache, or secret is tracked —
+`release_evidence/` and `dist/` are gitignored, and the previously tracked
+`.DS_Store` was untracked in the release-preparation commit. The wheel and
+sdist rebuild byte-identically from the tagged source
+(`ff1fff1880796803cf9454c1199c78e3e71bd41889301eb728e75a798dbbef91` and
+`cfc1497d171bc23c01e9558e7f8bb83f5ccfb4ec904019bb05b0b0be43fe75f7`).
 
 ## Three-minute demonstration storyboard
 

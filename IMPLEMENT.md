@@ -1978,11 +1978,13 @@ the standard library and Pydantic. `uv.lock` changed by exactly one line (the pa
 
 ### Git and CI
 
-Working tree holds the release for review. Nothing was committed, staged, tagged, pushed, or
-published. `git diff --check` is clean; `release_evidence/` is gitignored so no generated artifact
-tree, manifest, cache, or secret can be staged. **GitHub Actions has not run** — the workflow was
-validated only by executing its constituent commands locally, and remote CI remains an external
-gate.
+The release was committed as `5e02c9f` and pushed to `main`. `git diff --check` is clean;
+`release_evidence/` and `dist/` are gitignored so no generated artifact tree, manifest, cache, or
+secret can be staged. **GitHub Actions has run**: run `31293937904` executed all eight workflow
+steps against `5e02c9f` and succeeded. A follow-up release-preparation commit untracked `.DS_Store`
+(tracked since the initial commit, never part of `CHECKSUMS.md` or `release_freeze.json`),
+corrected the now-falsified external-gate statements, regenerated `CHECKSUMS.md`, and carries the
+`v0.1.0` tag.
 
 
 ## Decisions

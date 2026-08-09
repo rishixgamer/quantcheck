@@ -87,8 +87,12 @@ handoff's own longer list; anything here is stated for users of the release.
 
 ## Release and external gates
 
-* **GitHub Actions has not run.** The workflow has only been validated by
-  running its constituent commands locally. Remote CI remains an external gate.
-* **Nothing is published.** No Git tag, no GitHub release, no PyPI upload, no
-  hosted dashboard, no public URL, no DOI, no recorded demonstration video, and
-  no external attestation exists.
+* **GitHub Actions has run once, on the release source tree.** Run
+  `31293937904` executed every workflow step against commit
+  `5e02c9f84dafbe49f1f57c30d776d3a46576a9fe` and succeeded. Only Ubuntu
+  `x86_64` is covered; the release was produced on macOS `arm64`.
+* **Published only as source and a GitHub release.** The `v0.1.0` tag has a
+  GitHub release with the wheel and sdist attached. There is no package-index
+  upload, so `pip install quantcheck` does not resolve; install from the
+  attached wheel or from source. No hosted dashboard, public URL, DOI,
+  recorded demonstration video, or external attestation exists.
