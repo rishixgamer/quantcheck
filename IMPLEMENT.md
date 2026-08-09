@@ -2261,27 +2261,59 @@ corrected the now-falsified external-gate statements, regenerated `CHECKSUMS.md`
 
 ## Exact next task
 
-**v0.1 implementation is complete.** All eleven recovery phases are done and every locally
-controllable Milestone 11 gate passes. There is no unfinished v0.1 implementation milestone.
+**v0.1 is released and frozen.** All eleven recovery phases are done, every locally controllable
+Milestone 11 gate passes, GitHub Actions run `31293937904` is green, and the annotated tag
+`v0.1.0` marks the immutable historical baseline. There is no unfinished v0.1 implementation
+milestone.
 
-The next task is **external publication and release review**, which requires actions this
-environment cannot perform and which nobody has authorized:
+The next task is **Post-MVP Milestone A: Benchmark 2.0**.
 
-1. Human review of the working tree diff and of `docs/RELEASE_CHECKLIST.md`.
-2. Commit the release, then create the `v0.1.0` tag — **only on explicit authorization**.
-3. Push and let GitHub Actions run `.github/workflows/ci.yml` for the first time. Remote CI is
-   currently an unverified external gate.
-4. Decide whether to publish a GitHub release and/or a package registry upload. Nothing has been
-   uploaded and no registry credentials were used.
-5. Optionally record the three-minute demonstration from the storyboard in
-   `docs/RELEASE_CHECKLIST.md`. No video exists.
+### The baseline it must not disturb
 
-If post-MVP work is preferred instead of publishing, the honest highest-value candidates — each
-requiring its own milestone and a new release candidate — are: a larger or real-vendor fixture so
-the three structurally ineligible profile/severity cells have targets and the thin denominators
-grow; and a per-detector selection contract so cross-detector findings can be reported without
-counting against strict primary precision. Neither may be started as a way to improve the
-existing held-out numbers, which are now frozen evidence.
+`v0.1.0` is immutable. Milestone A may not amend, re-run, re-score, or re-describe the frozen
+held-out evidence behind it — candidate `relc_2c6e945a71b85b39`, benchmark
+`bench_403a85e506ff66ea`, aggregate `agg_571aae0b7c60a4a5`, and the numbers in
+`docs/FINAL_BENCHMARK_RESULTS.md`. Those stay exactly as tagged, and remain the comparison point
+that any 2.0 result is read against. Benchmark 2.0 is a **new** benchmark with its own release
+candidate, its own freeze record, and its own reserved-seed partition; it does not replace the
+v0.1 numbers in place.
+
+### What it is for
+
+The v0.1 held-out run exposed two structural weaknesses, both preserved rather than tuned away,
+and both diagnosed as measurement problems rather than detector problems:
+
+1. **Thirty `no_eligible_targets` failures** in three profile/severity cells. The reviewed
+   synthetic fixture has no record satisfying those frozen thresholds, so those cells were never
+   actually measured. The denominators that did report are correspondingly thin.
+2. **Seventy-eight false positives, all cross-detector.** Every one is a real finding raised by a
+   detector other than the case's primary fault label, and strict primary-label scoring counts
+   each against precision. Precision `0.625` therefore understates per-detector behaviour by an
+   amount v0.1 cannot separate out.
+
+### Scope
+
+- A larger or real-vendor fixture so the three structurally ineligible profile/severity cells
+  have eligible targets and the reporting denominators grow.
+- A per-detector selection contract so cross-detector findings can be attributed and reported
+  without silently counting against strict primary precision.
+- A fresh rehearsal, freeze, and held-out execution under the existing release-gate machinery,
+  producing a new candidate rather than editing the old one.
+
+### Hard constraint
+
+Neither change may be undertaken as a way to make the v0.1 numbers look better. If Benchmark 2.0
+reports higher precision, the write-up must state plainly which part came from a wider fixture
+and which from a changed scoring contract, and must show the v0.1 numbers unmodified beside it.
+Any threshold, matching-rule, or denominator change is a scientific change requiring its own ADR
+in `docs/DECISIONS.md` and its own release candidate.
+
+### Still-open external gates, deliberately not blocking Milestone A
+
+Package-registry publication, hosted dashboard, DOI, recorded demonstration, third-party
+attestation, and Windows verification. The tag and a GitHub release with the wheel and sdist
+attached are done; the release assets are not a package index, so `pip install quantcheck` still
+does not resolve. See `docs/RELEASE_CHECKLIST.md`.
 
 ## Fixed implementation choices
 
@@ -2317,5 +2349,8 @@ Record:
 
 ## Last updated
 
-2026-08-08 (Milestone 11 complete — final evidence and release; candidate
-`relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`, aggregate `agg_571aae0b7c60a4a5`)
+2026-08-09 (v0.1.0 tagged as the immutable baseline; candidate
+`relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`, aggregate `agg_571aae0b7c60a4a5`.
+Next task: Post-MVP Milestone A — Benchmark 2.0)
+
+2026-08-08 (Milestone 11 complete — final evidence and release)
