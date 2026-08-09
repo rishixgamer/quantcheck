@@ -119,11 +119,25 @@ def test_validation_seeds_are_allowed(seed: int) -> None:
 
 @pytest.mark.parametrize("seed", [1000, 1005, 1009])
 def test_final_release_seeds_remain_prohibited(seed: int) -> None:
+    """A reserved seed can never be executed through an ordinary path.
+
+    Milestone 11 moved where this is enforced. It used to be refused when a
+    *profile* was constructed; it is now refused when a benchmark is built,
+    expanded, or dispatched — because released held-out artifacts have to stay
+    deserializable by the public reader and the presentation surfaces, which
+    execute nothing. The prohibition itself is unchanged and is asserted here
+    at every point that can actually run a case.
+    """
     assert q.is_final_seed(seed)
     with pytest.raises(q.BenchmarkSeedClassError, match="reserved"):
         q.classify_benchmark_seed(seed)
-    with pytest.raises(ValidationError, match="final/release seed"):
-        lookahead_profile(seeds=(seed,))
+    with pytest.raises(q.BenchmarkSeedClassError, match="not authorized"):
+        q.require_seed_execution_authorized(seed)
+    with pytest.raises(q.BenchmarkSeedClassError, match="not authorized"):
+        q.build_benchmark_config(
+            benchmark_name="prohibited",
+            profiles=(lookahead_profile(seeds=(seed,)),),
+        )
 
 
 @pytest.mark.parametrize("seed", [10, 99, 110, 999, 1010])
@@ -151,8 +165,14 @@ def test_milestone8_exposes_no_release_seed_escape_hatch() -> None:
             assert not overlap, f"{module.__name__}.{name} exposes {sorted(overlap)}"
     assert tuple(q.FINAL_SEED_RANGE) == tuple(range(1000, 1010))
     for seed in q.FINAL_SEED_RANGE:
+        # Enforced at the execution boundary since Milestone 11 (see
+        # ``test_final_release_seeds_remain_prohibited``); still no parameter,
+        # flag, or keyword anywhere that would admit one.
         with pytest.raises((q.BenchmarkSeedClassError, ValidationError)):
-            lookahead_profile(seeds=(seed,))
+            q.build_benchmark_config(
+                benchmark_name="escape-hatch",
+                profiles=(lookahead_profile(seeds=(seed,)),),
+            )
 
 
 def test_expansion_covers_every_severity_seed_and_control_cell() -> None:

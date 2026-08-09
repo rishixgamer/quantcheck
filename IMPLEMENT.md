@@ -4,7 +4,7 @@ This is the operational handoff between Claude Code sessions. Keep it concise, f
 
 ## Current phase
 
-**Milestone 10 complete — Public-only presentation**
+**Milestone 11 complete — Final Evidence and Release**
 
 The original source repository was lost. Historical 0.1.0 documentation survives under
 `reference/`, but no historical implementation claim is considered current until rebuilt and
@@ -54,7 +54,14 @@ the package, so `import quantcheck` never pulls in Streamlit). Both surfaces ren
 model, execute no scientific logic, recompute no metric, and work with the entire `private/`
 tree deleted. It changes no injector, detector, threshold, matcher, scorer, denominator,
 severity, replay rule, research calculation, benchmark identity, expansion, or aggregation
-semantic, and adds no CLI root command. Release evidence remains unimplemented.
+semantic, and adds no CLI root command. Milestone 11 adds the release-evidence layer over all
+of it: a single narrow `release_gate` final-seed authorization, the frozen
+`release_contract`/`release_config` release matrix, a byte-verified `release_freeze`
+release-candidate record, the `release_run` held-out execution path, `release_evidence`
+public-only verification and leak scanning, and `release_checksums`/`CHECKSUMS.md`. The
+version is now `0.1.0`. It changes no scientific behavior; its one correction to completed
+code moved reserved-seed enforcement from *representation* to *execution* (ADR-010), which is
+proven to have changed no result by a byte comparison of two independent held-out runs.
 
 ## Milestone 0 verification
 
@@ -1734,6 +1741,250 @@ No metric is hard-coded from historical 0.1.0 documentation; these are this impl
 - No environmental retries were needed at any point.
 
 
+## Milestone 11 verification
+
+### Scope and release status
+
+- Recovery Phase 11 — **final evidence and release only**. No fault family, injector, detector,
+  threshold, matcher, denominator, severity rule, research formula, replay rule, benchmark
+  identity, expansion, aggregation semantic, CLI root command, or dashboard behavior was
+  redesigned. Version bumped `0.1.0.dev0` -> `0.1.0` per the Milestone 0 decision that the real
+  version is set at the release milestone. `LICENSE` (MIT) added and declared via
+  `license-files`.
+- **Release status: locally complete release candidate, not published.** No commit, tag, push,
+  GitHub release, or registry upload was made or attempted.
+
+### Freeze mechanism and release candidate
+
+- `release_freeze.json` — canonical `ReleaseFreezeRecord`, identity prefix `relc_`, namespace
+  `quantcheck/release-candidate/v1`. Freezes package version, Python requirement, benchmark spec
+  version, fault-profile list, severity list, final seed list, clean-control policy, case totals,
+  four fault specifications (type/subtype/injector/detector/scoring versions, matching rule,
+  false-positive denominator rule, replay method), twelve severity definitions, the detector
+  configuration hash, the Unit Drift ratio threshold, both reviewed fixture identities and
+  hashes, the benchmark id, the normalized release configuration hash, the expanded matrix hash,
+  the lockfile hash, and the SHA-256 of 67 explicitly listed frozen files.
+- Verification is byte-level and refuses to repair. `run_release_benchmark` validates the request
+  with the gate still closed, opens the authorization, rebuilds the configuration, verifies the
+  candidate, and only then dispatches. A drifted input refuses the run **with no output tree
+  created at all**.
+- **Final candidate: `relc_2c6e945a71b85b39`**, freeze record SHA-256
+  `7584be72c2fa3882c3a61c0ba47354cd3e45f53cd1f4d0bb70f9a012e59f42eb`.
+
+### A candidate was invalidated before the final candidate, and is preserved
+
+- `relc_a573d64b0345a5b5` completed a full 124-case held-out run first, then was invalidated by a
+  **release-plumbing defect, not by detector performance**: `schemas.py` refused to *deserialize*
+  a reserved seed, so the strict public reader could not load the released
+  `public/benchmark_config.json` and the public evidence package could not be aggregated,
+  presented, or rendered.
+- Smallest correctness fix (ADR-010): enforcement moved from representation to execution via the
+  new `benchmark_contract.require_seed_execution_authorized`, called by configuration building,
+  expansion, the dispatcher, and all three saved-stage functions. `schemas.py` keeps only
+  coherence rules.
+- All quality gates were rerun, a new candidate was frozen and fully verified, and the matrix was
+  run once against it. **Both runs are preserved**;
+  `release_evidence/candidate_1_relc_a573d64b0345a5b5/` holds the first with its freeze record.
+- **Proof the correction changed no science:** the two public trees have identical file sets (595
+  files) and **593 of 594 indexed artifacts are byte-identical** — every case config, audit input,
+  audit report, score, research summary, status, plus the benchmark config, case matrix, and
+  aggregate report. Only `runtime_metadata.json` (runtime-specific by schema design) and
+  `index.json` (which embeds its hash) differ. Both runs report the identical
+  `bench_403a85e506ff66ea`, `agg_571aae0b7c60a4a5`, precision `0.625`, and recall `1`.
+
+### Final-seed security boundary
+
+- One primitive, `release_gate`: accepts **only** the complete reserved partition (subset,
+  superset, duplicate, mixed, or off-by-one refused), context-manager scoped via a `ContextVar`,
+  removed even when the block raises, refuses to nest, requires a candidate identifier, and
+  imports nothing from `quantcheck`.
+- Ordinary interfaces refuse execution: `build_benchmark_config`, `expand_benchmark_cases`,
+  `dispatch_benchmark_case`, `run_benchmark`, `inject_case`/`audit_case`/`evaluate_case`, and
+  every CLI command (`benchmark run` exit 2, `benchmark smoke` never touches one, saved-stage
+  commands exit 2). Near-miss seeds `10/99/110/999/1010/1100/10000` stay refused with *and*
+  without an authorization. No CLI flag, parameter, or environment variable authorizes anything;
+  static AST tests confirm only `release_gate` and `release_run` open an authorization and that
+  `cli.py` never references the gate.
+
+### Rehearsal (before the freeze, ordinary seeds only)
+
+Release-shaped configuration over development seeds `0-9` and validation seeds `100-109`:
+`bench_81a335e01dba9417`, **244 cases**, 184 successful, 60 failed, 0 incomplete; precision
+`0.66326530612244897959183673469387755102040816326531`, recall `1`. Exercised all four families,
+all three severities, clean controls, expansion, sequential execution, persistence,
+public/private separation, aggregation, failure handling, resume, public-only reconstruction,
+strict reading, presentation, deterministic HTML, Streamlit AppTest, privacy scans,
+traversal/symlink defenses, subprocess determinism across three hash seeds, different output
+roots, and immutable-conflict rejection. **No release-plumbing defect was found at this stage,
+and no final seed executed.** The rehearsal correctly predicted the three structurally
+ineligible cells.
+
+### Final held-out benchmark
+
+Configuration: 4 fault profiles x 3 severities x 10 reserved final seeds = **120 fault cases**,
+plus **4 clean controls** (one per profile — the maximum `BenchmarkProfile.clean_control` can
+express; ADR-009) = **124 cases**. Per-profile fixtures, horizons, research contexts, and
+detector configuration are the reviewed smoke configuration reused verbatim; only severity and
+seed were expanded. Entirely offline; no live SEC call.
+
+`bench_403a85e506ff66ea`, `agg_571aae0b7c60a4a5`, config SHA-256
+`a29c131b83d85323b379436e674efbadff7e382f5e0ca09c7dd3e3bef46e6f3c`, matrix SHA-256
+`2a1ffbc7d2ff32a0965ccfea3076ac17f46a20d2de6c0d9fc6590799e629cc13`.
+
+- configured 124, successful 94, **failed 30**, incomplete 0
+- injected fault units 130, findings 208
+- true-positive faults 130, **false-negative faults 0**
+- true-positive findings 130, false-positive findings 78
+- eligible clean denominator 1070
+- precision `0.625`
+- recall `1`
+- F1 `0.76923076923076923076923076923076923076923076923077`
+- false-positive rate `0.072897196261682242990654205607476635514018691588785`
+- research output changed 90 of 90; exact replay restored 90 of 90
+- by fault profile — Duplicate 70 faults / 101 findings / 70 TP / 31 FP / denom 651 / P
+  `0.69306930693069306930693069306930693069306930693069`; Unit Drift 30 / 45 / 30 / 15 / 155 / P
+  `0.66666666666666666666666666666666666666666666666667`; Look-Ahead 20 / 41 / 20 / 21 / 253 / P
+  `0.4878048780487804878048780487804878048780487804878`; Revision Overwrite 10 / 21 / 10 / 11 /
+  11 / P `0.47619047619047619047619047619047619047619047619048`. Recall is `1` for all four.
+- by severity — high P `0.76923076923076923076923076923076923076923076923077`, medium
+  `0.59701492537313432835820895522388059701492537313433`, low
+  `0.52631578947368421052631578947368421052631578947368`; recall `1` at every severity.
+- by final seed — all ten seeds ran; recall `1` at every seed; precision `0.52` (seed 1000, which
+  also carries the four controls) to `0.68421052631578947368421052631578947368421052631579`.
+- clean controls — Unit Drift 0 findings (denom 5); Look-Ahead, Duplicate, and Revision Overwrite
+  1 finding each (denoms 13, 21, 1). All four have `injected_faults=0`.
+
+### Honest failure analysis
+
+- **All 30 failures are `stage=injection`, `category=no_eligible_targets`**, in exactly three
+  cells at ten seeds each: Look-Ahead `high` (needs a 30-day filing lag), Revision Overwrite
+  `medium` and `high` (need 5% and 20% relative revisions against the fixture's single 2%
+  history). These are frozen thresholds meeting a small reviewed fixture. They were kept in the
+  matrix and remain visible in the statuses and the aggregate rather than being configured away.
+- **Best precision** Duplicate `0.693…`; **worst** Revision Overwrite `0.476…`. **Recall is `1`
+  everywhere** — zero false negatives in the whole matrix, which is a measurement on a 26-record
+  synthetic fixture, not a general sensitivity claim.
+- **Precision rises with severity** (`0.526` -> `0.597` -> `0.769`): the cross-detector background
+  is roughly constant while true positives grow.
+- **All 78 false positives are cross-detector findings under strict primary-label scoring**, not
+  malfunctions. Public findings by rule: `occurrence.exact_duplicate` 133,
+  `value.scale_discontinuity` 45, `temporal.period_end_available_before_filing` 20,
+  `revision.later_vintage_in_earlier_state` 10. The dominant contributor is the reviewed
+  fixture's documented natural independent-occurrence pair (ADR-004).
+- **Revision Overwrite's false-positive rate is exactly `1`** over an eligible-clean denominator
+  of **11**. Reported as saved, with the denominator, rather than suppressed.
+- No fault family produced a legitimate zero research impact in this matrix.
+
+### Public-only evidence, privacy, and adversarial review
+
+- `release_evidence/public_only/` holds the public tree with **no private tree at all**. Against
+  it: 595 public files, 0 private files, 0 manifests; strict reader loads it; rebuilt aggregate is
+  byte-identical to the saved one; presentation model SHA-256
+  `2c2788ca2673f67f807c89760ddbc030ddde13b8395b65be9300af6566ef7f68`; HTML SHA-256
+  `2ba3c7746e18df90699a99ddd4ce0e0dc100bb6fa2b0ead7f88e4887e52ac795`; Streamlit AppTest renders
+  1,515 text chunks / 113,608 characters with 30 visible failure elements and no exception; a
+  real headless startup on `127.0.0.1:8766` returned `/_stcore/health` = `ok`.
+- Scans found no private object key, local/home/temp path, secret marker, traceback, symlink, or
+  traversable path in public bytes, the presentation model, the HTML, the dashboard text, or the
+  freeze record. The same pass confirmed the private tree *does* hold `mutation`,
+  `original_value`, `selection_digest`, `entity_name`, and `target_rank`, so the public scan
+  cannot pass vacuously.
+- Adversarial review verified: detectors take no manifest/clean-snapshot/seed/severity parameter;
+  audit inputs carry no answer-key field; `true_positive_findings == true_positive_faults` (130)
+  so duplicates cannot inflate recall; cross-detector findings stay visible; controls carry zero
+  injected faults; failed cases remain in matrix, statuses, and aggregate (124 status files, 94/30/0);
+  every fault, severity, and seed group is present even when weak; traversal and symlink escapes
+  rejected; artifact conflicts rejected without overwrite.
+- One nuance recorded rather than hidden: the `frozen_target_fraction` field name in the freeze
+  record is prefixed precisely so a public constant never collides with the private manifest's
+  `target_fraction` key in the context-free scan. No scan exemption was added.
+
+### Reproducibility
+
+`PYTHONHASHSEED` `0`/`1`/`987654` in fresh subprocesses produce identical model, HTML, and
+aggregate hashes; all 595 public artifacts canonical round-trip; HTML is byte-identical to two
+destinations; conflicting bytes at an existing destination are rejected; the public-only rebuild
+equals the saved aggregate; an identical rerun reuses all 94 successful cases and dispatches 0;
+an independent output root reproduces every logical byte. `runtime_metadata.json` and
+`index.json` differ by design and are named explicitly rather than glossed over.
+
+### Packaging
+
+- `uv build --offline` -> wheel `quantcheck-0.1.0-py3-none-any.whl` SHA-256
+  `ff1fff1880796803cf9454c1199c78e3e71bd41889301eb728e75a798dbbef91` (198,481 bytes, 68 entries,
+  includes `dist-info/licenses/LICENSE`); sdist `quantcheck-0.1.0.tar.gz` SHA-256
+  `cfc1497d171bc23c01e9558e7f8bb83f5ccfb4ec904019bb05b0b0be43fe75f7` (335,123 bytes, 161 entries).
+- Archive scans found no generated artifact tree, manifest, private artifact, reference/recovery
+  material, SEC cache, cache directory, bytecode, `release_evidence/`, `release_freeze.json`,
+  `CHECKSUMS.md`, `docs/`, `dashboard/`, `scripts/`, secret, or real checkout path. The only
+  `manifest`-named entries are the four legitimate `*_manifest.py` modules.
+- Clean `uv venv --python 3.12` install of the wheel: version `0.1.0`; **Streamlit not installed
+  at all**; `import quantcheck` pulls in no Streamlit/pandas/NumPy/PyArrow/matplotlib/Altair;
+  `quantcheck --help` exit 0; offline `benchmark smoke` exit 0 reproducing
+  `bench_654c76bb7eea251a` / `agg_1dedb2ca9aec9240` / precision `0.5`; public artifact loading and
+  HTML rendering reproduce SHA-256
+  `d3e433c80a79de47fd3566788938db7497c98fe4a2acd449abbd2b6a3d926107`, **identical to the
+  Milestone 10 recorded value**; reserved seeds still refused from the installed wheel.
+
+### Files added and changed
+
+- Runtime added: `release_gate.py`, `release_contract.py`, `release_config.py`,
+  `release_freeze.py`, `release_run.py`, `release_evidence.py`, `release_checksums.py`.
+- Runtime changed: `schemas.py` (seed-class `final`, coherence-only seed rules, no-mixing rule),
+  `benchmark_contract.py` (`require_seed_execution_authorized`, `ALL_SEED_CLASSES`,
+  authorization-aware classifier), `benchmark_dispatch.py` and `saved_case_workflow.py` (execution
+  guards), `__init__.py` (exports, docstring).
+- Scripts added: `release_freeze.py`, `run_release_benchmark.py`, `verify_release_evidence.py`,
+  `release_checksums.py`. No CLI command was added.
+- Root added: `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`, `CHECKSUMS.md`, `release_freeze.json`.
+- Docs added: `docs/METHODOLOGY.md`, `docs/ARTIFACTS_AND_PRIVACY.md`, `docs/THREAT_MODEL.md`,
+  `docs/REPRODUCIBILITY.md`, `docs/FINAL_BENCHMARK_RESULTS.md`, `docs/LIMITATIONS.md`,
+  `docs/RELEASE_CHECKLIST.md`, `docs/RELEASE_NOTES_0.1.0.md`.
+- Changed: `pyproject.toml` (version, `license-files`, sdist `LICENSE`), `uv.lock` (version line
+  only), `README.md`, `docs/DECISIONS.md` (ADR-009, ADR-010), `.gitignore`
+  (`release_evidence/`), `IMPLEMENT.md`.
+- Tests added: `tests/release_support.py`, `test_release_gate.py`, `test_release_freeze.py`,
+  `test_release_run.py`, `test_release_evidence.py`, `test_release_checksums.py`,
+  `test_release_final_seed_rejection.py`.
+- Tests updated, not weakened: `test_presentation_isolation.py` (import-closure pin widened by the
+  one named stdlib-only leaf `release_gate`, still an exact set equality) and
+  `test_benchmark_config.py` (two seed assertions moved to the execution boundary where the rule
+  now lives, with the guard additionally asserted).
+
+### Tests and commands
+
+- Added **204 tests**: gate 32, final-seed rejection 74, freeze 30, run 18, evidence 26,
+  checksums 14, plus shared support. Full suite **1,595 passed** (1,391 prior + 204).
+- The complete pre-Milestone-11 suite with all six release modules ignored still reports exactly
+  **1,391 passed**, so no prior test was weakened or removed.
+- Full suite green under `PYTHONHASHSEED` `0`, `1`, and `987654` (1,595 each).
+- Targeted suites: schema/serialization/golden/hashing 271; fixtures/point-in-time/audit-boundary
+  93; Look-Ahead 113; Unit Drift 130; Duplicate 134; Revision Overwrite 121; SEC 122; benchmark
+  229; CLI 100; presentation 145; determinism/subprocess 79; release-only 204; properties 79;
+  packaging 1.
+- Every required command exited 0 individually: `uv sync --all-groups`,
+  `uv sync --frozen --all-groups`, `uv run ruff check .`, `uv run ruff format --check .`,
+  `uv run mypy src tests` (151 files), `MYPYPATH=src uv run mypy --explicit-package-bases dashboard
+  scripts` (9 files), `uv run pytest`, `uv lock --check`, `uv run quantcheck --help`,
+  `uv build --offline`, `git diff --check`, both reviewed-fixture `--check` scripts,
+  `scripts/release_freeze.py --check`, `scripts/run_release_benchmark.py`,
+  `scripts/verify_release_evidence.py`, `scripts/release_checksums.py --check`.
+- No environmental retries were needed at any point.
+
+### Dependencies
+
+No runtime or development dependency was added, removed, or upgraded. The release layer uses only
+the standard library and Pydantic. `uv.lock` changed by exactly one line (the package version).
+
+### Git and CI
+
+Working tree holds the release for review. Nothing was committed, staged, tagged, pushed, or
+published. `git diff --check` is clean; `release_evidence/` is gitignored so no generated artifact
+tree, manifest, cache, or secret can be staged. **GitHub Actions has not run** — the workflow was
+validated only by executing its constituent commands locally, and remote CI remains an external
+gate.
+
+
 ## Decisions
 
 - **Milestone 1 identifier scheme.** `stable_id` hashes a versioned envelope
@@ -1853,10 +2104,26 @@ No metric is hard-coded from historical 0.1.0 documentation; these are this impl
 - Only the narrow Look-Ahead `period_end_substitution` subtype, narrow Unit Drift
   `value_scaled_unit_unchanged` subtype, narrow Duplicate Observations `exact_occurrence_copy`
   subtype, narrow Revision Overwrite `later_vintage_in_earlier_state` subtype, narrow SEC
-  adapter, the Milestone 8 benchmark layer, the Milestone 9 CLI, and the Milestone 10 public-only
-  presentation layer exist. Release evidence remains absent. None of the historical 0.1.0 metrics,
-  hashes, or test totals is reproduced or claimed; the smoke figures above are this
+  adapter, the Milestone 8 benchmark layer, the Milestone 9 CLI, the Milestone 10 public-only
+  presentation layer, and the Milestone 11 release-evidence layer exist. None of the historical
+  0.1.0 metrics, hashes, or test totals is reproduced or claimed; every figure here is this
   implementation's own.
+- **Three of the twelve release profile/severity cells have no eligible target on the reviewed
+  fixture** and fail all ten final seeds with `no_eligible_targets`: Look-Ahead at `high` (30-day
+  filing lag), Revision Overwrite at `medium` and `high` (5% and 20% relative revisions against a
+  single 2% history). 30 of 124 final cases therefore failed. No threshold was relaxed and no
+  fixture horizon was shopped for to make them pass.
+- **Revision Overwrite's held-out false-positive rate is exactly `1` over an eligible-clean
+  denominator of 11**, because the reviewed fixture contains one source-supported adjacent
+  revision history. The rate is arithmetically correct and statistically thin; it is reported as
+  saved, alongside its denominator.
+- **Held-out recall is `1` for every family, severity, and seed** - zero false negatives. This is
+  a measurement on a 26-record synthetic fixture and a five-observation series, not a general
+  detector-sensitivity claim.
+- **`runtime_metadata.json` and `index.json` are deliberately not byte-reproducible** across runs:
+  the former records the wall clock, platform, and interpreter by schema design, and the latter
+  embeds its content hash. Every other logical artifact is byte-identical across runs, output
+  roots, and hash seeds.
 - The CLI's `audit --case/--snapshot/--output` standalone form always runs every one of the four
   manifest-blind detectors and brands the combined report with one caller-chosen `fault_profile`'s
   identity, exactly like the benchmark dispatcher's own combined-report convention. There is no
@@ -1966,13 +2233,13 @@ No metric is hard-coded from historical 0.1.0 documentation; these are this impl
   including through the Milestone 9 CLI. Milestone 10 adds dashboard and HTML rendering as
   separate, standalone, read-only surfaces over already-saved artifacts; neither runs inside the
   benchmark, and neither is reachable from the CLI.
-- `CHECKSUMS.md` does not exist in this rebuilt repository and was not created. It is named only
-  in the historical `reference/IMPLEMENT_RELEASE_0.1.0.md` describing the lost 0.1.0 tree; no
-  Milestone 0-7 work introduced it, no current contract defines its format, and no verifier script
-  exists. Inventing one now would add harness infrastructure outside Milestone 8's scope and could
-  conflict with a later contract. Artifact integrity is instead verified by the reviewed-fixture
-  and SEC-fixture `--check` scripts, the Milestone 1 golden vectors, and the benchmark's own
-  content-hash validation.
+- `CHECKSUMS.md` now exists (Milestone 11). No historical format survived and no prior contract
+  defined one, so ADR-009 freezes the smallest deterministic format: a Markdown document whose
+  body is a fenced block of `<sha256>  <path>` lines, sorted by path, covering the committed
+  release surface (67 frozen source/lock files, the freeze record, and 20 release documents - 88
+  files total). Generated benchmark artifacts are deliberately excluded; they are reproduced from
+  the frozen configuration rather than committed. Verified by
+  `uv run python scripts/release_checksums.py --check`.
 - The dashboard is a local, read-only, single-user Streamlit app: no authentication, accounts,
   web backend, hosted deployment, or browser-level automation beyond Streamlit's official
   `AppTest` and a local headless health startup. There is no general artifact browser, no
@@ -1992,11 +2259,27 @@ No metric is hard-coded from historical 0.1.0 documentation; these are this impl
 
 ## Exact next task
 
-Implement Recovery Phase 11 - **final evidence and release**, as defined in
-`RECOVERY_SEQUENCE.md`: run the rehearsal, freeze the release candidate, authorize the reserved
-final seeds `1000-1009` only through the release path, generate public evidence, verify privacy
-and reproducibility, build packages, and document external gates honestly. Nothing in Milestone
-10 authorized, executed, or prepared a final seed, and no release evidence exists yet.
+**v0.1 implementation is complete.** All eleven recovery phases are done and every locally
+controllable Milestone 11 gate passes. There is no unfinished v0.1 implementation milestone.
+
+The next task is **external publication and release review**, which requires actions this
+environment cannot perform and which nobody has authorized:
+
+1. Human review of the working tree diff and of `docs/RELEASE_CHECKLIST.md`.
+2. Commit the release, then create the `v0.1.0` tag — **only on explicit authorization**.
+3. Push and let GitHub Actions run `.github/workflows/ci.yml` for the first time. Remote CI is
+   currently an unverified external gate.
+4. Decide whether to publish a GitHub release and/or a package registry upload. Nothing has been
+   uploaded and no registry credentials were used.
+5. Optionally record the three-minute demonstration from the storyboard in
+   `docs/RELEASE_CHECKLIST.md`. No video exists.
+
+If post-MVP work is preferred instead of publishing, the honest highest-value candidates — each
+requiring its own milestone and a new release candidate — are: a larger or real-vendor fixture so
+the three structurally ineligible profile/severity cells have targets and the thin denominators
+grow; and a per-detector selection contract so cross-detector findings can be reported without
+counting against strict primary precision. Neither may be started as a way to improve the
+existing held-out numbers, which are now frozen evidence.
 
 ## Fixed implementation choices
 
@@ -2013,6 +2296,7 @@ and reproducibility, build packages, and document external gates honestly. Nothi
 - Tabular processing: pandas and PyArrow, introduced only when required
 - Dashboard: Streamlit, introduced at the Milestone 10 presentation milestone as the
   optional `dashboard` dependency group (`streamlit>=1.40,<2`, resolved `1.61.1`)
+- Release version: `0.1.0`, set at the Milestone 11 release-evidence milestone
 
 ## Historical target
 
@@ -2031,4 +2315,5 @@ Record:
 
 ## Last updated
 
-2026-08-08 (Milestone 10 complete — public-only presentation)
+2026-08-08 (Milestone 11 complete — final evidence and release; candidate
+`relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`, aggregate `agg_571aae0b7c60a4a5`)

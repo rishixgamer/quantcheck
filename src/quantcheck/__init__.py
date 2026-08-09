@@ -24,8 +24,13 @@ Typer. Recovery Phase 10 adds the public-only presentation layer: the strict
 ``public_artifact_reader``, one immutable ``presentation`` model, and the
 deterministic ``html_summary`` renderer over it. The read-only Streamlit
 dashboard lives outside this package (``dashboard/app.py``) so that a bare
-``import quantcheck`` never pulls in Streamlit either. Release evidence is not
-implemented.
+``import quantcheck`` never pulls in Streamlit either. Recovery Phase 11 adds
+the release evidence path: the ``release_gate`` final-seed authorization,
+``release_contract``/``release_config`` frozen release matrix,
+``release_freeze`` release-candidate record, ``release_run`` held-out
+execution, ``release_evidence`` public-only verification, and
+``release_checksums``. Reserved final seeds ``1000-1009`` remain rejected by
+every ordinary interface.
 """
 
 from quantcheck.audit_boundary import sanitize_for_audit
@@ -35,6 +40,7 @@ from quantcheck.benchmark_aggregate import (
     aggregate_from_public_root,
 )
 from quantcheck.benchmark_contract import (
+    ALL_SEED_CLASSES,
     BENCHMARK_FAULT_PROFILES,
     BENCHMARK_SPEC_VERSION,
     PRIVATE_CASE_ARTIFACT_NAMES,
@@ -49,6 +55,7 @@ from quantcheck.benchmark_contract import (
     is_final_seed,
     public_case_directory,
     redacted_failure_message,
+    require_seed_execution_authorized,
 )
 from quantcheck.benchmark_dispatch import (
     BenchmarkCaseArtifacts,
@@ -356,6 +363,76 @@ from quantcheck.public_artifact_reader import (
     resolve_public_path,
     validate_public_relative_path,
 )
+from quantcheck.release_checksums import (
+    CHECKSUM_COVERED_FILES,
+    CHECKSUMS_FILE_NAME,
+    ChecksumEntry,
+    ChecksumMismatch,
+    ReleaseChecksumError,
+    parse_checksums_document,
+    render_checksums_document,
+    verify_checksums_document,
+)
+from quantcheck.release_config import (
+    REHEARSAL_BENCHMARK_NAME,
+    RELEASE_BENCHMARK_NAME,
+    RELEASE_CONTROL_SEED,
+    rehearsal_benchmark_config,
+    release_benchmark_config,
+    release_matrix_profiles,
+)
+from quantcheck.release_contract import (
+    FROZEN_SOURCE_FILES,
+    RELEASE_CLEAN_CONTROL_POLICY,
+    RELEASE_CONTROL_CASE_COUNT,
+    RELEASE_FAULT_CASE_COUNT,
+    RELEASE_FAULT_PROFILES,
+    RELEASE_FREEZE_RECORD_NAME,
+    RELEASE_SEEDS,
+    RELEASE_SEVERITIES,
+    RELEASE_SPEC_VERSION,
+    RELEASE_TOTAL_CASE_COUNT,
+    ReleaseContractError,
+)
+from quantcheck.release_evidence import (
+    LOCAL_PATH_MARKERS,
+    PRIVATE_ONLY_ARTIFACT_KEYS,
+    SECRET_MARKERS,
+    PublicEvidenceReport,
+    ReleaseEvidenceError,
+    build_public_only_copy,
+    scan_for_leaks,
+    verify_public_evidence,
+)
+from quantcheck.release_freeze import (
+    RELEASE_FREEZE_NAMESPACE,
+    FrozenFaultSpecification,
+    FrozenFileHash,
+    FrozenSeverityProfile,
+    ReleaseFreezeError,
+    ReleaseFreezeRecord,
+    build_release_freeze_record,
+    read_release_freeze_record,
+    release_freeze_record_hash,
+    verify_release_freeze_record,
+    write_release_freeze_record,
+)
+from quantcheck.release_gate import (
+    RESERVED_FINAL_SEEDS,
+    FinalSeedAuthorization,
+    FinalSeedAuthorizationError,
+    active_final_seed_authorization,
+    final_seed_authorized,
+    reserved_final_seeds,
+)
+from quantcheck.release_run import (
+    ReleaseRunError,
+    ReleaseRunResult,
+    build_authorized_release_config,
+    build_authorized_release_freeze,
+    run_release_benchmark,
+    verify_authorized_release_freeze,
+)
 from quantcheck.revision_overwrite_contract import (
     REVISION_OVERWRITE_DETECTOR_ID,
     REVISION_OVERWRITE_DETECTOR_VERSION,
@@ -617,7 +694,7 @@ from quantcheck.unit_drift_series import (
     comparable_series_key,
 )
 
-__version__ = "0.1.0.dev0"
+__version__ = "0.1.0"
 
 __all__ = [
     "ArtifactIntegrityError",
@@ -729,6 +806,64 @@ __all__ = [
     "lookahead_research_date",
     "metric_text",
     "public_case_directory",
+    "require_seed_execution_authorized",
+    "ALL_SEED_CLASSES",
+    "CHECKSUMS_FILE_NAME",
+    "CHECKSUM_COVERED_FILES",
+    "ChecksumEntry",
+    "ChecksumMismatch",
+    "FROZEN_SOURCE_FILES",
+    "FinalSeedAuthorization",
+    "FinalSeedAuthorizationError",
+    "FrozenFaultSpecification",
+    "FrozenFileHash",
+    "FrozenSeverityProfile",
+    "LOCAL_PATH_MARKERS",
+    "PRIVATE_ONLY_ARTIFACT_KEYS",
+    "PublicEvidenceReport",
+    "REHEARSAL_BENCHMARK_NAME",
+    "RELEASE_BENCHMARK_NAME",
+    "RELEASE_CLEAN_CONTROL_POLICY",
+    "RELEASE_CONTROL_CASE_COUNT",
+    "RELEASE_CONTROL_SEED",
+    "RELEASE_FAULT_CASE_COUNT",
+    "RELEASE_FAULT_PROFILES",
+    "RELEASE_FREEZE_NAMESPACE",
+    "RELEASE_FREEZE_RECORD_NAME",
+    "RELEASE_SEEDS",
+    "RELEASE_SEVERITIES",
+    "RELEASE_SPEC_VERSION",
+    "RELEASE_TOTAL_CASE_COUNT",
+    "RESERVED_FINAL_SEEDS",
+    "ReleaseChecksumError",
+    "ReleaseContractError",
+    "ReleaseEvidenceError",
+    "ReleaseFreezeError",
+    "ReleaseFreezeRecord",
+    "ReleaseRunError",
+    "ReleaseRunResult",
+    "SECRET_MARKERS",
+    "active_final_seed_authorization",
+    "build_authorized_release_config",
+    "build_authorized_release_freeze",
+    "verify_authorized_release_freeze",
+    "build_public_only_copy",
+    "build_release_freeze_record",
+    "final_seed_authorized",
+    "parse_checksums_document",
+    "read_release_freeze_record",
+    "rehearsal_benchmark_config",
+    "release_benchmark_config",
+    "release_freeze_record_hash",
+    "release_matrix_profiles",
+    "render_checksums_document",
+    "reserved_final_seeds",
+    "run_release_benchmark",
+    "scan_for_leaks",
+    "verify_checksums_document",
+    "verify_public_evidence",
+    "verify_release_freeze_record",
+    "write_release_freeze_record",
     "read_public_benchmark",
     "redacted_failure_message",
     "render_html_summary",

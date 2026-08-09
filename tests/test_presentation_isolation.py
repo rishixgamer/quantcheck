@@ -142,6 +142,14 @@ def test_the_reachable_presentation_dependencies_are_the_expected_small_set() ->
     ``unit_drift_math`` is in the set because ``schemas`` itself imports it: it
     is a leaf pure-``Decimal`` helper with no fault, manifest, or injector
     knowledge, not a private-truth module.
+
+    ``release_gate`` joined the closure in Milestone 11 for the same reason:
+    ``schemas`` consults it to decide whether a reserved final seed may be
+    represented. It is a standard-library-only leaf holding one
+    :class:`~contextvars.ContextVar` and the reserved seed partition, imports
+    nothing from ``quantcheck``, and carries no fault, manifest, injector, or
+    detector knowledge. The assertion stays an exact set equality, so this is
+    one named addition rather than a relaxed check.
     """
     reachable = _transitive_quantcheck_imports(_SOURCE / "public_artifact_reader.py")
     assert reachable == {
@@ -149,6 +157,7 @@ def test_the_reachable_presentation_dependencies_are_the_expected_small_set() ->
         "quantcheck.benchmark_store",
         "quantcheck.hashing",
         "quantcheck.json_types",
+        "quantcheck.release_gate",
         "quantcheck.schemas",
         "quantcheck.serialization",
         "quantcheck.unit_drift_math",

@@ -13,3 +13,4 @@ dist/
 htmlcov/
 .DS_Store
 .serena/
+release_evidence/

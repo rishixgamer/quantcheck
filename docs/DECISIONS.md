@@ -736,3 +736,113 @@ official Streamlit `AppTest` startup, overview, counts, metrics, filtering,
 findings, failed/incomplete/null rendering, sanitized errors, and read-only
 verification; and end-to-end runs of reader, model, HTML, and dashboard
 against a copied public tree with the entire private tree absent.
+
+## ADR-009 — Release matrix, clean-control policy, and the freeze record
+
+**Status.** Accepted (Recovery Phase 11).
+
+**Context.** Milestone 11 must execute a held-out benchmark over reserved final
+seeds `1000–1009` and freeze what produced it. Three details were genuinely
+unspecified by current contracts: how many clean controls the release runs, what
+a freeze record contains, and where release evidence lives. The historical
+0.1.0 documentation implies twelve controls for 132 total cases, but historical
+material cannot override the rebuilt repository's own schemas.
+
+**Decision.**
+
+*Clean-control policy: one control per fault profile — four controls, 124 total
+cases.* This is derived, not chosen. `schemas.BenchmarkProfile.clean_control` is
+a single optional `BenchmarkCleanControl` carrying one severity and one seed, so
+the completed Milestone 8 contract can express at most one control per profile.
+Reaching twelve would require widening a completed schema for presentation
+reasons, which this milestone must not do. The divergence from the historical
+target is recorded rather than hidden. Controls are pinned to the lowest
+reserved seed, because a control injects nothing and so selects no target.
+
+*Release matrix: the reviewed smoke configuration, expanded in exactly two
+dimensions.* Per-profile fixtures, point-in-time horizons, research contexts,
+and detector configuration are reused verbatim from the already-reviewed smoke
+benchmark; only severity (all three) and seed (the ten reserved) change.
+Searching over horizons or research cutoffs for a release matrix with better
+numbers is exactly what a held-out benchmark exists to prevent. A consequence is
+that three profile/severity cells have no eligible target on the reviewed
+fixture and fail every seed with `no_eligible_targets`; those failures are kept
+visible rather than configured away.
+
+*Freeze record.* A canonical JSON `ReleaseFreezeRecord` (`release_freeze.json`,
+identity prefix `relc_`, namespace `quantcheck/release-candidate/v1`) pinning the
+package version, Python requirement, benchmark spec version, release matrix,
+four fault specifications, twelve severity definitions, detector
+versions/configuration/threshold, matching rules, false-positive denominator
+rules, replay method, both reviewed fixture hashes, the normalized release
+configuration and its canonical hash, the expanded matrix hash, and the SHA-256
+of an explicit list of 67 frozen repository files. Verification is byte-level
+and refuses to repair. The record is publishable: it carries no secret, path,
+manifest, fault target, or answer-key relationship. Severity fields are prefixed
+`frozen_` so that public constants never collide with private manifest key names
+in the context-free privacy scan — a scan with exemptions is a scan that
+eventually misses something.
+
+*`CHECKSUMS.md`.* No historical format survived and no current contract defined
+one, so the smallest deterministic format is used: a Markdown document whose
+body is a fenced block of `<sha256>  <path>` lines, sorted by path, over the
+committed release surface. Generated benchmark artifacts are deliberately
+excluded; they are reproduced, not committed.
+
+*Evidence location.* Release output lives under the gitignored
+`release_evidence/`. Only the freeze record, the checksums, and the documented
+metrics are committed, so no generated artifact tree or private manifest enters
+version control.
+
+**Consequences.** The release reports 124 cases rather than the historical 132,
+and 30 of its 120 fault cases fail for a documented structural reason. Both are
+stated prominently rather than smoothed over.
+
+## ADR-010 — Final-seed authorization gates execution, not representation
+
+**Status.** Accepted (Recovery Phase 11). Supersedes the initial Milestone 11
+draft, which gated representation.
+
+**Context.** Reserved final seeds must be unusable through every ordinary
+interface. The first implementation enforced this in `schemas.py`, refusing to
+*construct or deserialize* any model carrying a reserved seed without an active
+authorization.
+
+That was over-broad, and the release itself proved it. After the first candidate
+(`relc_a573d64b0345a5b5`) produced a complete 124-case held-out run, the strict
+public reader could not load the released `public/benchmark_config.json`: the
+schema refused to deserialize it. The public evidence package — the thing the
+whole public/private boundary exists to make shareable — was unreadable by the
+reader, the aggregator, the presentation model, the HTML renderer, and the
+dashboard.
+
+**Decision.** The security property is that a reserved seed must never be
+**executed** without authorization. It is not that a reserved seed must never
+**exist**. Authorization is therefore decided in exactly one place,
+`benchmark_contract.require_seed_execution_authorized`, called by benchmark
+configuration building, expansion (via `classify_benchmark_seed`), the case
+dispatcher, and all three saved-stage workflow functions. `schemas.py` keeps
+only the coherence rules: a seed must fall in a known partition, a case's
+declared `seed_class` must match its seed, and a profile may not mix final seeds
+with ordinary ones.
+
+Reading a saved held-out artifact is permitted. Reading is not running, and the
+presentation layer executes nothing.
+
+**Consequences.** Candidate `relc_a573d64b0345a5b5` was invalidated — by a
+release-plumbing defect, not by its detector performance — and is preserved
+under `release_evidence/candidate_1_relc_a573d64b0345a5b5/` with its own freeze
+record. Candidate `relc_2c6e945a71b85b39` was frozen after the fix and re-ran
+the matrix. Of 594 indexed artifacts, 593 are byte-identical between the two
+runs; only `runtime_metadata.json` (runtime-specific by schema design) and
+`index.json` (which embeds its hash) differ, so the correction provably changed
+no science.
+
+**Verification.** Every reserved seed refused at every execution entry point and
+through every CLI command; near-miss seeds refused with *and* without an
+authorization; mixed partitions refused; static AST checks that only
+`release_gate` and `release_run` open an authorization and that `cli.py` never
+references the gate; a fresh-subprocess check that the gate starts closed; and
+`test_a_released_case_config_stays_readable_with_the_gate_closed` plus
+`test_the_released_public_evidence_loads_with_the_gate_closed`, the regression
+tests for the defect above.

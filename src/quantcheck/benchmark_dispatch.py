@@ -28,6 +28,7 @@ from datetime import date
 from decimal import Decimal, localcontext
 
 from quantcheck.audit_boundary import sanitize_for_audit
+from quantcheck.benchmark_contract import require_seed_execution_authorized
 from quantcheck.benchmark_fixtures import benchmark_fixture_records
 from quantcheck.duplicate_contract import (
     DUPLICATE_DETECTOR_ID,
@@ -379,7 +380,11 @@ def dispatch_benchmark_case(case: BenchmarkCaseConfig) -> BenchmarkCaseArtifacts
 
     The control flow *is* the contract: nothing that touches the manifest can
     run before ``combined_audit_report`` has returned a finalized report.
+
+    A reserved final seed is refused here unless the release path authorized
+    it. Reading a saved held-out case is allowed; running one is not.
     """
+    require_seed_execution_authorized(case.seed)
     clean, source_records = clean_snapshot_for_case(case)
 
     if case.case_kind == "clean_control":

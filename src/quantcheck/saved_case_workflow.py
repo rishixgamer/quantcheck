@@ -29,6 +29,7 @@ from quantcheck.benchmark_contract import (
     PRIVATE_CASE_ARTIFACT_NAMES,
     PUBLIC_CASE_ARTIFACT_NAMES,
     public_case_directory,
+    require_seed_execution_authorized,
 )
 from quantcheck.benchmark_dispatch import (
     clean_snapshot_for_case,
@@ -124,7 +125,10 @@ def inject_case(
     written. A ``clean_control`` case injects nothing and stops there; a
     fault case additionally writes the private corrupted snapshot and the
     private manifest. Nothing here runs detection, scoring, or replay.
+
+    A reserved final seed is refused unless the release path authorized it.
     """
+    require_seed_execution_authorized(case.seed)
     clean, source_records = clean_snapshot_for_case(case)
     public.write_immutable(public_artifact_path(case.benchmark_case_id, "case_config"), case)
     private.write_immutable(private_artifact_path(case.benchmark_case_id, "clean_snapshot"), clean)
@@ -179,7 +183,10 @@ def audit_case(
     Reads only the clean snapshot (for a clean control) or the corrupted
     snapshot (for a fault case) that ``inject_case`` already persisted. Never
     reads the manifest, even though it may already be sitting on disk.
+
+    A reserved final seed is refused unless the release path authorized it.
     """
+    require_seed_execution_authorized(case.seed)
     source_kind = "clean_snapshot" if case.case_kind == "clean_control" else "corrupted_snapshot"
     source_path = private_artifact_path(case.benchmark_case_id, source_kind)
     if not private.exists(source_path):
@@ -218,7 +225,10 @@ def evaluate_case(
     clean snapshot, and corrupted snapshot that ``inject_case``/``audit_case``
     already persisted. A clean control has no manifest and is rejected here
     by design: its terminal artifact is the audit stage's own score.
+
+    A reserved final seed is refused unless the release path authorized it.
     """
+    require_seed_execution_authorized(case.seed)
     if case.case_kind == "clean_control":
         raise SavedStageError(
             "evaluate does not apply to a clean control; it has no manifest to score against"

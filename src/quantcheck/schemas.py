@@ -27,6 +27,7 @@ from quantcheck.json_types import (
     parse_canonical_datetime,
     parse_canonical_decimal,
 )
+from quantcheck.release_gate import RESERVED_FINAL_SEEDS
 from quantcheck.unit_drift_math import decimal_divide, symmetric_absolute_ratio
 
 __all__ = [
@@ -175,12 +176,37 @@ BENCHMARK_AGGREGATE_ID_PATTERN = re.compile(r"^agg_[0-9a-f]{16}$")
 _PUBLIC_PATH_SEGMENT = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 PUBLIC_RELATIVE_PATH_PATTERN = re.compile(rf"^{_PUBLIC_PATH_SEGMENT}(?:/{_PUBLIC_PATH_SEGMENT})*$")
 
-#: The seed partitions for ordinary benchmark execution. Final/release seeds
-#: exist so that held-out evidence stays held out: they are rejected here and
-#: are authorized only through the later release milestone's own path.
+#: The seed partitions. Final/release seeds exist so that held-out evidence
+#: stays held out. This module only *names* the partitions; whether a reserved
+#: seed may be executed is decided once, in
+#: ``benchmark_contract.require_seed_execution_authorized``.
 DEVELOPMENT_SEED_RANGE = range(0, 10)
 VALIDATION_SEED_RANGE = range(100, 110)
-FINAL_SEED_RANGE = range(1000, 1010)
+FINAL_SEED_RANGE = range(RESERVED_FINAL_SEEDS[0], RESERVED_FINAL_SEEDS[-1] + 1)
+
+
+def _seed_class_for(seed: int) -> str:
+    """Return the documented partition name for one seed.
+
+    Reserved final seeds are *representable* here on purpose. Released
+    held-out artifacts must stay readable by the public reader, the
+    presentation model, the HTML summary, and the dashboard, none of which
+    execute anything; refusing to deserialize them would make the public
+    evidence package unreadable by the very surfaces built to present it.
+
+    Whether a seed may be **executed** is a separate question, answered in one
+    place: ``benchmark_contract.require_seed_execution_authorized``, which
+    benchmark building, expansion, the case dispatcher, and every saved-stage
+    workflow function call.
+    """
+    if seed in DEVELOPMENT_SEED_RANGE:
+        return "development"
+    if seed in VALIDATION_SEED_RANGE:
+        return "validation"
+    if seed in FINAL_SEED_RANGE:
+        return "final"
+    raise ValueError(f"unclassified benchmark seed: {seed}")
+
 
 PeriodType = Literal["instant", "duration"]
 LookAheadSeverity = Literal["low", "medium", "high"]
@@ -200,7 +226,7 @@ BenchmarkFixtureId = Literal[
     "quantcheck/reviewed-fixture/v1",
     "quantcheck/benchmark-unit-drift-series/v1",
 ]
-BenchmarkSeedClass = Literal["development", "validation"]
+BenchmarkSeedClass = Literal["development", "validation", "final"]
 BenchmarkCaseKind = Literal["fault", "clean_control"]
 BenchmarkCaseStatusKind = Literal["succeeded", "failed", "incomplete"]
 BenchmarkGrouping = Literal["overall", "fault_profile", "severity", "seed_class", "seed"]
@@ -2368,12 +2394,10 @@ def _normalize_seeds(value: tuple[int, ...]) -> tuple[int, ...]:
     if len(set(value)) != len(value):
         raise ValueError("seeds must not contain duplicates")
     for seed in value:
-        if seed in FINAL_SEED_RANGE:
-            raise ValueError(
-                f"final/release seed {seed} is not authorized for ordinary benchmark execution"
-            )
-        if seed not in DEVELOPMENT_SEED_RANGE and seed not in VALIDATION_SEED_RANGE:
-            raise ValueError(f"unclassified benchmark seed: {seed}")
+        _seed_class_for(seed)
+    classes = {_seed_class_for(seed) for seed in value}
+    if "final" in classes and len(classes) > 1:
+        raise ValueError("a benchmark profile must not mix final seeds with ordinary seeds")
     return tuple(sorted(value))
 
 
@@ -2401,10 +2425,7 @@ class BenchmarkCleanControl(CanonicalModel):
     def _check_control(self) -> BenchmarkCleanControl:
         if self.severity not in _SEVERITY_VALUES:
             raise ValueError(f"unsupported severity value: {self.severity!r}")
-        if self.seed in FINAL_SEED_RANGE:
-            raise ValueError("final/release seeds are not authorized for ordinary execution")
-        if self.seed not in DEVELOPMENT_SEED_RANGE and self.seed not in VALIDATION_SEED_RANGE:
-            raise ValueError(f"unclassified benchmark seed: {self.seed}")
+        _seed_class_for(self.seed)
         return self
 
 
@@ -2556,12 +2577,12 @@ class BenchmarkCaseConfig(CanonicalModel):
         expected = _RESEARCH_METHOD_BY_PROFILE[self.fault_profile]
         if self.research.method != expected:
             raise ValueError(f"{self.fault_profile} requires the {expected} research method")
-        if self.seed in FINAL_SEED_RANGE:
-            raise ValueError("final/release seeds are not authorized for ordinary execution")
-        expected_class = "development" if self.seed in DEVELOPMENT_SEED_RANGE else "validation"
-        if self.seed not in DEVELOPMENT_SEED_RANGE and self.seed not in VALIDATION_SEED_RANGE:
-            raise ValueError(f"unclassified benchmark seed: {self.seed}")
-        if self.seed_class != expected_class:
+        # An expanded case is evidence, not a request to run: a saved
+        # held-out case must stay readable with no authorization open, or the
+        # public evidence package would be unreadable by the presentation
+        # surfaces built to present it. Execution is gated by
+        # ``benchmark_contract.require_seed_execution_authorized`` instead.
+        if self.seed_class != _seed_class_for(self.seed):
             raise ValueError("seed_class must match the seed's documented partition")
         return self
 

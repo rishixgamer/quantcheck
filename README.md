@@ -8,7 +8,7 @@ statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
 
 ## Current implementation status
 
-**Recovery Phases 0–10 are complete.** The repository has a typed `quantcheck`
+**Recovery Phases 0–11 are complete.** Version `0.1.0`. The repository has a typed `quantcheck`
 package, a `uv`-managed toolchain (Ruff, MyPy, pytest, Hypothesis), a
 deterministic benchmark layer over the four completed fault families, an
 installed `quantcheck` CLI (Typer) exposing `ingest sec`, `inject`, `audit`,
@@ -84,12 +84,90 @@ Both surfaces work with the entire `private/` tree deleted and execute no
 scientific logic. See [`docs/DASHBOARD_AND_HTML.md`](docs/DASHBOARD_AND_HTML.md)
 and ADR-008.
 
-**Not implemented yet:** release evidence (Recovery Phase 11). The reserved
-final seeds `1000–1009` remain prohibited, and no final held-out benchmark has
-been run. No benchmark metrics, hashes, or test counts from any prior
-implementation apply to this repository; no historical digest is reproduced
-or claimed. `IMPLEMENT.md` is the authoritative operational record and
-next-task handoff.
+A release-evidence layer executes the held-out benchmark. Reserved final seeds
+`1000–1009` are rejected by every ordinary interface and are executable only
+through an explicit release path, guarded by a byte-verified frozen release
+candidate. See [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) and ADR-009/ADR-010.
+
+No benchmark metric, hash, identifier, or test count from any prior
+implementation applies to this repository; every number below was measured by
+this code. `IMPLEMENT.md` is the authoritative operational record and next-task
+handoff.
+
+## Final held-out benchmark result
+
+Release candidate `relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`,
+aggregate `agg_571aae0b7c60a4a5`. 4 fault profiles × 3 severities × 10 reserved
+final seeds = 120 held-out fault cases, plus 4 clean controls = **124 cases**.
+
+| Metric | Exact saved value |
+| --- | --- |
+| Successful / failed / incomplete | 94 / 30 / 0 |
+| Injected faults / findings | 130 / 208 |
+| True positives / false negatives | 130 / 0 |
+| False-positive findings | 78 |
+| Eligible clean denominator | 1070 |
+| **Precision** | `0.625` |
+| **Recall** | `1` |
+| **F1** | `0.76923076923076923076923076923076923076923076923077` |
+| **False-positive rate** | `0.072897196261682242990654205607476635514018691588785` |
+| Research output changed | 90 / 90 |
+| Exact replay restored | 90 / 90 |
+
+Read honestly: **30 cases failed** with `no_eligible_targets` because three
+profile/severity cells have no eligible target on the reviewed fixture
+(Look-Ahead at `high`, Revision Overwrite at `medium` and `high`). They were
+kept in the matrix rather than configured away. **All 78 false positives are
+cross-detector findings** under strict primary-label scoring, dominated by the
+reviewed fixture's documented natural duplicate pair — retained detector
+behaviour, not a defect, and not tuned. Recall of `1` is a measurement on a
+26-record synthetic fixture, not a general sensitivity claim.
+
+Every number traces to `release_evidence/final/public/aggregate_report.json`.
+Full breakdown, per-seed metrics, and failure analysis:
+[`docs/FINAL_BENCHMARK_RESULTS.md`](docs/FINAL_BENCHMARK_RESULTS.md).
+
+**QuantCheck claims no** production readiness, financial-data certification,
+automated remediation, loss prevention, trading alpha, universal SEC coverage,
+statement reconstruction, universal restatement detection, or vendor-wide
+reliability. See [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
+
+## Installation and five-minute quick start
+
+```bash
+# 1. Install (Python 3.12).
+uv sync --all-groups          # from a checkout
+# or: pip install dist/quantcheck-0.1.0-py3-none-any.whl
+
+# 2. Confirm the CLI works.
+uv run quantcheck --help
+
+# 3. Run the deterministic offline smoke benchmark (12 cases, no network).
+uv run quantcheck benchmark smoke --output /tmp/qc-smoke
+
+# 4. Render the self-contained HTML summary from public artifacts only.
+uv run python scripts/render_html_summary.py /tmp/qc-smoke \
+    --output /tmp/qc-smoke/summary.html
+
+# 5. Browse the same artifacts in the local read-only dashboard.
+uv run --group dashboard streamlit run dashboard/app.py -- --artifacts /tmp/qc-smoke
+```
+
+## Reproducing the final benchmark
+
+```bash
+uv run python scripts/release_freeze.py --check          # must pass first
+uv run python scripts/run_release_benchmark.py --output release_evidence/final
+uv run python scripts/verify_release_evidence.py \
+    --source release_evidence/final \
+    --public-only release_evidence/public_only \
+    --html release_evidence/public_only/summary.html
+uv run python scripts/release_checksums.py --check
+```
+
+Reserved seeds execute only through `scripts/run_release_benchmark.py`, and only
+after the frozen candidate verifies byte for byte against the working tree.
+See [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
 
 ## CLI usage
 
@@ -158,7 +236,12 @@ uv run quantcheck --help
 - `scripts/` — repository development tools (not distributed).
 - `tests/` — unit and smoke tests.
 - `docs/` — current architecture and process documents, starting with
-  `docs/AUTHORITY_AND_READING_ORDER.md`.
+  `docs/AUTHORITY_AND_READING_ORDER.md`. Release documents:
+  `METHODOLOGY.md`, `ARTIFACTS_AND_PRIVACY.md`, `THREAT_MODEL.md`,
+  `REPRODUCIBILITY.md`, `FINAL_BENCHMARK_RESULTS.md`, `LIMITATIONS.md`,
+  `RELEASE_CHECKLIST.md`, `RELEASE_NOTES_0.1.0.md`.
+- `CHANGELOG.md`, `CONTRIBUTING.md`, `CHECKSUMS.md`, `LICENSE`,
+  `release_freeze.json` — release surface.
 - `reference/` — historical documents describing the project concept and a
   prior 0.1.0 implementation. They are specifications and historical
   evidence only; they do not describe the current state of this repository.
