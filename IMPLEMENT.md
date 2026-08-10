@@ -4,6 +4,90 @@ This is the operational handoff between Claude Code sessions. Keep it concise, f
 
 ## Current phase
 
+**Post-MVP Milestone H Missing Observations vertical slice complete locally — selected by the
+documented evidence-tie fallback, not by a customer-pain claim**
+
+The repository contains no completed design-partner evaluation or discovery ranking that
+distinguishes Missing Observations from Entity Identity. Per the milestone instruction, Missing
+Observations was therefore selected first and ADR-V2-018 records the tie and the limit on that
+claim. The additive `quantcheck/missing-observation/v1` slice distinguishes random, periodic,
+entity-dependent, concept-dependent, survivorship-like, and source-feed-outage injection while
+requiring explicit source/customer-backed expectations for every detector conclusion. It preserves
+the unchanged `AuditInputSnapshot` boundary, exact scoring, clean controls, private exact replay,
+controlled Decimal cohort-mean impact, and a separately gated synthetic held-out evaluation. See
+`## Post-MVP Milestone H verification`, `docs/faults/MISSING_OBSERVATIONS.md`, and ADR-V2-018.
+
+No real customer file, expectation contract, missingness adjudication, Entity Identity evidence,
+or customer outcome was supplied or created. The saved evaluation is explicitly synthetic contract
+evidence and cannot establish customer pain or production-feed performance.
+
+**Post-MVP Milestone G design-partner/shadow-mode package complete locally — no pilot evidence
+claimed**
+
+The existing external-dataset mapping, policy, bounded execution, and self-hosted layers now feed
+an additive post-audit shadow workflow. It packages exact immutable public findings for researcher
+review, keeps complete sanitized adjudication and private reviewer notes separate, compares exact
+evidence across declared QuantCheck versions/code revisions, and generates privacy-minimized pilot
+metrics only from complete supplied adjudication exports. The workflow records five dispositions,
+independent investigation status, reviewer-supplied time, and only explicitly customer-confirmed
+research-decision impacts. It opens no source dataset and cannot modify or block production. See
+`## Post-MVP Milestone G verification`, `docs/DESIGN_PARTNER_SHADOW_MODE.md`, and ADR-V2-017.
+
+No real customer file, customer mapping/policy, adjudication, reviewer note, pilot report, or pilot
+number was supplied or created. All checked behavior uses ephemeral synthetic contract evidence.
+
+**Post-MVP Milestone F implementation complete locally — external publication evidence pending**
+
+The existing manifest-free production runner now has a minimal hardened batch distribution:
+confined mount-relative inputs, explicit output/work roots, fixed-disabled telemetry/network config,
+data-free canonical logs, a digest-pinned Python 3.12 container running as UID/GID `65532`, and a
+release path for SPDX SBOMs, dependency/image/secret scanning, reproducibility, GHCR publication,
+and GitHub/Sigstore provenance/SBOM attestations. The image adds no server, port, authentication,
+SAML, RBAC, team, billing, database, remote service, or scientific behavior. See
+`## Post-MVP Milestone F verification`, ADR-V2-016, `docs/SELF_HOSTED_DEPLOYMENT.md`,
+`docs/SELF_HOSTED_THREAT_MODEL.md`, and `docs/SUPPLY_CHAIN_SECURITY.md`.
+
+Local Python/package/security gates pass. This workstation has no Docker/Podman engine, and no new
+release or external write was authorized, so the configured image build, image scan, OCI
+reproducibility comparison, registry push, attestation, and pulled-image offline smoke have **not**
+run. No self-hosted image/digest/attestation is claimed published yet.
+
+**Bounded local production execution and performance evidence complete**
+
+The production audit path now has an additive content-addressed local runner over explicit
+complete-entity partitions. It supports deterministic local worker counts 1/2/4, verified
+worker-count-independent logical artifacts, safe resume/retry, partial failure isolation, atomic
+case/run finalization, interruption recovery, redacted operational logs, and changed-partition
+incremental auditing without modifying any frozen detector or benchmark rule. The reproducible
+small/medium/large suite records all requested runtime, memory, size, and rerun fields; the
+50,000-record reference run completed in 17.916s sequential / 6.436s with four workers and bounded
+largest-partition traced allocation at 36,325,079 bytes. See
+`docs/PERFORMANCE_AND_EXECUTION.md`, ADR-V2-015, and
+`performance_baseline_v1.json`.
+
+**Production audit policy layer complete — versioned behavior without benchmark-truth changes**
+
+The additive customer-data path accepts integrity-pinned Parquet, Arrow IPC file/stream, and CSV,
+plus caller-owned Python mappings. `quantcheck/dataset-mapping/v1` resolves every financial
+meaning explicitly; normalization rejects floats and ambiguous availability/revision semantics;
+and required `quantcheck/audit-policy/v1` policies now configure detector enablement/actions,
+contract-permitted Unit Drift thresholds, concept/unit and source-supported lag/frequency
+expectations, and reasoned dataset exceptions. Every current production report records the exact
+policy ID/version/hash and preserves disabled/not-evaluated/excepted outcomes. Benchmark configs,
+detectors, scores, and v0.1/v0.2 scientific behavior are unchanged. See
+`## Production audit policy layer verification`, `docs/PRODUCTION_AUDIT_POLICIES.md`, and
+ADR-V2-014 in `docs/DECISIONS_V0_2.md`.
+
+**Post-MVP Milestone A, Step 2 complete — v0.2 selected-detector execution and evaluation contract**
+
+`v0.1.0` remains the immutable tagged baseline; nothing about it changed. The current work is the
+additive v0.2 execution/evaluation contract over the Step 1 corpus. It selects one, several, or all
+four frozen detectors across the unchanged `AuditInputSnapshot` boundary; preserves the strict
+v0.1 primary-family score for all-detector comparison; and separately classifies every finding as
+primary matched, secondary/corroborating, independent/background, or unmatched. See
+`## Post-MVP Milestone A Step 2 verification`, `docs/BENCHMARK_V0_2.md`,
+`docs/CORPUS_V0_2.md`, and `docs/DECISIONS_V0_2.md`.
+
 **Milestone 11 complete — Final Evidence and Release**
 
 The original source repository was lost. Historical 0.1.0 documentation survives under
@@ -62,6 +146,321 @@ public-only verification and leak scanning, and `release_checksums`/`CHECKSUMS.m
 version is now `0.1.0`. It changes no scientific behavior; its one correction to completed
 code moved reserved-seed enforcement from *representation* to *execution* (ADR-010), which is
 proven to have changed no result by a byte comparison of two independent held-out runs.
+
+## Post-MVP Milestone H verification
+
+### Evidence-based selection and scope
+
+- Read the current design-partner workflow and ADR-V2-017 before selecting a family. Both state
+  that the repository contains no real design-partner data, adjudication, pilot report, customer
+  impact, or manufactured result. Historical Milestones 23/24 propose both Missing Observations and
+  Entity Identity but provide no customer ranking. The evidence therefore does not distinguish
+  them; Missing Observations was selected only by the task's explicit fallback.
+- Added `docs/faults/MISSING_OBSERVATIONS.md` and ADR-V2-018. They state the tie, reject a customer-
+  demand claim, freeze the additive rebuilt-v1 choices, and leave Entity Identity unimplemented
+  pending demonstrated evidence or another explicit prioritization decision.
+- No frozen v0.1 source, schema, detector, finding union, scorer literal, benchmark, release
+  artifact, CLI, package metadata, dependency, mapping, policy, or shadow contract changed.
+  `tests/test_release_freeze.py` now recognizes `missing_observation_*` as another additive,
+  unreachable post-v0.1 module family and proves no frozen module imports it. The 88-file checksum
+  surface and `relc_2c6e945a71b85b39` remain unchanged.
+
+### Explicit expectations and six deterministic mechanisms
+
+- Added strict immutable `MissingObservationSeriesKeyV1`, `ExpectedObservationV1`,
+  `MissingObservationDetectorConfigV1`, injection/private-truth, finding/report, score, research,
+  and evaluation contracts. Every identity uses the existing canonical serializer, SHA-256, and a
+  dedicated namespace. All artifacts round-trip from canonical JSON; caller ordering is
+  normalized.
+- A detector expectation names the exact entity, concept namespace/concept, unit, dimensions,
+  period type/start/end, source name/locator, `expected_by` date, and a non-blank source/customer-
+  contract evidence reference. Future expectations are recorded as not evaluated. An absent
+  quarter with no expectation emits no finding even when surrounding periods exist.
+- Public expectation contexts are general required cell, reporting schedule, entity coverage,
+  concept coverage, survivorship cohort, and source-feed coverage. They are explicit public
+  authority reused unchanged on clean controls, not injector truth. Random injection is reported
+  only as an explicit expected absence; the detector never claims an observed gap is statistically
+  random.
+- `inject_missing_observations` implements six distinct mechanisms: SHA-256-ranked random cells;
+  declared interior reporting gaps; deterministic entity-group and concept-group selection;
+  complete declared survivorship-entity removal; and complete declared source/window outage.
+  Low/medium/high row fractions are `0.10`/`0.25`/`0.50` for the first four. Survivorship/outage
+  scopes are complete and reject a cap that would partially remove them. Inputs are never mutated.
+- Private manifests retain exact deleted `FinancialFact` rows, clean/corrupted identities/hashes,
+  complete mechanism-scoped eligibility, seed/severity, selection digest/rank, and independently
+  reproducible expected public evidence. Manifest validation recomputes configuration, target
+  count, rank/digest, fault IDs, and manifest identity.
+
+### Manifest-blind detection, scoring, replay, and research
+
+- `detect_missing_observations` accepts exactly `AuditInputSnapshot` plus the public expectation
+  configuration. It imports no injector or manifest module and has no clean snapshot, seed,
+  severity, target, scorer, replay, or fault channel. The unchanged sanitizer omits entity names,
+  source-row keys, deleted rows/values, selection/rank, and fault/manifest identity.
+- A due exact cell with zero matching records emits one contextual finding. Evidence includes the
+  expectation/evidence reference, audit cutoff, zero matching count, and at most the nearest
+  earlier/later visible record IDs in the same exact series. It never exposes the deleted record ID
+  or value. One or more exact matches make a cell present; duplicate meaning remains the frozen
+  Duplicate Observations detector's concern.
+- `score_missing_observations` starts from an identity-verified finalized report and then reads the
+  private manifest. Complete evidence equality is one-to-one; duplicate findings do not inflate
+  recall; unrelated evidence is false positive; missed deleted cells are false negative. The
+  false-positive denominator is the mechanism-scoped eligible expected-cell count.
+- `manifest_assisted_exact_missing_observation_replay` accepts only the exact clean or corrupted
+  snapshot, reinserts only manifest rows, is idempotent on clean input, and requires repaired
+  canonical bytes/ID/hash to equal clean exactly. This is private answer-key replay, not detector-
+  only remediation.
+- `declared_expected_cohort_mean_v1` applies one pure Decimal count/sum/mean to the same due cohort
+  in clean, corrupted, and repaired states. All six controlled cases change and restore it. This is
+  cohort-composition sensitivity, not statement reconstruction, a backtest, financial performance,
+  loss, or customer-impact evidence.
+
+### Separately gated synthetic held-out evidence
+
+- The frozen evaluation has development, validation, and held-out partitions with disjoint
+  synthetic identifiers, one case for each of the six mechanisms, 16 clean records per case,
+  medium severity, and fixed seeds. Freeze `mefreeze_7b192c639c93010f`; configuration SHA-256
+  `da80dfbba2b6dcf4122c533d74d97109190a7bfa44231a6f8b87ac9167567f0c`.
+- A standard-library `ContextVar` gate authorizes only the complete six-case held-out set for that
+  exact freeze. It rejects no authorization, a subset, duplicates, wrong freeze, or nesting, and
+  resets after exceptions. No ordinary API, root CLI flag, or environment variable opens it; only
+  `scripts/missing_observation_evaluation.py` does outside tests.
+- Development and validation were run and reviewed before the saved held-out command. Each reports
+  six cases, 26 injected faults/findings/true positives, zero false positives/false negatives/
+  clean-control findings, six controlled research changes, six exact restorations, and
+  precision/recall/F1 `1`.
+- The complete gate then wrote `missing_observation_evaluation_v1.json`: evidence
+  `meval_51a9d73ee7d716a7`, 6,403 bytes, SHA-256
+  `bae2d0bb65a007ba0d1c1b2e3b549e23dbf5ff123ff69bb403cf09d0cdba064a`. Held-out reports the
+  same exact counts. The artifact has `synthetic_contract_evidence=true` and
+  `customer_evidence=false`; it contains no manifest, deleted/original record, source-row key,
+  selection digest/rank, aggregate value, or cohort mean. Perfect explicit-contract results are
+  not generalized to a real feed.
+
+### Files, tests, gates, packaging, and limitations
+
+- Added eleven runtime modules: `missing_observation_contract.py`,
+  `missing_observation_expectations.py`, `missing_observation_injection.py`,
+  `missing_observation_manifest.py`, `missing_observation_detection.py`,
+  `missing_observation_scoring.py`, `missing_observation_replay.py`,
+  `missing_observation_research.py`, `missing_observation_gate.py`,
+  `missing_observation_fixture.py`, and `missing_observation_evaluation.py`; one evaluation script,
+  six test modules, the current fault contract, and the aggregate evidence JSON. Updated only the
+  additive v0.2 decisions, release-isolation test, and this handoff.
+- Added **49 tests** for strict contracts, all six injection shapes, deterministic selection,
+  complete-scope refusal, clean controls, unconfigured/future hard negatives, sanitized/private
+  isolation, exact/duplicate/unrelated/missed scoring, tamper refusal, exact replay/research,
+  gate completeness, saved-evidence privacy/identity, documentation honesty, frozen-v0.1
+  isolation, and subprocess determinism under `PYTHONHASHSEED` `0`/`1`/`987654` plus changed
+  working/temp/output/user state. The final complete suite passed **2,245 tests in 67.82s**.
+- Normal/frozen all-group sync passed (64 resolved/61 checked). Ruff check and format passed for
+  246 files. Strict MyPy passed for 234 source/test files; source-aware dashboard/scripts MyPy
+  passed for 12. Lock, frozen CLI and additive v0.2 help, both reviewed fixtures, 88-file checksum,
+  67-file/124-case v0.1 release freeze, v0.2 corpus freeze/census, Missing Observations evidence
+  check, offline build, and `git diff --check` all passed.
+- Offline build produced a 107-file wheel and 244-file sdist. Both contain all eleven runtime
+  modules; the sdist contains all six focused tests. Separate extraction/name/content scans found
+  no docs/scripts/reference tree, evaluation evidence JSON, actual checkout path/user, credential,
+  private-key file/content, environment, cache, or bytecode. The saved held-out aggregate is
+  repository evidence, not a distributed runtime input.
+- A fresh Python 3.12.13 environment installed the wheel offline with 19 packages, ran frozen CLI
+  help from outside the checkout, confirmed Streamlit/pandas/NumPy/PyArrow/matplotlib absent, and
+  reproduced `meval_51a9d73ee7d716a7` with 26 held-out faults and zero FP/FN.
+- Explicit expectations can themselves be wrong and require source-owner review. The detector does
+  not infer fiscal calendars, first/last endpoints, taxonomy equivalence, issuer lifecycle, outage
+  cause, or a missing value. No real customer expectation, dataset, adjudication, or production
+  result exists. No commit, push, release, package publication, or external write occurred.
+
+## Post-MVP Milestone G verification
+
+### Shadow boundary and reproducible audit identity
+
+- Added `external_dataset_shadow_contract.py` and `external_dataset_shadow.py` as additive
+  `external_dataset_*` modules outside the frozen v0.1 release surface. They accept only finalized,
+  identity-verified `ExternalDatasetAuditReportV2` artifacts. They do not import source ingestion,
+  audit execution, or network modules and accept no source row, normalized private dataset,
+  manifest, injector, scorer, benchmark truth, remediation, or production-control input.
+- `ShadowFindingBundleV1` embeds the exact unchanged `Finding` objects and separately records their
+  canonical hashes and policy-result context. `shadow_audit_id` binds the declared QuantCheck
+  version/code revision, exact report IDs/hashes, optional execution run/finalization, and a
+  version-independent audit-context identity. Supplied runtime is deliberately outside the logical
+  audit identity but inside the immutable bundle hash and later aggregate metrics.
+- `audit_context_id` binds the pseudonymous dataset key, mapping/policy identities, as-of date,
+  normalized dataset, snapshot and sanitized audit-input hashes, and exact source/snapshot counts.
+  Equivalent package construction is stable across `PYTHONHASHSEED`, working directories, temp
+  roots, and user/log-name environment values. Runtime changes the bundle identity but not the
+  reproducible audit or context identity.
+- Shadow mode starts after audit finalization, reads no customer dataset, and writes only to an
+  explicit new package directory. Every bundle fixes `shadow_mode=true`, `source_modified=false`,
+  `production_blocking_used=false`, `manifest_used=false`, and `benchmark_claim=false`. A policy's
+  `blocking` action remains report classification only and has no production integration.
+
+### Researcher package, adjudication, notes, and reruns
+
+- `prepare` writes `researcher_finding_bundle.json`, a complete unresolved
+  `adjudication_input.json`, and a separate `private/reviewer_notes_input.json`; overwrite is
+  refused. Findings/evidence stay in the researcher bundle and are never edited to hold human
+  state.
+- Sanitized adjudication covers every finding exactly once and accepts `confirmed_issue`,
+  `legitimate_data_condition`, `accepted_exception`, `duplicate_correlated_signal`, or
+  `unresolved`. Investigation status is separate: a not-started review must remain unresolved,
+  unassessed, and zero seconds; an investigated review may remain unresolved.
+- `AdjudicationExportV1` retains only finding ID/hash, detector, investigation/disposition,
+  decision-impact state, and reviewer-supplied seconds. It contains no evidence, explanation,
+  customer record IDs/values, dataset name, or reviewer notes. Stable IDs remain linkable, so the
+  user guide labels the export privacy-minimized rather than anonymous.
+- Free-text `ReviewerNotesV1` is a distinct private, revisioned, hash-linked artifact and is never
+  accepted by pilot reporting. Tests prove notes change neither the finding bundle nor sanitized
+  adjudication/pilot artifacts.
+- `RerunComparisonV1` requires a different version or code revision, exposes exact audit-context
+  match/mismatch, and uses only a declared exact evidence key. Same-key equal/different full hashes
+  are unchanged/changed; unmatched keys are added/removed. There is no fuzzy matching, inferred
+  correlation, evidence rewrite, or code-only attribution when the audit context differs.
+
+### Factual aggregate pilot report and operator workflow
+
+- `PilotReportV1` requires at least one dataset and exactly one complete identity-verified
+  adjudication export per finding bundle. It mechanically derives datasets audited, point-in-time
+  records audited, supplied runtime, findings for all four detector keys, findings investigated,
+  confirmed issues, legitimate data conditions, accepted/legitimate exceptions,
+  duplicate/correlated signals, investigated unresolved alerts, not-investigated findings,
+  unexplained/noisy alerts, explicitly customer-confirmed research-decision issues, and supplied
+  researcher review seconds.
+- Research-decision impact can be `customer_independently_confirmed` only on a confirmed issue. It
+  is never inferred from detector evidence, policy action, notes, or synthetic research behavior.
+- Pilot output is aggregate-only and retains source artifact IDs/hashes without customer/dataset
+  names, findings/evidence, record IDs, values, or notes. The schema fixes
+  `manufactured_numbers=false`; the builder has no no-data path and refuses incomplete, unknown,
+  mutated, or multiply linked adjudications.
+- Added the module CLI commands `prepare`, `adjudicate`, `notes`, `compare`, and `report` without
+  changing the checksum-frozen six-command root CLI. Fixed redacted completion/failure events never
+  echo parsed artifact data or local paths.
+- Added `docs/DESIGN_PARTNER_SHADOW_MODE.md`: copy/snapshot-only operating workflow, data-owner
+  mapping/policy review, runtime/reviewer-time measurement, artifact/access/retention separation,
+  command examples, exact rerun interpretation, customer-confirmation rule, privacy cautions, and a
+  blank design-partner evaluation template. It contains no pilot values. ADR-V2-017 freezes the
+  evidence/human-state/reporting boundaries.
+
+### Tests, gates, packaging, and limitations
+
+- Added 19 tests across `test_external_dataset_shadow.py`,
+  `test_external_dataset_shadow_documentation.py`, and
+  `test_external_dataset_shadow_determinism_subprocess.py`. They cover positive, negative, edge,
+  privacy, non-mutation, exact identity, disposition, note isolation, report provenance, CLI,
+  cross-version/context-drift, alternate-hash-seed, documentation, and frozen-v0.1 isolation paths.
+  The focused shadow plus release-freeze/isolation selection passed 53 tests. The final complete
+  suite passed **2,196 tests in 65.74s** with no failures.
+- Ruff check and format passed for 228 files. Strict MyPy passed for 217 source/test files;
+  dashboard/scripts passed for 11 files with `MYPYPATH=src`. The first standalone
+  dashboard/scripts invocation omitted that source path and resolved the installed untyped wheel;
+  the corrected source-aware invocation passed. Normal/frozen all-group sync, lock check, frozen
+  root CLI help, shadow module help, both reviewed fixtures, the 88-file checksum surface, the
+  67-file/124-case v0.1 release freeze, v0.2 corpus freeze, offline build, and
+  `git diff --check` all passed.
+- Offline build produced a 96-file wheel and 227-file sdist. The wheel contains both shadow runtime
+  modules; the sdist contains all three shadow test modules. Separate extraction/name/content scans
+  found no reference/prompts/docs/dashboard/scripts tree, cache/bytecode/environment directory,
+  actual checkout username, or checkout path.
+- A fresh Python 3.12.13 environment installed the wheel offline with 19 packages, displayed shadow
+  module help, and completed the synthetic `prepare` -> `adjudicate` -> `report` workflow from
+  outside the checkout. The generated report validated aggregate-only/no-manufacture/no-evidence/
+  no-notes flags. This was packaging evidence only, not a design-partner pilot or customer result.
+- No commit, push, release, container publication, customer-data operation, or external write was
+  performed. The prior uncommitted Post-MVP A/F worktree was preserved and extended in place.
+
+## Post-MVP Milestone F verification
+
+### Scope and runtime boundary
+
+- Added `src/quantcheck/external_dataset_self_hosted.py` with strict
+  `quantcheck/self-hosted-run/v1` configuration. It embeds the existing
+  `ExternalAuditExecutionPlanV1`, exactly binds every partition ID to one safe relative input path,
+  rejects absolute/traversal/backslash/home/symlink paths, confines resolution below one input
+  root, and requires separate existing writable output/work roots.
+- Both `telemetry` and `network_required` are literal false; attempted telemetry enablement and
+  unknown fields (including credential-like fields) fail. The config has no credential-consuming
+  field. Registry credentials remain outside QuantCheck in the container/CI credential mechanism.
+- The module invokes `run_external_audit_execution` unchanged and emits only canonical JSON
+  started/completed events or fixed failure codes. It never logs financial values, entity names,
+  source locators/credentials, paths, exception text, or tracebacks. Unknown CLI text is not echoed.
+- The checksum-frozen six-command `quantcheck` CLI, every detector/scorer/policy/schema, benchmark
+  behavior, and public/private scientific contract are unchanged. The module remains additive under
+  the existing `external_dataset_*` v0.1 isolation rule.
+
+### Container and clean artifact verification
+
+- Added a two-stage `Dockerfile` with Python `3.12.13-slim-bookworm` and `uv 0.12.2` pinned by OCI
+  index digest, frozen runtime-only sync, no OS package install or download shell, numeric non-root
+  `USER 65532:65532`, no port or `VOLUME`, telemetry disabled, and explicit `/config`, `/input`,
+  `/output`, and `/work` boundaries. `.dockerignore` allowlists only package build inputs and the
+  synthetic smoke bundle.
+- Added `deploy/smoke/`: a canonical, integrity-pinned three-row synthetic CSV/config with run
+  `xrun_d65eac0fa9d81e72`. It is image verification material only, never customer data, benchmark
+  evidence, or a detector-performance claim.
+- Added `scripts/verify_container_reproducibility.sh`: two no-cache Linux/amd64 OCI exports with the
+  same source revision/epoch and BuildKit timestamp rewriting must have the same SHA-256. Security
+  CI pins Buildx `v0.36.1` and BuildKit `v0.32.2` by digest before running it.
+- Offline wheel/sdist build passed. The wheel contains 94 files including the self-hosted module;
+  the sdist contains 222 files including both focused test modules. Neither archive contains the
+  Dockerfile, deploy bundle, security/deployment docs, reference/recovery material, local paths,
+  environments, caches, or bytecode.
+- A fresh Python 3.12.13 environment installed the wheel offline with 19 packages from outside the
+  checkout, displayed module help, and completed the packaged synthetic audit as
+  `xrun_d65eac0fa9d81e72` / `xfinal_8791ef087a606457` with only redacted started/completed stdout.
+
+### CI, SBOM, provenance, and security process
+
+- Updated baseline CI to least-privilege `contents: read`, full-SHA action pins, and offline build.
+  Added `.github/workflows/security.yml` for scheduled/PR/push library vulnerability scanning,
+  separate secret scanning, container build/image scanning, SPDX 2.3 SBOM generation, and
+  reproducibility verification. Trivy `v0.73.0` and Syft `v1.50.0` are explicit tool inputs.
+- Added `.github/workflows/publish-self-hosted.yml`. A published GitHub Release must match the
+  Python version; the workflow builds wheel/sdist offline, creates checksums and downloadable SPDX
+  SBOMs, scans before publication, pushes the image to GHCR by version/source SHA and immutable
+  digest, attaches BuildKit max provenance/SBOM plus GitHub/Sigstore provenance/SBOM attestations,
+  then pulls the digest and runs the normal mounted audit with no network, read-only root/input,
+  dropped capabilities, no privilege escalation, and resource limits. It also checks non-root/no-
+  volume metadata, redacted stdout, output confinement, and mounted-data deletion.
+- All explicit workflow actions are pinned to full 40-character commits. No release asset is
+  overwritten by `--clobber`; remediation requires a new version/digest.
+- Checksum-verified local Trivy 0.73.0 scans found 0 fixable high/critical library vulnerabilities
+  and 0 detected repository secrets. Checksum-verified Syft 1.50.0 produced a valid SPDX 2.3
+  package SBOM. No container/image scan was possible without a local engine.
+- Added `SECURITY.md`, self-hosted deployment/data-lifecycle and threat-model documents, a
+  provenance/SBOM verification plus patch/dependency process, a secure-development checklist, and
+  ADR-V2-016. They explicitly disclaim certifications, SLSA levels, independent audit, guaranteed
+  erasure, and the idea that provenance/scanning proves security.
+
+### Tests and gates
+
+- Added `tests/test_external_dataset_self_hosted.py` and
+  `tests/test_self_hosted_distribution.py`: 20 focused tests for real offline execution, strict
+  config, secrets/telemetry rejection, traversal/symlink confinement, explicit roots, log
+  redaction, process arguments, canonical/integrity-pinned smoke evidence, Dockerfile hardening,
+  bounded build context, action pins, scan/SBOM/provenance/release workflow coverage, no network
+  client import, and documentation/non-certification requirements.
+- Full current outcomes: Ruff check passed; Ruff format passed (223 files); strict MyPy passed (212
+  source files); dashboard/scripts MyPy passed (11 files); frozen all-group sync checked 61
+  packages; lock check resolved 64; CLI help passed; both reviewed fixtures, 88-file release
+  checksum surface, 67-file/124-case release freeze, and v0.2 corpus freeze passed; YAML parsing,
+  shell syntax, offline build, clean wheel install/audit, archive inspection, and `git diff --check`
+  passed. The final full suite passed **2,177 tests in 63.24s** with no warnings.
+
+### External status and limitations
+
+- Docker, Podman, Syft, Trivy, and Cosign were not preinstalled. Trivy/Syft were downloaded from
+  their official releases into temporary directories and checksum-verified; there is still no
+  local container engine. The image build, image SBOM/scan, OCI repeatability check, non-root/no-
+  network pulled-image smoke, GHCR push, and GitHub attestations are configured and statically
+  tested but not observed running.
+- No new GitHub Release, GHCR image, digest, SBOM attachment, or attestation exists. Publication
+  requires an explicitly authorized versioned release and a green publishing workflow. Until then,
+  the acceptance gate is implemented but not externally completed.
+- The minimal container supports CSV. Parquet/Arrow remain implemented in the Python path but are
+  not claimed by this image until a future package version declares and locks PyArrow explicitly.
+- No real customer data, real customer policy, external penetration test, or third-party security/
+  supply-chain audit was used. Deletion controls cover declared mounts; runtime logs, snapshots,
+  backups, remapped media, and host compromise remain operator responsibilities.
 
 ## Milestone 0 verification
 
@@ -1986,9 +2385,668 @@ steps against `5e02c9f` and succeeded. A follow-up release-preparation commit un
 corrected the now-falsified external-gate statements, regenerated `CHECKSUMS.md`, and carries the
 `v0.1.0` tag.
 
+## Post-MVP Milestone A Step 1 verification — v0.2 benchmark corpus substrate
+
+**Task.** Build the next versioned benchmark substrate whose purpose is external validity: a
+corpus architecture with deterministic synthetic adversarial fixtures, curated public financial-data
+fixtures, and an externally supplied private/vendor source class that is never required to enter the
+repository; development / validation / separately frozen held-out partitions; explicit inclusion
+rules; exact eligible-unit denominators by detector family; and leakage tests proving corpus
+partition identity cannot enter detectors.
+
+**Scope boundary.** This step delivers the *substrate*, not a v0.2 benchmark run. `BenchmarkFixtureId`,
+`benchmark_fixtures.py`, and `benchmark_expansion.py` are frozen v0.1 modules; wiring the corpus into
+a benchmark needs its own versioned contract and its own release candidate, and is the next task.
+**No detector has been run against v0.2 data on any partition.**
+
+### v0.1 is untouched
+
+Every v0.2 file is new. No file in `FROZEN_SOURCE_FILES` (67 source/lock files), no release
+document, and no committed fixture byte changed. The single edit to an existing file is
+`tests/test_release_freeze.py`, which is not checksum-covered. See ADR-V2-008 and
+`tests/test_corpus_v01_isolation.py`.
+
+- `uv run python scripts/release_checksums.py --check` → `CHECKSUMS.md is current: 88 files verified`
+- `release_freeze.json` still verifies; reviewed fixture still regenerates to its committed bytes
+- candidate `relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`, aggregate
+  `agg_571aae0b7c60a4a5`, and every number in `docs/FINAL_BENCHMARK_RESULTS.md` are unchanged
+
+### Files added
+
+Package (`src/quantcheck/`, deliberately **outside** `FROZEN_SOURCE_FILES`):
+`corpus_contract.py`, `corpus_schemas.py`, `corpus_gate.py`, `corpus_synthetic.py`,
+`corpus_public.py`, `corpus_external.py`, `corpus_registry.py`, `corpus_eligibility.py`,
+`corpus_freeze.py`.
+
+Script: `scripts/corpus_freeze.py` (`--census` / `--check` / `--write`).
+
+Tests: `tests/corpus_support.py`, `tests/test_corpus_contract.py`, `tests/test_corpus_sources.py`,
+`tests/test_corpus_determinism.py`, `tests/test_corpus_determinism_subprocess.py`,
+`tests/test_corpus_partition_isolation.py`, `tests/test_corpus_eligibility.py`,
+`tests/test_corpus_external.py`, `tests/test_corpus_freeze.py`,
+`tests/test_corpus_properties.py`, `tests/test_corpus_v01_isolation.py`.
+
+Documents: `docs/CORPUS_V0_2.md`, `docs/DECISIONS_V0_2.md`.
+
+Committed evidence: `corpus_freeze_v0_2.json`.
+
+Modified: `tests/test_release_freeze.py` only.
+
+### Exact corpus sizes
+
+Corpus `quantcheck-corpus-v0.2`, spec `quantcheck/corpus/v2`. **12 units, 4,320 records**, three
+partitions of four units and 1,440 records each. Partitions hold the same four unit roles built
+from the same cohort specifications with **disjoint issuers**.
+
+| Unit | Records | Issuers | Concepts | Units of measure | Distinct period ends | Filing lag (days) | Lineages | Max relative revision | Hard negatives |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `<p>-broad` | 696 | 7 | 11 | 4 | 48 | 12–90 | 0 | – | 1 |
+| `<p>-revisions` | 504 | 7 | 8 | 3 | 16 | 25–215 | 56 | 0.412 | 0 |
+| `<p>-stress` | 168 | 4 | 5 | 3 | 25 | 0–133 | 1 | 0 | 14 |
+| `<p>-public` | 72 | 1 | 6 | 2 | 12 | 55 | 0 | – | 0 |
+
+Source classes: 9 units `synthetic_adversarial` (4,104 records), 3 units `curated_public`
+(216 records), 0 units `external_private`.
+
+Per-unit horizons (`snapshot_as_of` / `research_as_of`): `broad` 2024-08-31 / 2024-05-15,
+`revisions` 2024-06-30 / 2024-04-15, `stress` 2024-12-31 / 2024-11-15, `public` 2024-08-31 /
+2024-05-15.
+
+### Exact eligible-unit denominators, by detector family
+
+Computed by calling the **frozen v0.1 eligibility functions unchanged**
+(`is_eligible_lookahead_target`, `build_comparable_observations`, `build_duplicate_groups`,
+`build_revision_history_units`) — the same functions
+`benchmark_dispatch.eligible_clean_denominator` uses for a v0.1 clean control, so a v0.2
+denominator is the same quantity as a v0.1 one. Identical in all three partitions:
+
+| Fault profile | Eligible unit | `low` best / total | `medium` best / total | `high` best / total |
+| --- | --- | --- | --- | --- |
+| `duplicate_observation` | singleton fingerprint group | 596 / 1114 | 596 / 1114 | 596 / 1114 |
+| `lookahead_timestamp` | eligible clean record | 58 / 115 | 50 / 107 | **40 / 86** |
+| `revision_overwrite` | revision history unit | 56 / 56 | **42 / 42** | **28 / 28** |
+| `unit_drift` | comparable observation | 532 / 859 | 532 / 859 | 532 / 859 |
+
+**All 36 cells (12 per partition × 3) are `eligible`.** None is `declared_unsupported`; none is
+`insufficient`. The bolded cells are the three that failed every v0.1 seed with
+`no_eligible_targets`, and v0.1's whole-matrix `revision_overwrite` denominator of 11 is now 56 per
+partition.
+
+Declared adequacy floors, frozen in the contract before any corpus existed (ADR-V2-002):
+`MINIMUM_CELL_ELIGIBLE_UNITS = 8` (best single unit), `MINIMUM_PARTITION_ELIGIBLE_UNITS = 24`
+(partition total). These are corpus thresholds; **no frozen detector threshold moved**.
+
+### Hashes
+
+`corpus_freeze_v0_2.json`, 63,051 bytes, SHA-256
+`ab8dde4dce9e7db650b88da0ec0f1209c465efdef1b1a2a8d0e71bebc9ea3caa`.
+
+| | |
+| --- | --- |
+| Freeze | `cfrz_040ae8f12d864289` |
+| Corpus | `corp_a55d14a60c2f89d6` |
+| Census | `cens_4512c0c8f3fdb747` |
+
+Per-unit content hashes:
+
+| Unit | `corpus_unit_id` | SHA-256 of canonical records |
+| --- | --- | --- |
+| `development-broad` | `cunit_794a1981e01dfec3` | `0c4fff6eafcc513957d3a04652a0aeee828666491c95d08188bdb7130d126d32` |
+| `development-revisions` | `cunit_d378dddc70b0064a` | `6df6a6aced13c7eed7d04ca348cca652fa610c860463935de02766dfe9cd11a9` |
+| `development-stress` | `cunit_38ef8d3391ce3749` | `595d4e5ac816f6efe92c286d0f66f2af7701cf8b6b75264fa3e8649b1fe80a5c` |
+| `development-public` | `cunit_e28c230faf862521` | `96b83af9bbecf329126d129600b39fde10735a4f32d6aaa9e14263ec98f584bb` |
+| `validation-broad` | `cunit_78da2127c4b77edd` | `eba805984be02f55eabe22a86c88dd08df6925b96f64bd677791f1c9ec403e63` |
+| `validation-revisions` | `cunit_3e9f6ba799a63abc` | `c73607b0e1a981ea56e1d29d0fdf2671584e5b17410ee7c92965a707b19a3db5` |
+| `validation-stress` | `cunit_a3934b0a8a37b9a1` | `ed14e336f9ba2cdf244d1fe596c74ca6e204337769ef9a8da311d40f839eaf48` |
+| `validation-public` | `cunit_e8497a0e9d8f6419` | `3d0f2854bf2972df2a7f367ec1c5c1f8d40d33945c20d6fb800bbea71b4d67b6` |
+| `heldout-broad` | `cunit_9a577ffc870311dd` | `ea4f9105d54d3723bd8f77d368fbf0c1fd33be7910b0820453a92acb83f2f406` |
+| `heldout-revisions` | `cunit_c4770ca77fabccde` | `1086069f050853740ac607a5d08bd2b5b67d8a335990ff8fc365a459d541d9c0` |
+| `heldout-stress` | `cunit_28bbd77f1b09eb2d` | `459ddfb88d5d28eaa9a9ca611343a5cd2c9a0d70df266b9dad431bf3db5bac02` |
+| `heldout-public` | `cunit_171f409fd9271b2e` | `e8fde5b327d4c37c9be2729c4bb738c33409e337e8df14a39d3af8550714b4a6` |
+
+The freeze record commits hashes, diversity, and denominators — and **no record content**: no
+`records`, no `record_id`, no `source_row_key` appears in its bytes. Reading it needs no
+authorization; rebuilding it does.
+
+### Commands run and exact outcomes
+
+```
+uv run ruff check .                                   → All checks passed!
+uv run ruff format --check .                          → 181 files already formatted
+uv run mypy src tests                                 → Success: no issues found in 171 source files
+uv run pytest                                         → 1969 passed in 44.92s
+uv run quantcheck --help                              → exit 0
+uv run python scripts/release_checksums.py --check    → CHECKSUMS.md is current: 88 files verified
+uv run python scripts/corpus_freeze.py --write        → wrote corpus_freeze_v0_2.json
+uv run python scripts/corpus_freeze.py --check        → corpus_freeze_v0_2.json is current
+uv run python scripts/corpus_freeze.py --census       → 24 development/validation cells, all eligible
+uv build                                              → built sdist and wheel
+```
+
+Test suite went from 1,690 to 1,969 passing (279 new). New gate commands: corpus determinism
+(in-process and cross-process under three `PYTHONHASHSEED` values and three working directories),
+partition isolation, corpus eligibility, external boundary, corpus freeze, corpus properties
+(Hypothesis), and v0.1 isolation.
+
+### Leakage tests
+
+`tests/test_corpus_partition_isolation.py` closes six routes: vocabulary (every detector-visible
+string value is either present in every partition or present in exactly one and hash-opaque),
+opacity, structure (`AuditInputRecord` has no partition/corpus field; `run_all_detectors` has no
+corpus parameter), identity disjointness, imports (no detector module mentions the corpus layer),
+and construction (`check_detector_visible_naming` refuses a partition-bearing name).
+
+Deliberately **not** a substring search for "development": the real `us-gaap` concept
+`ResearchAndDevelopmentExpense` contains it, appears identically in all three partitions, and
+carries no partition information. See ADR-V2-004.
+
+### Held-out gate
+
+`corpus_gate.held_out_corpus_units` mirrors ADR-010's execution-not-representation split: a
+held-out unit may be described freely, but materializing its records needs an authorization
+covering the **complete** held-out partition. Standard-library only, `ContextVar`-scoped, opened by
+exactly one file outside the gate module (`scripts/corpus_freeze.py`), asserted by static test. The
+corpus gate and the release gate are independent in both directions.
+
+### Decisions added
+
+`docs/DECISIONS_V0_2.md`, ADR-V2-001 through ADR-V2-009 — a separate document because
+`docs/DECISIONS.md` is checksum-frozen for `v0.1.0`.
+
+
+## Post-MVP Milestone A Step 2 verification — v0.2 detector execution and evaluation
+
+**Task.** Add a versioned detector-execution and evaluation contract that preserves every v0.1
+behavior/artifact, keeps detectors manifest-blind behind `AuditInputSnapshot`, permits explicit
+one/multiple/all selection, retains the strict primary-family benchmark score, and adds a
+production-oriented interpretation that does not hide legitimate correlated findings.
+
+### Scope and compatibility
+
+- Every scientific v0.1 source file, `quantcheck` CLI byte, release document, benchmark metric,
+  checksum, and freeze identity remains unchanged. `benchmark_v2_*` is an additive module family,
+  and frozen-module tests prove no v0.1 module imports it.
+- `run_selected_detectors_v2` accepts only `audit_input` and the public execution config. It imports
+  no manifest or injector and reuses the four frozen detector implementations unchanged.
+- `DetectorExecutionConfigV2` is nested in `BenchmarkV2Config`/`BenchmarkV2CaseConfig` and reuses
+  `BenchmarkDetectorConfigs`; the Python and module-CLI paths validate the same models and use the
+  same canonical serializer and atomic artifact store.
+- This step admits development/validation corpus units and seeds only. It does not materialize a
+  held-out corpus unit, open the final-seed gate, run a complete rehearsal, freeze a v0.2 release
+  candidate, or publish aggregate v0.2 metrics.
+
+### Files added
+
+Package (`src/quantcheck/`, deliberately outside the v0.1 frozen surface):
+`benchmark_v2_contract.py`, `benchmark_v2_schemas.py`, `benchmark_v2_execution.py`,
+`benchmark_v2_config.py`, `benchmark_v2_evaluation.py`, `benchmark_v2_case.py`,
+`benchmark_v2_cli.py`.
+
+Tests: `tests/benchmark_v2_support.py`, `tests/test_benchmark_v2_config.py`,
+`tests/test_benchmark_v2_execution.py`, `tests/test_benchmark_v2_evaluation.py`,
+`tests/test_benchmark_v2_cli.py`, `tests/test_benchmark_v2_determinism_subprocess.py`,
+`tests/test_benchmark_v2_documentation.py`, `tests/test_benchmark_v2_v01_isolation.py`.
+
+Document: `docs/BENCHMARK_V0_2.md`.
+
+Modified v0.2/unfrozen evidence: `docs/CORPUS_V0_2.md`, `docs/DECISIONS_V0_2.md`,
+`IMPLEMENT.md`, and `tests/test_release_freeze.py`. `CHECKSUMS.md`, `release_freeze.json`, and
+every checksum-covered file are unchanged.
+
+### Versioned evaluation semantics
+
+The strict view calls the frozen v0.1 combined-report builder and the selected primary family's
+frozen exact scorer. With all four detectors, focused regression tests prove the strict report and
+score are canonical-byte identical to v0.1 direct dispatch for the same input/manifest. A subset
+retains strict primary-family semantics but is explicitly marked `v0_1_all_detector_comparable =
+false` because it does not contain the v0.1 all-detector finding population.
+
+The production interpretation preserves every finding and applies one deterministic precedence:
+exact primary one-to-one match; exact paired-clean-control equivalent (independent/background);
+non-primary public evidence uniquely related to one injected fault unit (secondary/corroborating);
+otherwise unmatched. Secondary findings do not affect recall. Schemas enforce one category per
+finding, one outcome per injected unit, exact equality between strict and production primary
+matches, and prohibit one secondary finding from attaching to multiple units.
+
+`FaultUnitOutcomeV2` answers whether each primary fault was detected and which other rules the same
+unit violated. `genuinely_unexplained_finding_ids` is validated to equal the unmatched category.
+The unusual development-stress clean control carries fourteen declared hard negatives and four
+legitimate findings; v0.2 keeps all four visible and classifies them as background from paired
+control evidence. A separate natural Unit Drift case proves genuinely unexplained findings remain
+explicit.
+
+### Serialization and migration
+
+New outer versions/namespaces are `quantcheck/benchmark/v2`,
+`quantcheck/detector-execution/v2`, and `quantcheck/finding-evaluation/v2`, with `bench2_`,
+`bcase2_`, `dexec2_`, `fint2_`, and `eval2_` identities. Nested v1 reports, findings, strict scores,
+provenance, and IDs are unchanged. `docs/BENCHMARK_V0_2.md` freezes the fields, categorization
+precedence, CLI/API use, public/private case tree, and explicit no-in-place-migration rule. A v1
+artifact stays v1; a v2 interpretation requires an explicit new paired-control execution and gets
+new v2 container IDs. Released v0.1 metrics are never retroactively recomputed.
+
+### Decisions added
+
+- ADR-V2-010: selected detector execution plus strict/production dual views.
+- ADR-V2-011: additive versioned envelopes and explicit re-execution rather than in-place migration.
+
+### Verification
+
+Focused coverage includes all four single-detector selections, all six pairwise cross-detector
+selections, all-detector execution, clean hard negatives, correlated secondary evidence, explicit
+unmatched evidence, exact one-to-one multi-fault scoring, CLI/Python model reuse, canonical round
+trips, v0.1 source/checksum isolation, and complete-byte cross-process determinism under three
+`PYTHONHASHSEED` values and three working directories.
+
+```
+uv sync --frozen --all-groups                         → checked 61 packages
+uv lock --check                                       → resolved 64 packages; current
+uv run ruff check .                                   → All checks passed!
+uv run ruff format --check .                          → 196 files already formatted
+uv run mypy src tests                                 → Success: no issues found in 186 source files
+uv run pytest                                         → 2021 passed in 47.52s
+uv run pytest tests/test_benchmark_v2_*.py
+  tests/test_release_freeze.py -q                     → 80 passed in 2.40s
+uv run quantcheck --help                              → exit 0; frozen v0.1 CLI unchanged
+uv run python -m quantcheck.benchmark_v2_cli --help   → exit 0
+uv run python scripts/release_checksums.py --check    → CHECKSUMS.md current: 88 files verified
+uv run python scripts/release_freeze.py --check       → relc_2c6e945a71b85b39; 67 frozen files;
+                                                        124 cases; unchanged hashes
+uv run python scripts/corpus_freeze.py --check        → corpus_freeze_v0_2.json is current
+uv run python scripts/corpus_freeze.py --census       → 24 dev/validation cells; all eligible
+uv build --offline                                    → sdist and wheel built
+git diff --check                                      → passed
+```
+
+Separate package inspection: wheel 84 files with all seven `benchmark_v2_*` package modules; sdist
+196 files with all seven modules plus shared v2 test support; neither artifact contains
+`reference/`, `IMPLEMENT.md`, `AGENTS.md`, local tool directories, or `corpus_freeze_v0_2.json`.
+A fresh Python 3.12.13 environment installed the wheel, imported v0.2 execution, and ran both the
+frozen `quantcheck --help` and additive v0.2 module help successfully.
+
+
+## External dataset production audit path verification
+
+**Task.** Build the narrowest production-quality path from an externally supplied financial
+dataset to a manifest-free public detector report, initially supporting Parquet, Arrow, CSV, and
+Python mappings. Every external-to-canonical meaning must be versioned and explicit; values must
+remain exact; availability, revision, and source-row semantics must never be guessed; dry-run must
+make no audit/benchmark claim; source files must be read-only; diagnostics must be machine-readable
+and data-free; and every existing benchmark path must remain unchanged.
+
+### Scope and compatibility
+
+- Added an independent customer audit path, not another corpus unit, benchmark case, vendor
+  adapter, fault-injection workflow, scorer, or CLI root command. No real customer or vendor file
+  was supplied, so no vendor-specific integration was added.
+- Frozen `FinancialFact`, `DatasetSnapshot`, `AuditInputSnapshot`, point-in-time selection,
+  sanitization, all four detectors, benchmark v1/v2 modules, release artifacts, installed v0.1 CLI,
+  `pyproject.toml`, and `uv.lock` are unchanged.
+- `tests/test_release_freeze.py` now treats `external_dataset_*` like the existing additive
+  `corpus_*` and `benchmark_v2_*` exclusions and proves no frozen module imports any of them.
+  `CHECKSUMS.md` still verifies all 88 v0.1 files and release candidate
+  `relc_2c6e945a71b85b39` still verifies its 67 frozen files and 124-case matrix.
+
+### Mapping and normalization contracts
+
+- `DatasetMappingV1` / `quantcheck/dataset-mapping/v1` is frozen, strict, and
+  `extra="forbid"`. It explicitly maps dataset name, entity ID/name, concept namespace/concept,
+  exact value, unit, dimensions, period type/start/end, filing date, availability date, form,
+  accession/equivalent, public source name/locator, source-row ID, and revision lineage.
+- A field is a declared source column, declared constant, or (only for nullable canonical fields)
+  an explicit absent declaration. Dimensions are explicit axis/member-column pairs; `()` is the
+  dimension-free declaration. Mixed period labels name exact instant/duration source values.
+- Availability is either a source column whose declared meaning is
+  `first_available_to_researcher_end_of_day`, with an evidence reference, or explicit equality to
+  filing backed by
+  `source_contract_confirms_filing_date_equals_availability_date`. There is no default, timestamp
+  truncation, or fallback equality.
+- Revision lineage is either explicit source lineage plus positive sequence, with paired nulls
+  explicitly independent, or globally declared absent. Forms, accessions, economic keys, values,
+  and row adjacency never infer a history. Normalization validates unique sequence numbers, one
+  economic identity, and monotonic filing/availability through the existing point-in-time engine.
+- Financial values accept only `Decimal`, non-boolean integer, or canonical fixed-point decimal
+  text. Python floats, Arrow floating types, booleans, exponent text, and non-finite or implicitly
+  converted values are rejected. No accepted value crosses binary floating point.
+- Every row needs a source-defined row ID. Canonical source coordinates are deterministic opaque
+  `xrow_` identities, or `xline_<digest>#r<n>` for source-declared histories—never row position.
+  `NormalizedRowProvenanceV1` privately preserves the exact upstream row ID and raw lineage while
+  the unchanged sanitizer drops both.
+- `NormalizedDatasetV1` / `quantcheck/normalized-dataset/v1` sorts facts and provenance by stable
+  record ID. Equivalent CSV, Parquet, Arrow, and Python rows produce byte-identical normalized
+  output independent of source order, `PYTHONHASHSEED`, current directory, temp/output/user state,
+  and input container.
+
+### Input integrity, dry-run, and diagnostics
+
+- File format is explicit: `csv`, `parquet`, `arrow_file`, or `arrow_stream`. CSV encoding,
+  delimiter, quote character, and null tokens are explicit; no format or dialect is sniffed.
+- Production normalize/audit requires the caller's expected raw SHA-256; expected byte size is an
+  optional second guard. The digest is calculated before parsing from the same read-only handle,
+  then device/inode/size/mtime-ns are rechecked. Missing, symlinked, changed, mismatched, malformed,
+  truncated, invalid-UTF-8, wrong-width, and wrong-container input is rejected. No source is ever
+  written, renamed, repaired, or permission-changed.
+- `ExternalDatasetValidationProfileV1` / `quantcheck/dataset-validation-profile/v1` is the dry-run
+  artifact. It reports only format, digest/size, row/valid/error/warning counts, bounded diagnostics,
+  and omitted count. It carries literal `audit_claim=false`, `benchmark_claim=false`,
+  `network_used=false`, and `manifest_used=false`.
+- Diagnostic codes/messages come from a fixed catalogue. Raw financial values, source-row values,
+  upstream exception text, and local file paths never enter profiles or the fixed public exception
+  message. A valid dry-run can discover raw digest/size before the operator pins them for audit.
+
+### Production audit workflow and public boundary
+
+The current implemented workflow is exactly external bytes/Python rows -> validate mapping and
+integrity -> `NormalizedDatasetV1` -> existing `build_dataset_snapshot` -> existing
+`sanitize_for_audit` -> required identity-checked `AuditPolicyV1` -> enabled unchanged detector
+reports plus production-only policy expectations -> explicit exception resolution ->
+`ExternalDatasetAuditReportV2` (`quantcheck/external-audit/v2`). The former v1 report remains a
+strict parsing type for pre-policy evidence; no current production entry point emits it.
+
+`audit_external_file`, `audit_external_rows`, and `audit_normalized_dataset` accept no manifest,
+clean answer key, seed, severity, injector, target count, fault profile, or benchmark config. They
+require a policy rather than accepting a detector-selection config directly. The public report
+holds mapping/normalized/snapshot/audit identities and hashes, exact policy provenance, counts,
+resolved detector configuration, unchanged selected public `AuditReport`s, every rule status,
+policy results, applied-exception reasons, action counts, and disposition. It omits the full
+normalized facts, entity names, source-row keys, raw revision lineage, private provenance links,
+runtime/local paths, benchmark metrics, and private truth; it declares
+manifest/fault-injection/benchmark/network use false.
+
+Reviewed synthetic demonstration over five source records and all four selected detectors:
+mapping `dmap_f27356a1ad33fe6d`, normalized dataset `ndset_a52ede369707aea8`, snapshot
+`snap_2cd85ba3d98cb820` (four point-in-time records), sanitized audit input
+`audit_8652d572ab479233`. Its pre-policy v1 report was `xaudit_fee7d1b60d621a42`; the current
+explicit monitoring policy/report evidence is recorded in the policy-layer section below. These
+are new rebuilt-contract examples, not historical metrics or a claim about a real customer
+dataset.
+
+### Files and decisions
+
+- Runtime foundation added: `external_dataset_contract.py`, `external_dataset_ingestion.py`,
+  `external_dataset_audit.py`; the policy task extends the contract/audit modules additively and
+  adds the three policy modules listed below.
+- Tests added: `external_dataset_support.py` plus eight `test_external_dataset_*.py` modules for
+  contracts, formats, validation/privacy, audit, large/integrity inputs, cross-process determinism,
+  documentation, and v0.1/benchmark isolation.
+- Documentation foundation: `docs/EXTERNAL_DATASETS.md`. `docs/DECISIONS_V0_2.md` adds
+  ADR-V2-012 (explicit mapping and manifest-free production audit) and ADR-V2-013 (lazy PyArrow
+  until a v0.2 package metadata freeze); the policy task updates the user contract and adds
+  ADR-V2-014 separately below.
+- Modified: `tests/test_release_freeze.py` only outside v0.2 docs/this handoff. No frozen source,
+  package metadata, lock, checksum, freeze record, benchmark artifact, or fixture byte changed.
+
+### Tests and commands
+
+- Added **89 tests**: contracts 16, format interop/exact Decimal/dimensions 16,
+  validation/privacy/ambiguity
+  21, production audit 10, large file/integrity 14, subprocess determinism 2, isolation 6, and
+  documentation 4. Full suite: **2,110 passed** (2,021 prior + 89 new).
+- Large-file tests normalize 10,000 CSV rows and validate 66,000 Parquet rows across the 65,536-row
+  Arrow batch boundary. Malformed coverage includes truncated Parquet/Arrow file/Arrow stream,
+  malformed CSV, invalid UTF-8, float schemas, digest/size mismatch, absent integrity pin, missing
+  file, symlink, missing PyArrow, ambiguous revisions, invalid dates/periods, duplicate identity,
+  and bounded diagnostics.
+- Every required command exited 0: normal/frozen all-group sync, Ruff check, Ruff format check
+  (208 files), strict MyPy (198 source files), full pytest (2,110), lock check, frozen CLI help,
+  both reviewed-fixture checks, release checksum/freeze checks, corpus freeze/census checks,
+  offline build, and `git diff --check`.
+- The 2,107-test suite passed under `PYTHONHASHSEED=1` (62.82s) and `987654` (62.88s); the three
+  final dimension/evidenced-availability additions passed as part of the final 16-test format suite
+  under both alternate seeds. Focused external suite plus release-freeze regression passed 117
+  tests; the final ordinary full run passed 2,110 in 64.04s.
+
+### Packaging and clean install
+
+- `uv build --offline` produced the v0.1-named additive working-tree wheel and sdist without
+  changing package metadata. The wheel has 87 files and contains all three external dataset
+  modules; the sdist has 208 files and contains all eight external test modules plus support.
+- Separate extraction/name/content scans found no reference/prompt/docs/dashboard/scripts,
+  generated `release_evidence/`, environment/cache/bytecode directory, actual checkout username,
+  local checkout path, or access-key pattern. Existing `release_evidence.py` and its private-key
+  *marker strings* are legitimate privacy-scanner code, not packaged evidence or credentials; an
+  initially over-broad scan was corrected and the precise scans passed.
+- A fresh offline Python 3.12.13 environment installed the wheel plus the already locked PyArrow
+  24.0.0 explicitly. Importing `quantcheck` and `external_dataset_ingestion` first left PyArrow
+  unloaded; frozen CLI help passed; then a Decimal128 Parquet file completed the full production
+  audit and preserved `Decimal("1234567890.1234")` exactly, producing
+  `xaudit_26cf6cee2f0c3fc1` with no manifest.
+- PyArrow remains a lazy additive capability because `pyproject.toml`/`uv.lock` are immutable v0.1
+  release inputs. Missing PyArrow is a fixed diagnostic. A future v0.2 package freeze must declare
+  it as a dependency or extra; this limitation is explicit in ADR-V2-013 and the user contract.
+
+
+## Production audit policy layer verification
+
+**Task.** Add a versioned, deterministic customer policy layer over the completed external audit
+path without changing scientific benchmark truth. Policies must explicitly configure detector
+enablement and actions, concept/unit expectations, source-supported publication lag, reporting
+frequency, contract-permitted detector thresholds, and reasoned dataset exceptions; every current
+production report must record exact policy provenance; precedence and malformed-input behavior must
+fail closed; and no real customer requirement may be invented.
+
+### Policy and identity contracts
+
+- Added strict frozen `AuditPolicyContentV1` / `AuditPolicyV1` under
+  `quantcheck/audit-policy/v1`. All nested models inherit canonical `extra="forbid"` validation.
+  Policies are distinct from `BenchmarkConfig`, `BenchmarkV2Config`, and
+  `DetectorExecutionConfigV2`; no benchmark entry point accepts a policy.
+- Policy content requires an explicit name/version, all four detector rules exactly once, every
+  production expectation tuple, and every dataset exception tuple. Collections normalize by
+  stable keys, so logical declaration order cannot affect canonical bytes.
+- `policy_content_hash` is the SHA-256 of exact normalized policy content; `policy_id` (`apol_`) is
+  a dedicated stable identity over that content. Both are recomputed and validated. Version,
+  enablement, action, threshold, expectation, exception, and reason changes all produce new hashes
+  and IDs; a reordered equivalent policy does not.
+- No policy model has a manifest, fault, seed, severity, target, clean/corrupted snapshot,
+  benchmark ID, score, injector-only field, or hidden answer-key channel. The audit API has no
+  module/environment/global default: every file, row, and normalized-dataset audit requires an
+  identity-bearing `policy` argument.
+
+### Rules, thresholds, actions, and report provenance
+
+- Each detector is explicitly enabled or disabled. Disabled rules require a non-blank reason and
+  remain in the report as `disabled`; enabled rules forbid a stale disablement reason. All rule
+  kinds take exactly one `blocking`, `warning`, or `informational` action.
+- Unit Drift is the only current detector contract with a configurable threshold, so every Unit
+  Drift policy entry must state its exact Decimal `ratio_threshold`. The frozen supported factor set
+  is reused. Other detectors reject threshold configuration. A focused 100/6000/100 series emits
+  the frozen detector's three local findings at threshold 50 and none at policy threshold 75,
+  while a fresh `DetectorExecutionConfigV2` still resolves threshold 50.
+- Concept/unit expectations apply an explicit non-empty accepted-unit set to one exact concept and
+  optional entity scope. Publication lag admits three exact day-level bases and runs only over the
+  mapping's evidenced filing/availability meanings. Both availability-column and evidenced
+  same-as-filing mappings are tested. Reporting frequency compares adjacent distinct period ends
+  in an exact entity/concept/unit/dimension/period-shape series; insufficient history is recorded
+  as `not_evaluated`, never as a silent pass.
+- Current production entry points emit `ExternalDatasetAuditReportV2`
+  (`quantcheck/external-audit/v2`, `xaudit2_`). Every report records policy ID/name/version/hash,
+  exact selected detectors and resolved public configs, unchanged nested v1 detector reports,
+  every policy rule status/result, action/waiver/exception counts, and disposition. The prior v1
+  report remains only a parsing type; no current entry point emits policy-free evidence.
+- Disposition precedence is blocking -> `blocked`, otherwise warning -> `review_required`,
+  otherwise informational -> `passed_with_information`, otherwise `passed`. The report validator
+  recomputes action counts, result partitions, detector selection, audit context, and disposition;
+  its deterministic identity covers the complete envelope.
+
+### Explicit exceptions and fail-closed precedence
+
+- Dataset exceptions require exact dataset and configured enabled rule IDs, an exact `waive` or
+  `override_action` effect, a non-blank reason, and optional record/entity/concept/unit predicates.
+  They never erase an underlying detector finding or policy violation. The result retains base and
+  effective actions, exception ID/effect/reason, and an explicit exception-applied disposition.
+- Structural mapping/input/normalization/identity/audit-boundary validation cannot be excepted.
+  A float remains rejected when all detectors are disabled, proving malformed input cannot make a
+  rule silently disappear.
+- After a valid result exists, exceptions match exact dataset/rule first. The greatest number of
+  exact scope predicates wins; a general waiver and entity-specific action override prove the
+  specific choice. Two matching exceptions with equal specificity raise
+  `PolicyEvaluationError`; declaration order is never a tie-breaker. Exceptions for unknown or
+  disabled rules are rejected while the policy is built.
+
+### Representative evidence, files, tests, and decisions
+
+- Added `external_dataset_policy_contract.py`, `external_dataset_policy.py`, and
+  `external_dataset_policy_examples.py`; extended `external_dataset_contract.py` and
+  `external_dataset_audit.py`. The example module exposes explicit factories only—no active
+  default. One is all-detector informational monitoring; the feature-complete example uses
+  deliberately fictional taxonomy/dataset semantics and is not a customer recommendation.
+- Added `tests/test_external_dataset_policy_contract.py` (14 tests) and
+  `tests/test_external_dataset_policy_evaluation.py` (15 tests); one documentation assertion makes
+  **30 new tests** total. Updated external support/audit/contract/determinism/documentation/isolation
+  tests for the required policy API and policy-bearing report.
+- Added `docs/PRODUCTION_AUDIT_POLICIES.md`, updated `docs/EXTERNAL_DATASETS.md`, and added
+  ADR-V2-014 to `docs/DECISIONS_V0_2.md`. The historical Milestone 26 list is supporting scope
+  evidence only; current semantics and precedence are rebuilt decisions, not recovered behavior.
+- Representative five-row monitoring evidence: policy `apol_fa463bec1d2a529d`, content hash
+  `23a008e07430575aafe89f7242ebcad7e5b599e462e14f9e21d43a70b7ed9ca4`, mapping
+  `dmap_f27356a1ad33fe6d`, normalized dataset `ndset_a52ede369707aea8`, snapshot
+  `snap_2cd85ba3d98cb820` (four visible records), audit input `audit_8652d572ab479233`, report
+  `xaudit2_628418e791c77238` / hash
+  `e87eacc37fa58041aa4256f57b5c30c1fa94627f7ff5fcb931624e68b3f0a176`, zero findings, and
+  `passed`. This is synthetic contract evidence, not a real customer audit or performance claim.
+- ADR-V2-014 records policy/benchmark separation, mandatory report provenance, threshold scope,
+  exception visibility/specificity, and absolute structural-validation precedence. No v0.1/v0.2
+  detector, benchmark config, case, score, corpus, release artifact, package metadata, or lock
+  selection changed.
+
+### Verification and packaging
+
+- Focused policy/external audit suite passed 63 tests; the policy contract/evaluation/determinism
+  subset passed 31 tests under `PYTHONHASHSEED=1` and `987654`. Final ordinary full suite passed
+  **2,140 tests** (2,110 prior + 30 new) in 58.82s with no failures.
+- All repository gates exited 0: normal/frozen all-group sync (64 resolved/61 checked), Ruff check,
+  Ruff format check (213 files), strict MyPy (203 source files), full pytest, lock check, CLI help,
+  both reviewed-fixture checks, 88-file release checksum check, 67-file/124-case release freeze
+  check, v0.2 corpus freeze check, offline build, and `git diff --check`.
+- Offline build produced a 90-file wheel and 213-file sdist. Both contain all three policy runtime
+  modules; the sdist contains both policy test modules. Separate name/content scans found no
+  recovery/reference/governance/docs/dashboard/scripts tree, local tool/environment/cache path,
+  bytecode, or actual checkout path. The sdist contains the literal fake source-secret marker used
+  by its negative privacy test, not populated private audit data; the wheel does not contain it.
+- A clean Python 3.12.13 environment installed the wheel offline with 19 declared/transitive
+  packages, ran frozen CLI help, imported the example policy, and completed a one-row production
+  audit as `quantcheck/external-audit/v2` with policy `apol_fa463bec1d2a529d`, disposition
+  `passed`, and no PyArrow import.
+
+
+## Bounded local production execution and performance verification
+
+**Task.** Profile the existing implementation on progressively larger deterministic datasets,
+identify measured bottlenecks, and add only evidence-backed production execution improvements.
+Required evidence includes record count, detector-specific and total runtime, peak memory,
+normalized/public/private sizes, and incremental rerun cost. Production behavior must be bounded
+where practical, deterministic across supported worker counts, resumable, retry-safe,
+failure-isolating, atomically finalized, interruption-recoverable, incrementally reusable where
+the data contract permits it, and operationally logged without exposing source data. No service or
+distributed infrastructure is permitted.
+
+### Profile and optimization boundary
+
+- Pre-change deterministic raw-row profiles at 1,000 / 5,000 / 20,000 records measured
+  normalization at 0.096 / 0.553 / 2.007s and the existing all-detector normalized audit at
+  0.255 / 1.336 / 7.345s. Traced peak Python allocations were 7,938,232 / 38,899,200 /
+  154,250,416 bytes. Normalized bytes were 777,229 / 3,885,229 / 15,549,643 while serializing all
+  private in-memory representations required 1,823,915 / 9,115,915 / 36,489,157 bytes.
+- A 20,000-record `cProfile` run attributed 12.8 of 16.6 instrumented cumulative seconds to
+  canonical conversion; repeated whole-input identity construction/checking dominated the
+  orchestration. Direct unprofiled detector passes over one already-sanitized input were 0.394s
+  Look-Ahead, 0.700s Unit Drift, 1.026s Duplicate, and 0.396s Revision Overwrite.
+- The frozen identity checks and detector implementations remain unchanged. The supported
+  improvements are complete-entity partitioning, bounded local processes, hash-verified
+  incremental reuse, and persisting one normalized private representation rather than redundant
+  full snapshot/audit-input copies. No cache bypasses identity validation and no scientific rule,
+  threshold, report, finding, benchmark case, score, or release artifact changed.
+
+### Execution and recovery contract
+
+- Added `external_dataset_execution_contract.py` and `external_dataset_execution.py` under the
+  additive `quantcheck/external-audit-execution/v1` contract. A partition identity covers source
+  SHA-256/size, opaque logical key, expected count, mapping, policy, as-of date, and
+  `complete_entity_histories_disjoint` semantics. Run identity covers the sorted partition set.
+  Paths, worker count, scheduling, timestamps, and filesystem enumeration are excluded.
+- Current detectors and production expectation rules are entity-local. The runner verifies that
+  successful partitions have disjoint entity sets before finalization. Upstream completeness is an
+  explicit source attestation; overlap rejects finalization. A future cross-entity rule cannot
+  silently use this incremental contract.
+- Supported worker counts are exactly 1, 2, and 4 spawned local processes. One worker holds one
+  partition. Fresh 1/2/4-worker runs produce byte-identical logical public/private trees; only the
+  explicitly non-logical operational attempt log records worker count/reuse state.
+- Every evidence write reuses the canonical atomic store. Partition success is written last.
+  Run finalization is written only after every partition has terminal state and entity
+  disjointness passes. One failure remains terminal and visible while other partitions complete;
+  retries may turn a failed case/finalization into success without replacing conflicting immutable
+  evidence or a prior different success.
+- Resume verifies raw source SHA-256/size, schemas, public references/hashes, report identity,
+  mapping/policy/as-of links, normalized private bytes, and private entity summary. Unchanged
+  content is reused. Changed content receives a new partition ID and executes alone. An interrupt
+  propagates without finalization; already-completed case statuses are reused on the next run.
+- Operational logs contain only fixed event/failure codes, run/partition IDs, worker count, and
+  `redacted=true`. They carry no local path, timestamp, duration, value, source row, exception text,
+  or traceback. Public indexes/statuses cannot navigate into the private tree.
+
+### Reproducible benchmark and exact evidence
+
+- Added `external_dataset_performance.py` and `scripts/run_performance_benchmarks.py`. Deterministic
+  corpora contain twenty exact-Decimal duration observations per entity; complete entities are
+  SHA-256 ranked then round-robin assigned, independent of input order and Python hash seed.
+- Checked-in `performance_baseline_v1.json` is 3,386 bytes, SHA-256
+  `0ed3fe5cb5e3b2c466208503ab2abe5c25c8e14f7a8d75614ddaa70235ebf70e`. It records macOS
+  26.5.2 arm64 / Python 3.12.13 and makes `scientific_metrics_claim=false`.
+- Small 1,000-record / 2x500 run: total 0.350s; detector runtimes Duplicate 0.035,
+  Look-Ahead 0.014, Revision 0.014, Unit 0.022s; peak 3,704,317 bytes; normalized/public/private
+  801,494 / 18,892 / 802,702 bytes; unchanged 0.004s; one changed partition 0.176s.
+- Medium 10,000-record / 4x2,500 run: total 3.435s; detector runtimes 0.388 / 0.139 /
+  0.139 / 0.226s; peak 18,297,232 bytes; normalized/public/private 8,010,992 / 34,280 /
+  8,019,008 bytes; unchanged 0.010s; one changed partition 0.865s (3 reused).
+- Large 50,000-record / 10x5,000 run: total 17.916s; detector runtimes 1.884 / 0.734 /
+  0.767 / 1.247s; peak 36,325,079 bytes; normalized/public/private 40,091,893 / 80,332 /
+  40,129,433 bytes; unchanged 0.036s; one changed partition 1.802s (9 reused).
+- Large 1/2/4-worker runtimes were 17.916 / 9.725 / 6.436s (1.00x / 1.84x / 2.78x).
+  Every run produced logical tree hash
+  `42f05328cdcda08e0882415197f8dde62bc71c591412e31e37abb6387c76203e`.
+  `docs/PERFORMANCE_AND_EXECUTION.md` defines headroom envelopes and states that traced Python
+  allocation excludes native/PyArrow and aggregate worker RSS.
+
+### Tests, decisions, and verification
+
+- Added `tests/test_external_dataset_execution.py`,
+  `tests/test_external_dataset_execution_determinism_subprocess.py`, and
+  `tests/test_external_dataset_performance.py`: 17 tests covering normalized identities,
+  filesystem/scheduling independence, every supported worker count, byte-identical logical trees,
+  monolithic-finding equivalence under the complete-entity contract, unchanged/changed reuse,
+  failure isolation/retry, interruption recovery, privacy/logging, tamper refusal, entity-overlap
+  refusal, all-worker cross-process/hash-seed determinism, required benchmark fields, the checked-in
+  baseline, documented envelopes, and the script contract.
+- Added `docs/PERFORMANCE_AND_EXECUTION.md`, updated `docs/EXTERNAL_DATASETS.md`, and recorded
+  ADR-V2-015. No Kubernetes, queue, database, microservice, network orchestration, new dependency,
+  frozen v0.1 file, or benchmark behavior was introduced.
+- The entire scientific suite passed after the initial engine change (**2,154 tests in 56.92s**).
+  A safer spawned-process context replaced a warning-producing fork; focused tests passed, then the
+  entire suite passed again (**2,154 tests in 58.28s**, no warnings). The final artifact-enumerator
+  adjustment passed the entire 2,156-test suite in 58.97s. After the cross-process/hash-seed and
+  checked-baseline tests, the final complete suite passed **2,157 tests in 60.31s** with no warnings.
+- Final gates all exited 0: frozen all-group sync (61 packages), Ruff check, Ruff format check
+  (220 files), strict MyPy (209 source files), lock check (64 resolved packages), installed v0.1 CLI
+  help, additive v0.2 module help, both reviewed-fixture regeneration checks, 88-file release
+  checksum check, 67-file/124-case release freeze check, v0.2 corpus freeze/census checks, offline
+  build, and `git diff --check`.
+- Offline build produced a 93-file wheel and 219-file sdist. Both contain all three execution/
+  performance runtime modules; the sdist contains all three focused test modules. Neither contains
+  `reference/`, governance/implementation docs, `docs/`, `scripts/`, the machine-specific baseline,
+  local tool/environment directories, or caches. A clean Python 3.12.13 environment installed the
+  wheel offline with 19 packages, ran frozen CLI help, and completed a 40-record/two-partition
+  production execution as run `xrun_9e95579e07b3df1c`, finalization
+  `xfinal_c91fafab0339a9c2`.
+
 
 ## Decisions
 
+- **Shadow-mode evidence and human outcomes are separate (ADR-V2-017).** Design-partner packaging
+  starts only from immutable public production reports over a customer-controlled copy/snapshot.
+  Exact findings stay unchanged; sanitized dispositions and private notes are distinct hash-linked
+  artifacts; version comparison is exact and context-aware; and aggregate pilot metrics exist only
+  when derived from complete supplied adjudication. No customer impact or pilot number is inferred.
 - **Milestone 1 identifier scheme.** `stable_id` hashes a versioned envelope
   (`{"id_scheme": "quantcheck/stable-id/v1", "namespace": ..., "payload": ...}`) and keeps the
   first 16 hex characters after a `<prefix>_`. Assigned: `rec`/source-record,
@@ -2101,7 +3159,130 @@ corrected the now-falsified external-gate statements, regenerated `CHECKSUMS.md`
   carry Streamlit as a `dashboard` dependency group rather than a runtime dependency. No
   historical presentation byte, hash, metric, or dependency version is claimed.
 
+- **v0.2 decisions live in `docs/DECISIONS_V0_2.md` (ADR-V2-001 .. ADR-V2-018).**
+  `docs/DECISIONS.md` is one of the twenty release documents `CHECKSUMS.md` freezes for the
+  immutable `v0.1.0` tag, so appending to it would break that manifest and change released
+  evidence. ADR-001 .. ADR-010 stay exactly as tagged; the v0.2 sequence is numbered separately so
+  the two can never be confused.
+- **`FinancialFact` is unchanged (ADR-V2-001).** The v0.2 mandate permits a versioned contract
+  change if a demonstrated missing field requires one. None does: issuer, fiscal calendar, filing
+  lag, unit of measure, revision lineage, delayed availability, and dimensions are all already
+  representable. Leaving the contract alone is also what keeps the audit boundary — and therefore
+  every v0.1 detector isolation guarantee — unmodified, and leaves a corpus partition nowhere to
+  hide inside a record.
+- **Corpus adequacy floors were declared before any corpus existed (ADR-V2-002).**
+  `MINIMUM_CELL_ELIGIBLE_UNITS = 8` and `MINIMUM_PARTITION_ELIGIBLE_UNITS = 24` are frozen in
+  `corpus_contract.py`, and a saved rollup is validated against the contract's floors so a census
+  cannot lower them locally. They are corpus thresholds, not detector thresholds: they change how
+  much data a cell must have, never what a detector finds.
+- **The census calls the frozen v0.1 eligibility functions unchanged (ADR-V2-003)**, so a v0.2
+  denominator is the same quantity as a v0.1 one rather than an analogue. An unsupported profile
+  raises rather than returning zero, because an unmeasured cell must never read as a measured
+  empty one.
+- **Corpus partitions are separate from seed partitions (ADR-V2-009).** A seed partition holds out
+  an injection draw; a corpus partition holds out clean sources. Two independent authorizations,
+  neither implying the other; a v0.2 held-out release must open both.
+- **v0.2 has strict and production views, not revised v0.1 scoring (ADR-V2-010).** The strict view
+  calls the unchanged primary-family scorer and is all-detector comparable only for the exact four-
+  detector selection. The production view categorizes every preserved finding but creates no new
+  metric and cannot change recall.
+- **v0.2 serialization is additive and migration requires an explicit new run (ADR-V2-011).** New
+  envelopes receive new spec versions/namespaces while nested v1 findings/reports/scores preserve
+  their bytes and IDs. No v1 artifact or released metric is rewritten in place.
+- **External production mapping/audit, lazy PyArrow, versioned policies, and bounded local
+  execution are additive v0.2 decisions (ADR-V2-012/013/014/015).** Every financial meaning is
+  explicit; customer audits never route through injection, a manifest, or benchmark scoring;
+  policy config is separate from scientific benchmark truth and exactly identified in every
+  current audit report; entity-partition execution preserves frozen findings and identities; and
+  immutable v0.1 package metadata is not reopened merely to advertise the pre-release paths.
+- **Self-hosting, shadow evidence, and Missing Observations are additive decisions
+  (ADR-V2-016/017/018).** The hardened batch image adds no service or scientific behavior; shadow
+  human outcomes remain separate from immutable findings; and Missing Observations was selected by
+  the explicit evidence-tie fallback, requires exact source/customer-backed expected cells, keeps
+  deleted-row truth private, and labels its gated held-out result synthetic rather than customer
+  evidence.
+
 ## Known limitations
+
+- **Missing Observations has no customer evidence.** The design-partner/discovery evidence did not
+  distinguish it from Entity Identity, so implementation followed the explicit fallback rather
+  than observed pain. Its expectation contracts and development/validation/held-out results are
+  synthetic. Explicit expectations can be incorrect and require source-owner approval; the
+  detector does not infer calendars, legitimate endpoints, issuer lifecycle, outage cause, or
+  missing values. Entity Identity remains unimplemented.
+- **The shadow package has not been used in an external pilot.** No real design-partner dataset,
+  mapping, policy, disposition, reviewer note, research-decision confirmation, runtime, review
+  time, or pilot report exists in repository evidence. The workflow and clean-package smoke use
+  ephemeral synthetic data only. A factual pilot report requires customer-supplied, approved
+  adjudication and independently confirmed decision-impact facts.
+- **Privacy minimization is not anonymization.** Sanitized adjudication retains stable finding and
+  bundle hashes that can be linked to customer-held evidence, and aggregate counts may remain
+  commercially sensitive for small samples. Access, sharing, retention, deletion, and publication
+  approval remain customer/operator responsibilities.
+- **Rerun comparison is intentionally exact.** It does not infer semantic or fuzzy equivalence. An
+  evidence-key change appears as removed/added; a comparison with different mapping, policy, data,
+  as-of date, or point-in-time input reports context mismatch and cannot support a code-only causal
+  claim.
+- **The self-hosted artifact is implemented but not published.** This host has no container engine,
+  and no release/publication was authorized. The image build/scan/reproducibility, GHCR push,
+  provenance/SBOM attestations, and pulled-digest `--network none` smoke are configured and tested
+  statically but have not run. There is no current image digest for a customer to install.
+- **The minimal image claims CSV only.** Parquet/Arrow remain implemented and tested in the Python
+  path, but the immutable v0.1 package metadata does not declare PyArrow. Adding it to a future
+  version requires a separately locked, scanned, and clean-installed distribution.
+- **No certification or independent security assessment exists.** NIST SSDF/SLSA-informed
+  controls, SBOMs, scans, and attestations are scoped practices/evidence only. They do not establish
+  NIST, SLSA, ISO, SOC, PCI DSS, FedRAMP, or other certification, nor guarantee secure erasure.
+- **No real customer or vendor file has been exercised.** The production mapping and file-integrity
+  path is tested with exact synthetic CSV/Parquet/Arrow/Python inputs only. No vendor-specific
+  semantics were needed or added. A real mapping must cite the source contract for availability,
+  revision, identifiers, units, periods, and public provenance before audit.
+- **No real customer policy has been authored or approved.** Both representative policies are
+  explicitly fictional contract examples, not operational recommendations. A real policy needs
+  source-owner review of concept/unit, availability-lag, reporting-frequency, action, threshold,
+  and exception reasons; applying a new policy necessarily produces a new identity and report.
+- **Production frequency rules still detect internal gaps, not missing endpoints.** The policy
+  rule compares adjacent distinct period ends and reports insufficient history. The separate
+  Missing Observations detector can evaluate endpoints only when an explicit expected cell and
+  `expected_by` date are supplied. Neither path infers a fiscal calendar or taxonomy equivalence.
+- **PyArrow is not yet declared by the immutable v0.1 wheel metadata.** Parquet/Arrow operators must
+  install it explicitly; missing support is a fixed diagnostic. The first v0.2 package freeze must
+  add a dependency or optional extra and rerun its own clean-install/packaging gates.
+- **External audit execution is bounded by partition, not out-of-core within one partition.** The
+  frozen snapshot and detector interfaces still require immutable complete tuples. The additive
+  local runner caps explicitly complete/disjoint entity partitions and holds one per worker, but a
+  single oversized entity history cannot be split without breaking current detector semantics.
+  Peak evidence uses traced Python allocation and excludes native PyArrow and aggregate worker RSS.
+- **The v0.2 contract currently runs deterministic development/validation single cases, not a
+  complete benchmark rehearsal.** It has no v0.2 aggregate report, release freeze, checksum
+  surface, or held-out result. No validation matrix has yet been persisted as evidence, and neither
+  held-out gate has been opened for performance evaluation.
+- **Production finding categories are conservative interpretations, not corrected precision or
+  recall.** Background requires exact paired-control equivalence; a valid relationship without that
+  proof may remain unmatched. Secondary means one uniquely related non-primary rule finding, never
+  another recall credit.
+- **The v0.2 curated public unit is a declared placeholder.** It is a curated field-shape document
+  in the real SEC Company Facts contract with placeholder registrants and purpose-built values; no
+  live SEC request has been made and no saved response is reproduced. Recorded machine-readably as
+  `CURATED_PUBLIC_IS_PLACEHOLDER` and `verbatim_source=False`. Current SEC guidance must be
+  rechecked before any live run.
+- **The `curated_public` source class cannot support Revision Overwrite.** A Company Facts
+  response carries no declared lineage marker, so the class structurally cannot express a revision
+  history. Declared on the unit rather than worked around.
+- **Zero `external_private` units exist.** The class is implemented and tested against synthetic
+  external roots under `tmp_path`; no real vendor or customer dataset has been exercised, and none
+  is required by any test, gate, or command.
+- **The v0.2 corpus is still predominantly synthetic** — 4,104 of 4,320 records. External validity
+  is improved along every declared axis (issuer, fiscal calendar, period, concept, filing lag, unit
+  of measure, revision history, volatility, hard negative), but this is not a real vendor feed.
+- **v0.2 partitions are structurally symmetric by construction** — the same cohort specifications
+  with disjoint issuers. That is what makes a held-out result comparable with a development one,
+  but it also means the held-out partition is an independent sample of the same generator, not an
+  independent sample of the world.
+- **`maximum_relative_revision_size` carries a long exact-Decimal tail** (e.g.
+  `0.41200000003244181914110357583158594362874095490195`) because it is an exact division at 50
+  digits of precision over volatility-perturbed values. It is deterministic and per-partition
+  distinct in its low-order digits; the census counts it feeds are identical across partitions.
 
 - Only the narrow Look-Ahead `period_end_substitution` subtype, narrow Unit Drift
   `value_scaled_unit_unchanged` subtype, narrow Duplicate Observations `exact_occurrence_copy`
@@ -2266,7 +3447,66 @@ Milestone 11 gate passes, GitHub Actions run `31293937904` is green, and the ann
 `v0.1.0` marks the immutable historical baseline. There is no unfinished v0.1 implementation
 milestone.
 
-The next task is **Post-MVP Milestone A: Benchmark 2.0**.
+**Post-MVP Milestone A, Steps 1 and 2 are complete.** The next task is **Step 3: a persisted v0.2
+development rehearsal, then a validation rehearsal and aggregate contract**.
+
+**The external dataset production audit and policy slices are also complete.** They are
+independent of the benchmark sequence and do not change Step 3's scope. A real customer/vendor
+source may add a separately reviewed mapping, adapter, or policy only when its actual file and
+operating contracts demonstrate the need.
+
+**Post-MVP Milestone F is implemented locally but has one external completion gate.** When a
+versioned self-hosted release is explicitly authorized, run the new security and publishing
+workflows, require every scan/build/reproducibility/smoke job to pass, and record the published
+package/image digests plus verified provenance/SBOM attestations. Do not claim the acceptance gate
+complete before that evidence exists. This release gate is independent of benchmark Step 3.
+
+**Post-MVP Milestone G product support is complete locally.** The next Milestone G action is an
+actual customer-authorized shadow evaluation: approve the real mapping/policy and data lifecycle,
+audit a read-only snapshot, collect supplied adjudication/review time and any independently
+confirmed decision impacts, compare later versions only with context disclosure, and generate the
+aggregate report. Do not add pilot results to repository claims until those artifacts exist and the
+customer authorizes their use. This external pilot does not change the benchmark Step 3 task.
+
+**Post-MVP Milestone H Missing Observations is complete locally.** The next customer-driven fault
+action is evidence collection: obtain a real, source-owner-approved expectation contract and
+design-partner adjudication before making any production-performance or customer-pain claim. Do not
+start Entity Identity merely because it is the remaining historical candidate; require
+demonstrated customer evidence or a new explicit prioritization instruction. This does not change
+the independent Benchmark v0.2 Step 3 task.
+
+### Exact next task: Step 3
+
+Build the runner/resume/aggregate evidence layer over the now-versioned v0.2 cases without changing
+the detector or evaluation contract. Specifically:
+
+1. Define a normalized development matrix and persist its paired clean/corrupted executions,
+   strict score, production interpretation, status, and failure evidence with safe resume.
+2. Aggregate strict primary metrics separately from categorical finding counts. Never call the
+   production interpretation revised precision/recall, and retain the untouched v0.1 published
+   numbers beside any comparison.
+3. Complete and review development evidence first; freeze configuration before running validation;
+   then run and review validation without changing corpus units, thresholds, relationship rules, or
+   categorization precedence in response to results.
+4. Only after both rehearsals pass, design the separate v0.2 release freeze/checksum surface. A
+   held-out execution remains later work and requires both the reserved-final-seed and complete-
+   held-out-corpus authorizations.
+
+Constraints carried forward: no frozen v0.1 file may be edited; no threshold, matching rule, or
+denominator may change without its own ADR; corpus units may not be added, removed, resized, or
+re-parameterised on the basis of observed detector performance (inclusion rule IR-03); and v0.2
+development/validation evidence must not be presented as held-out evidence.
+
+### Still-open from Step 1
+
+- The `curated_public` source class ships a declared placeholder. Substituting genuine saved SEC
+  bytes is a change of bytes plus a re-freeze; it needs no code change.
+- No `external_private` unit has ever been supplied. The boundary is implemented and tested
+  against synthetic external roots only. The newer production mapping/audit path is likewise
+  tested with synthetic CSV/Parquet/Arrow/Python data, not a licensed or real customer file.
+
+### The original Milestone A statement, for context
+
 
 ### The baseline it must not disturb
 
@@ -2348,6 +3588,68 @@ Record:
 - exact next task.
 
 ## Last updated
+
+2026-08-09 (Post-MVP Milestone H Missing Observations complete locally — selected only by the
+documented evidence-tie fallback; explicit due-cell/source-context contract; six deterministic
+missingness mechanisms; private deleted-row truth; unchanged sanitized audit boundary; exact
+one-to-one scoring; clean controls; exact replay; controlled Decimal cohort impact; separately
+gated synthetic held-out evidence `meval_51a9d73ee7d716a7`. Added 49 tests; final suite 2,245 passed
+in 67.82s; all repository, release-preservation, evaluation-freeze, packaging, clean-install, and
+determinism gates pass. No customer data/evidence, Entity Identity implementation, commit, push,
+release, publication, or external write.)
+
+2026-08-09 (Post-MVP Milestone G design-partner/shadow-mode support complete locally — immutable
+version-bound researcher finding bundles, complete sanitized five-value adjudication, separate
+private reviewer notes, exact context-aware rerun comparison, aggregate-only supplied-data pilot
+report, additive module CLI, blank evaluation template, and ADR-V2-017. Added 19 tests; final suite
+2,196 passed in 65.74s; all repository, release-preservation, packaging, clean-install, and
+determinism gates pass. No customer data, pilot result, commit, push, release, or external write.)
+
+2026-08-09 (Post-MVP Milestone F self-hosted distribution implemented locally — strict secret-free
+mount binding, fixed-disabled telemetry/network config, redacted JSON logs, digest-pinned non-root
+container, explicit read-only/writable roots, repeatable OCI check, Trivy/Syft security CI,
+SBOM/provenance attestations, pulled-image offline/deletion release smoke, security contact, updated
+threat model, supply-chain/patch/provenance/retention docs, and ADR-V2-016. Final suite: 2,177 passed
+in 63.24s; all local Python/package/release-preservation/security-source gates pass. No container
+engine or authorized publication: image build/scan/push/attestation evidence remains external.)
+
+2026-08-09 (bounded local production execution and performance evidence complete — profiled
+1k/5k/20k deterministic inputs first; added content-addressed complete-entity partitions, local
+1/2/4-worker determinism, bounded per-worker memory, safe resume/retry, failure isolation,
+interruption recovery, atomic finalization, changed-partition incremental reuse, redacted logs,
+and reproducible 1k/10k/50k envelopes. Large 50k: 17.916s sequential, 6.436s at four workers,
+36,325,079-byte largest-partition traced allocation, identical logical hash across workers. Full
+scientific suite passed after each engine change. Next benchmark task remains Post-MVP Milestone A
+Step 3.)
+
+2026-08-09 (production audit policy layer complete — strict `AuditPolicyV1` identity/hash,
+explicit detector enablement/actions, Unit Drift threshold, concept/unit and source-supported
+publication-lag/reporting-frequency expectations, auditable dataset exceptions with deterministic
+specificity precedence, and policy-bearing `ExternalDatasetAuditReportV2`. Added 30 tests; final
+suite 2,140 passed; all repository, release-preservation, corpus, packaging, and clean-install gates
+pass. v0.1/v0.2 benchmark truth is unchanged. Next benchmark task remains Post-MVP Milestone A
+Step 3.)
+
+2026-08-09 (external dataset production audit path complete — versioned explicit mapping, exact
+Decimal normalization for integrity-pinned Parquet/Arrow/CSV and Python rows, data-free dry-run
+diagnostics, deterministic private provenance, existing point-in-time/sanitize/selected-detector
+workflow, and manifest-free public audit report. Final suite: 2,110 passed, with complete
+alternate-hash-seed coverage; v0.1
+checksums/freeze/CLI and all benchmark paths remain unchanged. Next benchmark task remains
+Post-MVP Milestone A Step 3.)
+
+2026-08-09 (Post-MVP Milestone A Step 2 complete — additive
+`quantcheck/benchmark/v2` configuration/case expansion, one/multiple/all manifest-blind detector
+execution, strict v0.1-comparable primary scoring, paired-control production finding
+interpretation, canonical v2 serialization/migration contract, and additive module CLI. v0.1
+source, CLI, metrics, `release_freeze.json`, and 88-file `CHECKSUMS.md` surface remain unchanged.
+Next task: Step 3 — persisted development rehearsal, then validation rehearsal and aggregation.)
+
+2026-08-09 (Post-MVP Milestone A Step 1 complete — v0.2 benchmark corpus substrate. Corpus
+`corp_a55d14a60c2f89d6`, census `cens_4512c0c8f3fdb747`, freeze `cfrz_040ae8f12d864289`;
+12 units, 4,320 records, all 36 fault/severity cells eligible. `v0.1.0` untouched: `CHECKSUMS.md`
+verifies over 88 files. Next task: Post-MVP Milestone A Step 2 — the v0.2 benchmark contract over
+the corpus.)
 
 2026-08-09 (v0.1.0 tagged as the immutable baseline; candidate
 `relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`, aggregate `agg_571aae0b7c60a4a5`.

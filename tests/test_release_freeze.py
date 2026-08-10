@@ -111,22 +111,63 @@ def test_the_record_freezes_the_configuration_and_the_lockfile(
 def test_the_frozen_file_list_covers_every_scientific_module(
     record: q.ReleaseFreezeRecord,
 ) -> None:
-    """Any module that can change a result must be frozen.
+    """Any module that can change a **v0.1** result must be frozen.
 
     The check is derived from the package tree rather than restated, so a new
     scientific module cannot be added without either freezing it or updating
     the deliberate exclusion list here.
+
+    The ``corpus_*``, ``benchmark_v2_*``, ``external_dataset_*``, and
+    ``missing_observation_*`` modules are the documented exclusions. They are
+    additive post-v0.1 surfaces, unreachable from every frozen module, and named by no frozen
+    configuration, so they cannot change a v0.1 artifact's bytes. Adding them
+    to ``FROZEN_SOURCE_FILES`` would change the v0.1 release candidate identity
+    and its checksum manifest — precisely what the immutability of the tagged
+    release forbids. Companion isolation tests prove the exclusions are safe
+    rather than convenient.
     """
     frozen = {entry.path for entry in record.frozen_files}
     source = Path(q.__file__).resolve().parent
+    repo_root = source.parent.parent
     #: Modules deliberately outside the frozen set, each because it cannot
     #: change a saved artifact's bytes or a scientific result.
     excluded = {"py.typed"}
+    corpus_modules = []
+    benchmark_v2_modules = []
+    external_dataset_modules = []
+    missing_observation_modules = []
     for module in sorted(source.glob("*.py")):
         relative = f"src/quantcheck/{module.name}"
         if module.name in excluded:
             continue
+        if module.name.startswith("corpus_"):
+            corpus_modules.append(module)
+            continue
+        if module.name.startswith("benchmark_v2_"):
+            benchmark_v2_modules.append(module)
+            continue
+        if module.name.startswith("external_dataset_"):
+            external_dataset_modules.append(module)
+            continue
+        if module.name.startswith("missing_observation_"):
+            missing_observation_modules.append(module)
+            continue
         assert relative in frozen, relative
+
+    # The exclusion holds only while no frozen module can reach the corpus
+    # layer, so that condition is asserted here rather than assumed.
+    assert corpus_modules, "the corpus exclusion is stale: no corpus module exists"
+    assert benchmark_v2_modules, "the v0.2 exclusion is stale: no v0.2 module exists"
+    assert external_dataset_modules, "the external-dataset exclusion is stale"
+    assert missing_observation_modules, "the Missing Observations exclusion is stale"
+    for path in frozen:
+        if not path.startswith("src/quantcheck/") or not path.endswith(".py"):
+            continue
+        text = (repo_root / path).read_text()
+        assert "quantcheck.corpus" not in text
+        assert "quantcheck.benchmark_v2" not in text
+        assert "quantcheck.external_dataset" not in text
+        assert "quantcheck.missing_observation" not in text
 
 
 # --------------------------------------------------------------------------

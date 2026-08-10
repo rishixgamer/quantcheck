@@ -1,0 +1,12 @@
+*
+!.python-version
+!Dockerfile
+!LICENSE
+!README.md
+!pyproject.toml
+!uv.lock
+!src/
+!src/**
+!deploy/
+!deploy/smoke/
+!deploy/smoke/**

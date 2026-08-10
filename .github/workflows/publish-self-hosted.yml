@@ -1,0 +1,207 @@
+name: Publish self-hosted artifacts
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  actions: read
+  artifact-metadata: write
+  attestations: write
+  contents: write
+  id-token: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  publish:
+    name: Build, verify, attest, and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the released tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.12.2"
+
+      - name: Install Python 3.12
+        run: uv python install 3.12
+
+      - name: Validate release identity and build inputs
+        id: release
+        shell: bash
+        run: |
+          python_bin=$(uv python find 3.12)
+          version=$("$python_bin" -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          test "v$version" = "${{ github.event.release.tag_name }}"
+          echo "epoch=$(git log -1 --format=%ct)" >> "$GITHUB_OUTPUT"
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "image=${REGISTRY}/${GITHUB_REPOSITORY,,}-self-hosted" >> "$GITHUB_OUTPUT"
+
+      - name: Sync frozen dependencies
+        run: uv sync --frozen --all-groups
+
+      - name: Build wheel and source distribution offline
+        run: uv build --offline
+
+      - name: Generate package SPDX 2.3 SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          path: dist
+          format: spdx-json
+          output-file: dist/quantcheck-packages.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+          syft-version: v1.50.0
+
+      - name: Attest package provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            dist/quantcheck-*.whl
+            dist/quantcheck-*.tar.gz
+
+      - name: Attest package SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            dist/quantcheck-*.whl
+            dist/quantcheck-*.tar.gz
+          sbom-path: dist/quantcheck-packages.spdx.json
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+        with:
+          version: v0.36.1
+          driver-opts: image=moby/buildkit:v0.32.2@sha256:28a898719c18a33f4e8000685287fa36fd0dd9560c6440227d3a732d79bb41d8
+
+      - name: Build local release candidate
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          load: true
+          tags: quantcheck-release-candidate:${{ github.sha }}
+          provenance: false
+          sbom: false
+          build-args: |
+            SOURCE_DATE_EPOCH=${{ steps.release.outputs.epoch }}
+            VCS_REF=${{ steps.release.outputs.revision }}
+            QUANTCHECK_VERSION=${{ steps.release.outputs.version }}
+
+      - name: Scan candidate before publication
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: quantcheck-release-candidate:${{ github.sha }}
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+          format: table
+          version: v0.73.0
+
+      - name: Log in to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish digest-addressable image
+        id: image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.release.outputs.image }}:${{ steps.release.outputs.version }}
+            ${{ steps.release.outputs.image }}:sha-${{ github.sha }}
+          provenance: mode=max
+          sbom: true
+          build-args: |
+            SOURCE_DATE_EPOCH=${{ steps.release.outputs.epoch }}
+            VCS_REF=${{ steps.release.outputs.revision }}
+            QUANTCHECK_VERSION=${{ steps.release.outputs.version }}
+
+      - name: Attest container provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-name: ${{ steps.release.outputs.image }}
+          subject-digest: ${{ steps.image.outputs.digest }}
+          push-to-registry: true
+
+      - name: Pull the published digest
+        run: docker pull "${{ steps.release.outputs.image }}@${{ steps.image.outputs.digest }}"
+
+      - name: Generate downloadable container SPDX 2.3 SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          image: ${{ steps.release.outputs.image }}@${{ steps.image.outputs.digest }}
+          format: spdx-json
+          output-file: dist/quantcheck-container.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+          syft-version: v1.50.0
+
+      - name: Attest container SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-name: ${{ steps.release.outputs.image }}
+          subject-digest: ${{ steps.image.outputs.digest }}
+          sbom-path: dist/quantcheck-container.spdx.json
+          push-to-registry: true
+
+      - name: Verify clean offline deployment from the published image only
+        shell: bash
+        run: |
+          image="${{ steps.release.outputs.image }}@${{ steps.image.outputs.digest }}"
+          smoke_root=$(mktemp -d)
+          container=$(docker create "$image")
+          trap 'docker rm -f "$container" >/dev/null 2>&1 || true; rm -rf "$smoke_root"' EXIT
+          docker cp "$container:/opt/quantcheck/smoke/." "$smoke_root/bundle"
+          docker rm "$container"
+          container=""
+          install -d -m 0777 "$smoke_root/output" "$smoke_root/work"
+          test "$(docker image inspect --format '{{.Config.User}}' "$image")" = "65532:65532"
+          test "$(docker image inspect --format '{{json .Config.Volumes}}' "$image")" = "null"
+          docker run --rm \
+            --network none \
+            --read-only \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            --pids-limit 128 \
+            --memory 512m \
+            --cpus 1 \
+            --mount "type=bind,src=$smoke_root/bundle/config,dst=/config,readonly" \
+            --mount "type=bind,src=$smoke_root/bundle/input,dst=/input,readonly" \
+            --mount "type=bind,src=$smoke_root/output,dst=/output" \
+            --mount "type=bind,src=$smoke_root/work,dst=/work" \
+            "$image" | tee "$smoke_root/structured.log"
+          test -f "$smoke_root/output/public/runs/xrun_d65eac0fa9d81e72/finalization.json"
+          ! grep -E '100\.25|120\.00|Example Customer Issuer|customer-warehouse|customer://' "$smoke_root/structured.log"
+          rm -rf "$smoke_root/output" "$smoke_root/work"
+          test ! -e "$smoke_root/output"
+          test ! -e "$smoke_root/work"
+
+      - name: Publish package, checksums, and downloadable SBOMs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          (cd dist && sha256sum quantcheck-*.whl quantcheck-*.tar.gz *.spdx.json > SHA256SUMS)
+          gh release upload "${{ github.event.release.tag_name }}" dist/*
+
+      - name: Retain release artifacts in the workflow record
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: quantcheck-${{ steps.release.outputs.version }}-published-artifacts
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

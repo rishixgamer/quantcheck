@@ -1,0 +1,4 @@
+entity,entity_name,concept,amount,unit,period_kind,period_start,period_end,filed_date,available_date,form,accession,source_row,revision_lineage,revision_sequence
+ENTITY-001,Example Customer Issuer,RevenueFromContractWithCustomerExcludingAssessedTax,100.25,USD,D,2024-01-01,2024-03-31,2024-04-30,2024-05-02,10-Q,0000000000-24-000001,row-1,,
+ENTITY-001,Example Customer Issuer,RevenueFromContractWithCustomerExcludingAssessedTax,120.00,USD,D,2024-04-01,2024-06-30,2024-07-30,2024-07-31,10-Q,0000000000-24-000002,row-2,,
+ENTITY-001,Example Customer Issuer,RevenueFromContractWithCustomerExcludingAssessedTax,130,USD,D,2024-07-01,2024-09-30,2024-10-30,2024-10-31,10-Q,0000000000-24-000003,row-3,,
