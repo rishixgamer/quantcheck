@@ -42,8 +42,18 @@ digest() {
 
 first=$(digest "$build_dir/first.oci.tar")
 second=$(digest "$build_dir/second.oci.tar")
-if [ "$first" != "$second" ]; then
-  echo "container reproducibility check failed" >&2
+comparison="$build_dir/oci-comparison.json"
+if ! python3 "$repo_root/scripts/inspect_oci_layout.py" \
+  "$build_dir/first.oci.tar" "$build_dir/second.oci.tar" >"$comparison"
+then
+  cat "$comparison" >&2
+  echo "container reproducibility check failed: OCI identities differ" >&2
   exit 1
 fi
+if [ "$first" != "$second" ]; then
+  cat "$comparison" >&2
+  echo "container reproducibility check failed: raw OCI archives differ" >&2
+  exit 1
+fi
+cat "$comparison"
 printf '%s  %s\n' "$first" "quantcheck-linux-amd64.oci.tar"

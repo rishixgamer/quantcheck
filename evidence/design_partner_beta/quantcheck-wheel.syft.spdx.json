@@ -1,0 +1,42 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "created": "2026-08-12T16:47:48Z",
+    "creators": [
+      "Organization: Anchore, Inc",
+      "Tool: syft-1.50.0"
+    ],
+    "licenseListVersion": "3.28"
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://anchore.com/syft/file/quantcheck-0.2.0.dev0-py3-none-any.whl-58db31ce-748a-40e6-92f4-d1b05935ce57",
+  "name": "quantcheck-0.2.0.dev0-py3-none-any.whl",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-DocumentRoot-File-quantcheck-0.2.0.dev0-py3-none-any.whl",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "51a0eb676a06772d21d0175c571ae43df9f791df2da3d32e602c327ae2162ff1"
+        }
+      ],
+      "copyrightText": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "name": "quantcheck-0.2.0.dev0-py3-none-any.whl",
+      "primaryPackagePurpose": "FILE",
+      "supplier": "NOASSERTION",
+      "versionInfo": "sha256:51a0eb676a06772d21d0175c571ae43df9f791df2da3d32e602c327ae2162ff1"
+    }
+  ],
+  "relationships": [
+    {
+      "relatedSpdxElement": "SPDXRef-DocumentRoot-File-quantcheck-0.2.0.dev0-py3-none-any.whl",
+      "relationshipType": "DESCRIBES",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    }
+  ],
+  "spdxVersion": "SPDX-2.3"
+}

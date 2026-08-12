@@ -21,13 +21,24 @@ WORKDIR /build
 COPY --from=uv /uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock README.md LICENSE .python-version ./
 COPY src/ ./src/
-RUN uv sync --frozen --no-dev --no-editable
+RUN uv sync --frozen --no-dev --no-editable \
+    && find /opt/quantcheck/.venv -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} + \
+    && tar \
+        --sort=name \
+        --mtime="@${SOURCE_DATE_EPOCH}" \
+        --owner=65532 \
+        --group=65532 \
+        --numeric-owner \
+        --pax-option=delete=atime,delete=ctime \
+        -C /opt/quantcheck \
+        -cf /opt/quantcheck/venv.tar \
+        .venv
 
 FROM ${PYTHON_IMAGE} AS runtime
 
 ARG SOURCE_DATE_EPOCH=0
 ARG VCS_REF=unknown
-ARG QUANTCHECK_VERSION=0.1.0
+ARG QUANTCHECK_VERSION=0.2.0.dev0
 LABEL org.opencontainers.image.title="QuantCheck self-hosted audit runner" \
       org.opencontainers.image.description="Offline, single-tenant financial-data audit batch image" \
       org.opencontainers.image.licenses="MIT" \
@@ -49,7 +60,8 @@ ENV PATH="/opt/quantcheck/.venv/bin:${PATH}" \
     HOME=/nonexistent
 
 WORKDIR /opt/quantcheck
-COPY --from=builder --chown=65532:65532 /opt/quantcheck/.venv /opt/quantcheck/.venv
+RUN --mount=type=bind,from=builder,source=/opt/quantcheck/venv.tar,target=/tmp/venv.tar \
+    tar -xf /tmp/venv.tar -C /opt/quantcheck
 COPY --chown=65532:65532 deploy/smoke /opt/quantcheck/smoke
 
 # /config and /input are mount points for read-only customer material.

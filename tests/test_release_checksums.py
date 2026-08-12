@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 
 import quantcheck as q
-from tests.release_support import REPO_ROOT, repo_copy
+from tests.release_support import historical_v01_checksums_match_tag, repo_copy
 
 
 @pytest.fixture
@@ -112,7 +112,6 @@ def test_the_manifest_records_no_generated_benchmark_artifact() -> None:
         assert not relative.endswith("aggregate_report.json")
 
 
-def test_the_repository_manifest_is_current() -> None:
-    """The committed CHECKSUMS.md must match the working tree."""
-    mismatches = q.verify_checksums_document(repo_root=REPO_ROOT)
-    assert mismatches == (), [f"{m.path}: {m.reason}" for m in mismatches]
+def test_the_historical_manifest_matches_the_immutable_v01_tag() -> None:
+    """The old manifest authenticates its tag, not the additive v0.2 worktree."""
+    assert historical_v01_checksums_match_tag() == ()

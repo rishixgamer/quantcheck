@@ -1,7 +1,13 @@
-# QuantCheck 0.1.0 limitations
+# QuantCheck limitations
 
 This is the authoritative public list. `IMPLEMENT.md` keeps the internal
 handoff's own longer list; anything here is stated for users of the release.
+
+The immutable v0.1 limitations below remain historical truth. The current
+`0.2.0.dev0` worktree adds synthetic development/validation evidence,
+production-input and self-hosted engineering, but still has no completed
+design-partner pilot, customer adjudication, production deployment, signed
+candidate attestation, or held-out v0.2 result.
 
 ## Scientific scope
 
@@ -86,6 +92,17 @@ handoff's own longer list; anything here is stated for users of the release.
   recovered, and the reviewed fixture is newly authored.
 
 ## Release and external gates
+
+* **The current beta candidate is not a published release.** Its local SPDX
+  SBOM and in-toto/SLSA provenance statement are machine-readable and
+  hash-bound to package artifacts, but the provenance uses an untrusted local
+  builder identity and is unsigned. A candidate-source security workflow,
+  byte-identical OCI proof, registry digest, and trusted CI attestations must be
+  verified before deployment-grade release claims.
+* **The design-partner workflow is a protocol, not completed evidence.** No
+  customer input, disposition, confirmed research impact, pilot metric, or
+  testimonial is present. Synthetic development/validation performance cannot
+  fill that gap.
 
 * **GitHub Actions has run once, on the release source tree.** Run
   `31293937904` executed every workflow step against commit

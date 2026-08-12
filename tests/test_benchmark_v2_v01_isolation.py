@@ -4,14 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from quantcheck.release_checksums import CHECKSUM_COVERED_FILES, verify_checksums_document
+from quantcheck.release_checksums import CHECKSUM_COVERED_FILES
 from quantcheck.release_contract import FROZEN_SOURCE_FILES
+from tests.release_support import historical_v01_checksums_match_tag
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
-def test_v01_checksum_manifest_remains_current() -> None:
-    assert verify_checksums_document(repo_root=REPO_ROOT) == ()
+def test_v01_checksum_manifest_remains_valid_for_its_tag() -> None:
+    assert historical_v01_checksums_match_tag() == ()
 
 
 def test_no_v2_execution_module_is_checksum_covered_as_v01() -> None:

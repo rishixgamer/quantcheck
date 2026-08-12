@@ -4,6 +4,71 @@ This is the operational handoff between Claude Code sessions. Keep it concise, f
 
 ## Current phase
 
+**Prompt 10 design-partner beta engineering closure implemented locally;
+production readiness remains NOT READY and external OCI/security evidence is pending**
+
+The current package is `0.2.0.dev0`; the annotated `v0.1.0` tag,
+`release_freeze.json`, and `CHECKSUMS.md` remain immutable historical evidence.
+PyArrow `>=24,<25` is now a direct runtime dependency (locked 24.0.0), while its
+import remains lazy. A built wheel installed into a new Python 3.12 environment
+without an explicit PyArrow install and passed 38 package/CSV/Parquet/Arrow IPC,
+integrity, and isolation tests.
+
+Post-MVP Milestone A Step 3 is complete locally. The preregistered v0.2 evidence
+contains 390/390 successful development cases and 390/390 successful validation
+cases, zero failed and zero incomplete statuses, and mandatory paired clean
+controls. Development aggregate `agg2_921fce1a47bbf8a2` belongs to benchmark
+`bench2_d06358afb2c2e976`; validation aggregate `agg2_2c9cafb077a33ebd`
+belongs to `bench2_6c07efb5b326076d`; validation freeze
+`vfrz2_91347fdf3c3ff88a` was written after complete development evidence and
+before validation. Candidate 1 was retained separately because its derived F1
+used the default 28-digit Decimal context; candidate 2 changed only aggregate
+F1 arithmetic to the required 50-digit context and reran all 780 cases.
+
+The container root-cause boundary was narrowed to nondeterministic virtual-
+environment layer assembly: two same-path installs had identical file bytes,
+while historical Security run `31368451109` had different OCI manifest and
+config digests with identical source/build arguments. The Dockerfile now
+canonicalizes virtual-environment entry order, timestamps, ownership, and PAX
+metadata before a sorted extraction layer. The unchanged exact gate now also
+reports and compares raw archive, OCI index, manifest, config, and layer
+digests. This host has no Docker/Podman/BuildKit engine, and no commit/push was
+authorized, so the candidate has not received a two-build OCI proof or remote
+Security run. Do not mark that blocker closed until both exact builds pass for
+the candidate source.
+
+The beta evidence builder produces a deterministic SPDX 2.3 distribution SBOM,
+an in-toto statement using the SLSA v1 predicate, compact development/
+validation aggregates, checksums, and `design_partner_beta_freeze.json`. Local
+provenance is deliberately unsigned with an untrusted builder identity; trusted
+GitHub/Sigstore package/image attestations require an authorized release run.
+The workflow-pinned Trivy 0.73.0 binary was checksum-verified from its official
+release: the current lock scan found zero fixable high/critical production
+dependency vulnerabilities and the repository scan found zero secrets in its
+scanned source scope. Checksum-verified Syft 1.50.0 independently emitted an
+SPDX 2.3 record for the exact wheel hash. The JSON reports persist with the
+candidate evidence; none substitutes for the unavailable container-image scan.
+No customer data, pilot, adjudication, confirmed research impact, deployment,
+or held-out v0.2 execution exists or is claimed.
+
+### Fresh v1-readiness audit after Prompt 10
+
+| Area | Status | Current evidence or missing gate |
+| --- | --- | --- |
+| Release identity/version | Partial | `0.2.0.dev0` and beta freeze identify the worktree; no exact candidate commit/tag exists yet. |
+| Wheel/sdist and clean install | Pass | Offline build plus new-env wheel install; PyArrow arrived from wheel metadata; 38 focused format/package tests passed. |
+| Local CI-equivalent quality | Pass | Ruff, Ruff format, strict MyPy, full pytest, lock, build, CLI, archive, and diff gates are required below. |
+| Remote CI/Security | Partial | Current local Trivy dependency/secret equivalents pass; candidate source has not run remotely. Historical Security fails only exact OCI reproducibility. |
+| OCI reproducibility/image identity | Partial | Canonical assembly fix and stronger diagnostic are local; exact two-build Linux/amd64 proof and candidate digest are absent. |
+| SBOM/provenance/attestation | Partial | Current package SBOM and unsigned local provenance are persisted; trusted CI attestation and container SBOM remain absent. |
+| Synthetic development/validation | Pass | 780/780 statuses succeeded, exact aggregates persisted, public-only reconstruction supported. This is not customer evidence. |
+| Held-out v0.2 | Not run | Still separately sealed; Prompt 10 did not authorize it. |
+| Design-partner/customer evidence | Fail for production readiness | No authorized customer file, adjudication, pilot metrics, or confirmed impact. |
+| Production deployment readiness | Fail | No published candidate image/digest, green candidate Security run, trusted attestations, production deployment, or customer validation. |
+
+Overall classification: **PARTIAL for design-partner beta engineering closure;
+NOT READY for production v1.0**. A `1.0.0` version would overstate the evidence.
+
 **Post-MVP Milestone H Missing Observations vertical slice complete locally — selected by the
 documented evidence-tie fallback, not by a customer-pain claim**
 
@@ -3447,55 +3512,60 @@ Milestone 11 gate passes, GitHub Actions run `31293937904` is green, and the ann
 `v0.1.0` marks the immutable historical baseline. There is no unfinished v0.1 implementation
 milestone.
 
-**Post-MVP Milestone A, Steps 1 and 2 are complete.** The next task is **Step 3: a persisted v0.2
-development rehearsal, then a validation rehearsal and aggregate contract**.
+**Post-MVP Milestone A, Steps 1–3 are complete locally.** Development and
+validation evidence is persisted and frozen. The v0.2 held-out partition is
+still sealed and is not the automatic next action.
 
 **The external dataset production audit and policy slices are also complete.** They are
 independent of the benchmark sequence and do not change Step 3's scope. A real customer/vendor
 source may add a separately reviewed mapping, adapter, or policy only when its actual file and
 operating contracts demonstrate the need.
 
-**Post-MVP Milestone F is implemented locally but has one external completion gate.** When a
-versioned self-hosted release is explicitly authorized, run the new security and publishing
-workflows, require every scan/build/reproducibility/smoke job to pass, and record the published
-package/image digests plus verified provenance/SBOM attestations. Do not claim the acceptance gate
-complete before that evidence exists. This release gate is independent of benchmark Step 3.
+**Post-MVP Milestone F is implemented locally but has external completion
+gates.** The immediate engineering gate is an exact two-build Linux/amd64 OCI
+reproducibility run for the current source, followed by a green candidate
+Security workflow. Publication, registry digest, pulled-image offline smoke,
+and trusted provenance/SBOM attestations require separate explicit release
+authorization. Do not claim these gates complete from workflow configuration.
 
 **Post-MVP Milestone G product support is complete locally.** The next Milestone G action is an
 actual customer-authorized shadow evaluation: approve the real mapping/policy and data lifecycle,
 audit a read-only snapshot, collect supplied adjudication/review time and any independently
 confirmed decision impacts, compare later versions only with context disclosure, and generate the
 aggregate report. Do not add pilot results to repository claims until those artifacts exist and the
-customer authorizes their use. This external pilot does not change the benchmark Step 3 task.
+customer authorizes their use.
 
 **Post-MVP Milestone H Missing Observations is complete locally.** The next customer-driven fault
 action is evidence collection: obtain a real, source-owner-approved expectation contract and
 design-partner adjudication before making any production-performance or customer-pain claim. Do not
 start Entity Identity merely because it is the remaining historical candidate; require
-demonstrated customer evidence or a new explicit prioritization instruction. This does not change
-the independent Benchmark v0.2 Step 3 task.
+demonstrated customer evidence or a new explicit prioritization instruction.
 
-### Exact next task: Step 3
+### Exact next task: close external beta gates without expanding product scope
 
-Build the runner/resume/aggregate evidence layer over the now-versioned v0.2 cases without changing
-the detector or evaluation contract. Specifically:
+After a maintainer reviews and commits this scoped candidate, run the existing
+CI and Security workflows against that exact commit. Specifically:
 
-1. Define a normalized development matrix and persist its paired clean/corrupted executions,
-   strict score, production interpretation, status, and failure evidence with safe resume.
-2. Aggregate strict primary metrics separately from categorical finding counts. Never call the
-   production interpretation revised precision/recall, and retain the untouched v0.1 published
-   numbers beside any comparison.
-3. Complete and review development evidence first; freeze configuration before running validation;
-   then run and review validation without changing corpus units, thresholds, relationship rules, or
-   categorization precedence in response to results.
-4. Only after both rehearsals pass, design the separate v0.2 release freeze/checksum surface. A
-   held-out execution remains later work and requires both the reserved-final-seed and complete-
-   held-out-corpus authorizations.
+1. Require the two no-cache Linux/amd64 OCI exports to match in raw archive,
+   index, manifest, config, and layer digests. If they do not, retain both
+   identities and diagnose the remaining layer; do not weaken the comparison.
+2. Require dependency, secret, image-vulnerability, and SBOM steps to pass for
+   the same candidate commit. Update the beta freeze with verified workflow and
+   OCI identities only after they exist.
+3. If and only if release publication is explicitly authorized, create a
+   reviewed pre-release tag, run the publishing workflow, verify package/image
+   digests and trusted attestations, and run the pulled digest offline smoke.
+4. Keep the package pre-release. Production `1.0.0` still requires a real,
+   customer-authorized design-partner shadow evaluation, adjudication evidence,
+   agreed acceptance criteria, and a separate held-out/release decision. Do not
+   substitute synthetic metrics for any of those gates.
 
-Constraints carried forward: no frozen v0.1 file may be edited; no threshold, matching rule, or
-denominator may change without its own ADR; corpus units may not be added, removed, resized, or
-re-parameterised on the basis of observed detector performance (inclusion rule IR-03); and v0.2
-development/validation evidence must not be presented as held-out evidence.
+Constraints carried forward: the immutable v0.1 tag/freeze/checksums may not be
+rewritten; no threshold, matching rule, or denominator may change without its
+own ADR; corpus units may not be changed in response to observed performance
+(IR-03); development/validation evidence must not be presented as held-out or
+customer evidence; and no commit, push, tag, release, registry write, or
+external publication occurs without explicit authorization.
 
 ### Still-open from Step 1
 
@@ -3567,10 +3637,12 @@ does not resolve. See `docs/RELEASE_CHECKLIST.md`.
 - Tests: pytest and Hypothesis
 - CLI: Typer, introduced at the Milestone 9 CLI milestone (`typer>=0.12,<1`, resolved `0.27.1`)
 - HTTP: HTTPX, introduced with the SEC adapter
-- Tabular processing: pandas and PyArrow, introduced only when required
+- Tabular processing: pandas plus direct runtime PyArrow `>=24,<25` (locked
+  24.0.0) for declared Parquet/Arrow production inputs; imports remain lazy
 - Dashboard: Streamlit, introduced at the Milestone 10 presentation milestone as the
   optional `dashboard` dependency group (`streamlit>=1.40,<2`, resolved `1.61.1`)
-- Release version: `0.1.0`, set at the Milestone 11 release-evidence milestone
+- Historical release version: immutable tag `v0.1.0`
+- Current candidate version: `0.2.0.dev0`
 
 ## Historical target
 
@@ -3588,6 +3660,21 @@ Record:
 - exact next task.
 
 ## Last updated
+
+2026-08-12 (Prompt 10 design-partner beta engineering closure — package
+`0.2.0.dev0`; PyArrow direct and clean-wheel verified; v0.2 Step 3 development
+aggregate `agg2_921fce1a47bbf8a2` and validation aggregate
+`agg2_2c9cafb077a33ebd`, 390/390 successful cases each, validation freeze
+`vfrz2_91347fdf3c3ff88a`; separate beta freeze/SBOM/unsigned provenance path;
+container venv canonicalization and stronger OCI digest diagnostics. Local
+Ruff/format/MyPy pass. Full pytest first rerun found two stale tests that still
+treated historical `CHECKSUMS.md` as a current-worktree manifest; they were
+corrected to verify the immutable tag. Clean built-wheel focused suite: 38
+passed. Checksum-verified Trivy 0.73.0 current lock vulnerability and repository
+secret scans passed with zero findings; checksum-verified Syft 1.50.0 emitted
+SPDX 2.3 for the exact wheel. External candidate OCI, remote Security, trusted attestation, registry,
+customer/pilot, production, and held-out v0.2 evidence remain open. No commit,
+push, tag, release, publication, or external write.)
 
 2026-08-09 (Post-MVP Milestone H Missing Observations complete locally — selected only by the
 documented evidence-tie fallback; explicit due-cell/source-context contract; six deterministic

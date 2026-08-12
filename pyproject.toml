@@ -4,14 +4,19 @@ build-backend = "hatchling.build"
 
 [project]
 name = "quantcheck"
-version = "0.1.0"
+version = "0.2.0.dev0"
 description = "Deterministic point-in-time financial data reliability auditing framework."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "QuantCheck maintainers" }]
-dependencies = ["httpx>=0.28,<1", "pydantic>=2,<3", "typer>=0.12,<1"]
+dependencies = [
+    "httpx>=0.28,<1",
+    "pyarrow>=24,<25",
+    "pydantic>=2,<3",
+    "typer>=0.12,<1",
+]
 
 [project.scripts]
 quantcheck = "quantcheck.cli:main"

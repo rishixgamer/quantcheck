@@ -7,12 +7,48 @@ one. ``assert_gate_closed`` makes that explicit where it matters.
 
 from __future__ import annotations
 
+import hashlib
 import shutil
+import subprocess
 from pathlib import Path
 
 import quantcheck as q
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+V01_TAG = "v0.1.0"
+V01_TAG_COMMIT = "f4ab7cee3a4f645c3280f69fdd00011a434778cd"
+
+
+def historical_v01_checksums_match_tag() -> tuple[str, ...]:
+    """Verify the immutable v0.1 manifest against the tagged source bytes."""
+    observed_commit = subprocess.run(
+        ("git", "rev-parse", f"{V01_TAG}^{{commit}}"),
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    problems: list[str] = []
+    if observed_commit != V01_TAG_COMMIT:
+        problems.append(f"{V01_TAG} resolves to unexpected commit {observed_commit}")
+    tagged_manifest = subprocess.run(
+        ("git", "show", f"{V01_TAG}:CHECKSUMS.md"),
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout
+    if (REPO_ROOT / "CHECKSUMS.md").read_bytes() != tagged_manifest:
+        problems.append("working CHECKSUMS.md differs from the immutable v0.1 tag")
+    for entry in q.parse_checksums_document(tagged_manifest.decode("utf-8")):
+        payload = subprocess.run(
+            ("git", "show", f"{V01_TAG}:{entry.path}"),
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+        if hashlib.sha256(payload).hexdigest() != entry.sha256:
+            problems.append(f"tagged content hash differs: {entry.path}")
+    return tuple(problems)
 
 
 def assert_gate_closed() -> None:

@@ -1,0 +1,16 @@
+# QuantCheck design-partner beta evidence checksums
+
+These SHA-256 values cover the locally generated candidate evidence; they are not signatures.
+
+```text
+51a0eb676a06772d21d0175c571ae43df9f791df2da3d32e602c327ae2162ff1  dist/quantcheck-0.2.0.dev0-py3-none-any.whl
+3cc757e759f20cd12ce4c5c469a426afe115b5c7cbcf43a9774dec5973df3053  dist/quantcheck-0.2.0.dev0.tar.gz
+375a38f1d585b4e8041d9a8f31a1a1161004246e1c777d09c9f8c3f80e393999  evidence/design_partner_beta/quantcheck-distribution.spdx.json
+3cf1c908ba066e3729867f06d7733ea2e67e14affb9c0e14328939c55ce4358b  evidence/design_partner_beta/quantcheck-distribution.intoto.json
+23762b6c968a3ec2199c064aac53f5c44b0c2e357749757e0c5ca7f535576f30  evidence/design_partner_beta/development_aggregate.json
+3bd0ce0868f8e159f14608b66c455fe74667b31e0af0de3ea145ebb728a7b9c4  evidence/design_partner_beta/validation_aggregate.json
+98a5ef916a1305b6e70622aac043527eceed63f9a70bc3286de6f5ca3d741737  evidence/design_partner_beta/validation_freeze.json
+28839cb412e4cd469765b7a97677ed1767c19ea99ce5db2f41fe62258df06830  evidence/design_partner_beta/trivy-vulnerability.json
+cdaa57230f54a48e727ea4d86e2cb461602561d833b9b954eea269cabb221f8b  evidence/design_partner_beta/trivy-secret.json
+7e1ee8074d32a2762c13fa78ae22da4f0b2147f18972820565b5340a53d91bb3  evidence/design_partner_beta/quantcheck-wheel.syft.spdx.json
+```

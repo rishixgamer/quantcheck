@@ -35,14 +35,13 @@ dialects are not sniffed. CSV syntax, encoding, delimiter, quote character, and
 null tokens are explicit. Parquet and Arrow are read with PyArrow in batches;
 PyArrow is imported only when one of those formats is used.
 
-The immutable v0.1 wheel metadata cannot be changed without invalidating the
-released checksum surface. Consequently this additive, pre-v0.2-release module
-does not yet advertise a wheel extra. Operators using Parquet or Arrow must
-install a compatible PyArrow explicitly (the repository lock currently tests
-PyArrow 24.0.0). Absence produces the data-free diagnostic
-`input.pyarrow_unavailable`; importing QuantCheck or using CSV/Python input does
-not import or require PyArrow. A future v0.2 release must declare the dependency
-or extra in its own package metadata and freeze.
+The immutable v0.1 wheel remains unchanged. The `0.2.0.dev0` distribution
+declares PyArrow `>=24,<25` directly and the lock resolves PyArrow 24.0.0, so a
+clean wheel install supports Parquet and both Arrow IPC variants without an
+operator-supplied extra. The import remains lazy: importing QuantCheck or using
+CSV/Python input does not load PyArrow. The fixed
+`input.pyarrow_unavailable` diagnostic remains a defensive response for an
+incomplete or damaged environment; it is not the supported installation path.
 
 ## Mapping contract
 

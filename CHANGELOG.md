@@ -3,6 +3,40 @@
 All notable changes to QuantCheck are recorded here. This project follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0.dev0] — Unreleased
+
+### Added
+
+* Persisted, resumable 390-case development and 390-case validation evidence
+  runs over the frozen v0.2 corpus, with mandatory paired clean controls,
+  terminal status artifacts, exact-count aggregates, and byte-identical
+  public-only reconstruction.
+* A validation preregistration freeze that refuses validation until all
+  development cases succeed and binds both configs/matrices, the development
+  aggregate, and the science-source hashes.
+* A design-partner beta-candidate freeze plus deterministic SPDX 2.3 package
+  SBOM, in-toto/SLSA v1 provenance statement, and evidence checksums. Local
+  provenance is explicitly unsigned; a trusted CI attestation remains an
+  external release gate.
+
+### Changed
+
+* Package version advanced from the immutable `v0.1.0` release to the explicit
+  pre-release version `0.2.0.dev0`; the historical tag, release freeze, and
+  `CHECKSUMS.md` are not rewritten.
+* PyArrow `>=24,<25` is now a direct runtime dependency because Parquet and
+  Arrow IPC are supported production inputs. Imports remain lazy for CSV and
+  Python-row use.
+* Container assembly canonicalizes virtual-environment entry order, ownership,
+  and timestamps before extraction. The reproducibility gate reports and
+  compares raw OCI archives plus index, manifest, config, and layer digests.
+
+### Not claimed
+
+* No customer data, design-partner adjudication, pilot outcome, live-source
+  evidence, production deployment, signed attestation, or held-out v0.2 result
+  is represented by this engineering closure.
+
 ## [0.1.0] — 2026-08-08
 
 First release candidate. Prepared locally; **not published**. No Git tag,

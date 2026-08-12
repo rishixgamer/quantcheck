@@ -58,7 +58,7 @@ def test_contract_documents_dry_run_and_public_report_boundaries() -> None:
 def test_v2_decisions_record_mapping_and_pyarrow_packaging_choices() -> None:
     text = (REPO_ROOT / "docs" / "DECISIONS_V0_2.md").read_text()
     assert "ADR-V2-012 — External production audits require an explicit mapping contract" in text
-    assert "ADR-V2-013 — PyArrow is lazy until v0.2 package metadata is frozen" in text
+    assert "ADR-V2-013 — PyArrow remains lazy and is declared by v0.2 package metadata" in text
     assert "ADR-V2-014 — Production policies are versioned overlays" in text
 
 

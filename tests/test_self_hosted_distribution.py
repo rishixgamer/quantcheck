@@ -82,6 +82,18 @@ def test_container_context_and_reproducibility_script_are_bounded() -> None:
     assert "--provenance=false" in text
     assert "--sbom=false" in text
     assert "first" in text and "second" in text
+    assert "inspect_oci_layout.py" in text
+    assert "raw OCI archives differ" in text
+
+    dockerfile = (REPO_ROOT / "Dockerfile").read_text()
+    for required in (
+        "--sort=name",
+        '--mtime="@${SOURCE_DATE_EPOCH}"',
+        "--numeric-owner",
+        "--pax-option=delete=atime,delete=ctime",
+        "source=/opt/quantcheck/venv.tar",
+    ):
+        assert required in dockerfile
 
 
 def test_all_github_actions_are_pinned_to_full_commit_shas() -> None:

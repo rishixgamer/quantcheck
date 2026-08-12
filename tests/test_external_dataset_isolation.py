@@ -14,8 +14,8 @@ from quantcheck.external_dataset_audit import (
     audit_external_rows,
     audit_normalized_dataset,
 )
-from quantcheck.release_checksums import verify_checksums_document
 from quantcheck.release_contract import FROZEN_SOURCE_FILES
+from tests.release_support import historical_v01_checksums_match_tag
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MODULES = (
@@ -28,8 +28,8 @@ MODULES = (
 )
 
 
-def test_v01_checksum_manifest_remains_current() -> None:
-    assert verify_checksums_document(repo_root=REPO_ROOT) == ()
+def test_v01_checksum_manifest_remains_valid_for_its_tag() -> None:
+    assert historical_v01_checksums_match_tag() == ()
 
 
 def test_no_frozen_v01_module_imports_the_external_dataset_path() -> None:

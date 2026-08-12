@@ -1,5 +1,33 @@
 # Software supply chain, provenance, and patch process
 
+## Current beta-candidate evidence state
+
+The `0.2.0.dev0` closure generates a deterministic SPDX 2.3 JSON package SBOM,
+an in-toto statement with the SLSA v1 provenance predicate, and SHA-256 evidence
+checksums under `evidence/design_partner_beta/`.
+`design_partner_beta_freeze.json` binds those
+artifacts to the distribution hashes, source-tree hash, corpus, and benchmark
+identities. The provenance builder ID is deliberately
+`local-untrusted://...`; it is unsigned and is not a GitHub/Sigstore
+attestation. It proves what the local script recorded, not who operated the
+builder.
+
+The most recent historical Security workflow run (`31368451109`) passed locked
+dependency scanning, secret scanning, the local image build, the image
+vulnerability scan, and SPDX SBOM generation, but failed the exact OCI
+reproducibility step. That run predates this candidate. A green workflow run
+for the exact candidate source, a verified byte-identical OCI result and image
+digest, and trusted release attestations remain external gates until they
+actually exist. Workflow configuration is not completion evidence.
+
+For the local candidate closure, checksum-verified workflow-pinned Trivy 0.73.0
+reported zero fixable high/critical production dependency vulnerabilities in
+`uv.lock` and zero secrets in the scanned repository source scope. A
+checksum-verified Syft 1.50.0 run emitted SPDX 2.3 for the exact candidate wheel
+hash. Their JSON reports are persisted beside the beta evidence. These local
+checks do not include the unavailable candidate container image and do not make
+the remote workflow green.
+
 ## What is implemented
 
 The self-hosted release workflow publishes these versioned artifacts from one release tag:

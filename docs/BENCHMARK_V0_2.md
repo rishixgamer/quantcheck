@@ -210,11 +210,47 @@ There is deliberately no in-place migration:
 - consumers dispatch on `spec_version`; they must not coerce a v1 artifact into
   a v2 schema or overwrite an existing v1 path with v2 bytes.
 
-The v0.1 `CHECKSUMS.md` is intentionally unchanged because v0.2 files are
-outside the v0.1 release surface. A future v0.2 release candidate must define
-its own freeze and checksums after development and validation rehearsal. This
-milestone does not authorize a held-out execution and does not claim v0.2
-aggregate metrics.
+The v0.1 `CHECKSUMS.md` is intentionally unchanged because it authenticates the
+immutable v0.1 release surface. The `0.2.0.dev0` candidate has its own
+`design_partner_beta_freeze.json` and generated beta evidence checksums after
+development and validation execution. This does not authorize a held-out
+execution and does not turn synthetic aggregate metrics into customer evidence.
+
+## Persisted development and validation evidence
+
+`scripts/run_benchmark_v2_evidence.py` expands all supported frozen corpus
+units across three severities and the ten partition-specific seeds. The result
+is 390 development and 390 validation fault cases; every fault case runs its
+paired clean control. The persisted layout is:
+
+```text
+benchmark_evidence_v0_2/
+  public/
+    development_config.json
+    development_matrix.json
+    development_aggregate.json
+    validation_config.json
+    validation_matrix.json
+    validation_freeze.json
+    validation_aggregate.json
+    cases/<case-id>/{case_config,clean_control_execution,
+                     corrupted_execution,evaluation,status}.json
+    index.json
+  private/
+    cases/<case-id>/{clean_snapshot,corrupted_snapshot,manifest,index}.json
+```
+
+Terminal status is written after all required case artifacts. Missing status is
+`incomplete`; explicit failures remain `failed`; a resumed success is reused
+only after every referenced public and private hash verifies. Aggregation sums
+integer counts before deriving exact Decimal precision, recall, F1, and
+false-positive rate. It separately reports clean-control findings, eligible
+denominators, and non-metric production interpretation categories.
+
+Before validation, `validation_freeze.json` binds both config/matrix byte
+hashes, the complete development aggregate identity/hash, and source hashes.
+Validation refuses missing, malformed, or drifted freeze evidence. The public
+aggregate can be reconstructed with the complete private tree absent.
 
 ## Current limitations
 
@@ -226,6 +262,7 @@ aggregate metrics.
 - `secondary_corroborating` proves a unique record-level relationship to an
   injected unit, not that the secondary rule was the injector's intended
   failure family.
-- Only development and validation single-case execution is implemented here.
-  Aggregate reporting, a v0.2 release freeze, and held-out execution remain
-  later gated work.
+- Development and validation aggregate evidence is synthetic and conditional
+  on this corpus. It is not customer sensitivity or a design-partner result.
+- The v0.2 held-out partition is still sealed and requires its separate
+  authorization and release decision.

@@ -420,9 +420,9 @@ dry-run profile an audit.
 
 ---
 
-## ADR-V2-013 — PyArrow is lazy until v0.2 package metadata is frozen
+## ADR-V2-013 — PyArrow remains lazy and is declared by v0.2 package metadata
 
-**Status.** Accepted for the additive pre-release surface.
+**Status.** Accepted; packaging consequence completed by `0.2.0.dev0`.
 
 **Context.** Parquet and Arrow require PyArrow, but `pyproject.toml` and
 `uv.lock` are in the immutable v0.1 release checksum and candidate. Editing
@@ -430,16 +430,16 @@ them now would falsify the released evidence. The repository environment
 already locks and tests PyArrow through the dashboard dependency graph.
 
 **Decision.** Import PyArrow only when a declared Parquet or Arrow input is
-used. CSV/Python use needs no PyArrow, and importing the ingestion module does
-not load it. A missing dependency returns the fixed machine-readable
-`input.pyarrow_unavailable` diagnostic. Production and clean-wheel gates install
-the wheel plus the tested locked PyArrow explicitly.
+used. CSV/Python use does not load it. Beginning with `0.2.0.dev0`, declare
+PyArrow `>=24,<25` as a direct runtime dependency and lock 24.0.0. A missing
+dependency still returns the fixed machine-readable
+`input.pyarrow_unavailable` diagnostic so damaged environments fail explicitly.
 
-**Consequences.** The v0.1 checksum and package behavior remain unchanged while
-the full format path is implemented and verifiable. A future v0.2 release must
-declare PyArrow as a dependency or optional extra in its own package metadata;
-until then, operators must install it explicitly. This is a packaging
-limitation, not a silent fallback to a different Parquet reader.
+**Consequences.** The v0.1 checksum and package behavior remain unchanged.
+Clean installs of the v0.2 development distribution and its self-hosted image
+support Parquet and Arrow without an operator-supplied extra. PyArrow increases
+artifact size and vulnerability surface, so clean-install format tests, wheel
+metadata inspection, dependency/image scanning, and SBOM review are gates.
 
 ---
 
@@ -571,8 +571,10 @@ Distribute that entry point in a digest-pinned, two-stage Python 3.12 image. The
 UID/GID `65532`, exposes no port, declares no volume, and treats `/config`/`/input` as read-only and
 `/output`/`/work` as the only writable roots. The supported invocation additionally disables the
 network, makes the root filesystem read-only, drops capabilities, prevents privilege escalation,
-and applies resource limits. The minimal image supports CSV because immutable v0.1 metadata does
-not declare PyArrow; no implicit out-of-band install is hidden in the build.
+and applies resource limits. The immutable v0.1 image supports CSV only. The
+`0.2.0.dev0` candidate installs its declared PyArrow dependency and therefore
+supports the declared CSV, Parquet, and Arrow inputs without an implicit
+out-of-band install.
 
 Build inputs, workflow actions, Buildx, and BuildKit are version/digest pinned. CI scans secrets,
 locked dependencies, and the final image; generates SPDX SBOMs; and compares two no-cache OCI
@@ -696,3 +698,69 @@ passing deleted records, manifests, seeds, selected entities/concepts, outage wi
 survivorship labels to the detector; detector-only imputation; partial complete-scope injection;
 changing frozen v0.1 findings/scores; or presenting synthetic held-out evidence as a design-partner
 pilot.
+
+---
+
+## ADR-V2-019 — Development completes before a frozen validation run
+
+**Status.** Accepted.
+
+**Context.** One-case execution proved the v0.2 boundary but did not produce a
+resumable experiment, complete status inventory, aggregate denominators, or a
+development-before-validation record. A combined unit/seed cross product would
+also mispair development units with validation seeds.
+
+**Decision.** Preregister two linked matrices: all supported development units
+with seeds `0`–`9`, and all supported validation units with seeds `100`–`109`.
+Each matrix has 390 fault cases across three severities; each case has a
+mandatory paired clean control. Persist canonical public/private artifacts,
+write terminal status last, keep failures and missing statuses visible, and
+reuse prior success only after public and private hash verification.
+
+Run development first. Only a 390-success, zero-failure, zero-incomplete
+development aggregate permits creation of `validation_freeze.json`. That freeze
+binds both configs/matrices, the development aggregate bytes and identity, and
+science-source hashes. Validation refuses any missing or drifted freeze.
+Aggregate only successful science rows, while counting every configured status;
+derive ratios from summed integer counts and rebuild identically from public
+artifacts alone.
+
+**Consequences.** Development and validation evidence becomes inspectable,
+resumable, partition-correct, and resistant to post-development configuration
+changes. These are synthetic corpus measurements, not customer validation. The
+held-out partition remains sealed.
+
+**Rejected.** One mixed config that crosses both unit and seed partitions;
+validation before development; dropping failures; treating missing status as
+success; averaging per-case ratios; requiring private manifests to report
+public aggregates; or adjusting thresholds after development.
+
+---
+
+## ADR-V2-020 — A beta candidate gets a new freeze; v0.1 evidence stays immutable
+
+**Status.** Accepted.
+
+**Context.** PyArrow, version metadata, container assembly, and v0.2 evidence
+must change for beta closure. Rewriting `release_freeze.json` or `CHECKSUMS.md`
+would misrepresent the published v0.1 tag. Calling this work `1.0.0` would also
+imply production/customer evidence that does not exist.
+
+**Decision.** Use PEP 440/SemVer-compatible `0.2.0.dev0`. Preserve the v0.1 tag,
+freeze, checksums, metrics, and notes as historical artifacts. Create a distinct
+`design_partner_beta_freeze.json` over the exact base commit plus source-tree
+hash, package/lock state, corpus IDs, development/validation identities,
+detector/injector versions, distributions, OCI state, SBOM, provenance, and
+attestation state. Generated package SBOM and provenance are machine-readable
+and checksum-bound. Local provenance is labeled unsigned and untrusted; only
+the release workflow can create trusted GitHub/Sigstore attestations.
+
+**Consequences.** The candidate is reproducibly identifiable even before a
+maintainer commits it, without falsely describing the dirty worktree as a Git
+commit. Missing OCI, workflow, registry, attestation, customer, or held-out
+evidence remains an explicit gate rather than a blank implied success.
+
+**Rejected.** Editing historical v0.1 integrity artifacts; version `1.0.0`;
+calling a configured workflow an attestation; signing locally with no trusted
+identity and describing it as release provenance; or filling customer evidence
+fields with synthetic results.

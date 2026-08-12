@@ -53,10 +53,12 @@ absolute root, and must resolve to a regular non-symlink file below the input mo
 ingestion layer then verifies its declared SHA-256 and byte size before parsing and checks for file
 replacement during parsing.
 
-The published minimal image installs the package's declared runtime dependencies and supports the
-CSV production path. The immutable v0.1 package metadata does not declare PyArrow; therefore this
-image does not claim Parquet or Arrow support. A later versioned distribution may add a separately
-locked PyArrow extra after its own size, vulnerability, and clean-install review.
+The beta-candidate image installs the `0.2.0.dev0` package's declared runtime dependencies,
+including locked PyArrow 24.0.0. CSV, Parquet, Arrow IPC file, and Arrow IPC stream inputs therefore
+use the same supported clean-install surface. This changes package/image size and vulnerability
+surface, so the clean-wheel format tests, locked-dependency scan, image scan, SBOM review, and
+resource-bounded smoke run are required before distribution. The immutable v0.1 wheel and image
+claims remain unchanged.
 
 ## Verify before running
 

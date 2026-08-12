@@ -8,8 +8,11 @@ statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
 
 ## Current implementation status
 
-**Recovery Phases 0–11 are complete.** Version `0.1.0`. The repository has a typed `quantcheck`
-package, a `uv`-managed toolchain (Ruff, MyPy, pytest, Hypothesis), a
+**Recovery Phases 0–11 are complete.** The immutable `v0.1.0` tag remains the
+historical release. The current worktree is version `0.2.0.dev0`, a
+design-partner beta-closure candidate rather than a production release. It has
+a typed `quantcheck` package, a `uv`-managed toolchain (Ruff, MyPy, pytest,
+Hypothesis), a
 deterministic benchmark layer over the four completed fault families, an
 installed `quantcheck` CLI (Typer) exposing `ingest sec`, `inject`, `audit`,
 `evaluate`, `benchmark run`, `benchmark smoke`, and `explain`, a public-only
@@ -127,7 +130,8 @@ Every number traces to `release_evidence/final/public/aggregate_report.json`.
 Full breakdown, per-seed metrics, and failure analysis:
 [`docs/FINAL_BENCHMARK_RESULTS.md`](docs/FINAL_BENCHMARK_RESULTS.md).
 
-**QuantCheck claims no** production readiness, financial-data certification,
+**QuantCheck claims no** production readiness, completed design-partner pilot,
+customer validation, financial-data certification,
 automated remediation, loss prevention, trading alpha, universal SEC coverage,
 statement reconstruction, universal restatement detection, or vendor-wide
 reliability. See [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
@@ -137,7 +141,7 @@ reliability. See [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
 ```bash
 # 1. Install (Python 3.12).
 uv sync --all-groups          # from a checkout
-# or: pip install dist/quantcheck-0.1.0-py3-none-any.whl
+# or: pip install dist/quantcheck-0.2.0.dev0-py3-none-any.whl
 
 # 2. Confirm the CLI works.
 uv run quantcheck --help
@@ -155,6 +159,9 @@ uv run --group dashboard streamlit run dashboard/app.py -- --artifacts /tmp/qc-s
 
 ## Reproducing the final benchmark
 
+The commands below reproduce the historical v0.1 held-out evidence. They are
+not the v0.2 development/validation evidence path.
+
 ```bash
 uv run python scripts/release_freeze.py --check          # must pass first
 uv run python scripts/run_release_benchmark.py --output release_evidence/final
@@ -168,6 +175,33 @@ uv run python scripts/release_checksums.py --check
 Reserved seeds execute only through `scripts/run_release_benchmark.py`, and only
 after the frozen candidate verifies byte for byte against the working tree.
 See [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
+
+## Reproducing the v0.2 beta-candidate evidence
+
+The v0.2 runner preregisters separate 390-case development and validation
+matrices. It completes development first, writes a validation freeze over both
+matrices plus the development aggregate and science-source hashes, and only
+then unseals validation. Every case has a paired clean control. Failed and
+incomplete cases remain visible, and aggregates rebuild byte-for-byte from the
+public tree without the private manifests or snapshots.
+
+```bash
+uv run python scripts/run_benchmark_v2_evidence.py \
+  --partition all --output benchmark_evidence_v0_2
+
+uv build --offline
+uv run python scripts/build_beta_evidence.py \
+  --benchmark-evidence benchmark_evidence_v0_2 \
+  --output evidence/design_partner_beta
+```
+
+`design_partner_beta_freeze.json` binds the current package, source-tree hash,
+corpus identities, development/validation aggregate identities, distributions,
+SBOM, provenance statement, OCI state, and attestation state. Generated bulky
+case evidence lives in the gitignored `benchmark_evidence_v0_2/` directory;
+compact aggregates and supply-chain records persist under
+`evidence/design_partner_beta/`. This is synthetic engineering evidence, not a
+design-partner result; held-out v0.2 execution remains separately gated.
 
 ## CLI usage
 
@@ -241,7 +275,9 @@ uv run quantcheck --help
   `REPRODUCIBILITY.md`, `FINAL_BENCHMARK_RESULTS.md`, `LIMITATIONS.md`,
   `RELEASE_CHECKLIST.md`, `RELEASE_NOTES_0.1.0.md`.
 - `CHANGELOG.md`, `CONTRIBUTING.md`, `CHECKSUMS.md`, `LICENSE`,
-  `release_freeze.json` — release surface.
+  `release_freeze.json` — immutable v0.1 release surface.
+- `design_partner_beta_freeze.json` — current v0.2 beta-candidate identity and
+  references to generated engineering evidence.
 - `reference/` — historical documents describing the project concept and a
   prior 0.1.0 implementation. They are specifications and historical
   evidence only; they do not describe the current state of this repository.

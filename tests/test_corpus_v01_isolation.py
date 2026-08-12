@@ -1,8 +1,8 @@
 """The v0.1 release must be completely unaffected by the v0.2 corpus.
 
 ``v0.1.0`` is frozen evidence. The corpus substrate is purely additive, and
-these tests are the mechanical proof: not one byte of the frozen release
-surface changed, the reviewed fixture still regenerates identically, and the
+these tests are the mechanical proof: the historical manifest still matches
+the immutable tag, the reviewed fixture still regenerates identically, and the
 frozen benchmark configuration still expands to exactly the same matrix.
 
 The freeze record and the checksum manifest are the two documents that would
@@ -24,18 +24,16 @@ from quantcheck.fixtures import (
     canonical_reviewed_fixture_bytes,
     generate_reviewed_fixture,
 )
-from quantcheck.release_checksums import CHECKSUM_COVERED_FILES, verify_checksums_document
+from quantcheck.release_checksums import CHECKSUM_COVERED_FILES
 from quantcheck.release_contract import FROZEN_SOURCE_FILES, RELEASE_FREEZE_RECORD_NAME
+from tests.release_support import historical_v01_checksums_match_tag
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class TestNoFrozenFileWasTouched:
-    def test_the_checksum_manifest_still_verifies(self) -> None:
-        mismatches = verify_checksums_document(repo_root=REPO_ROOT)
-        assert mismatches == (), "\n".join(
-            f"{mismatch.path}: {mismatch.reason}" for mismatch in mismatches
-        )
+    def test_the_checksum_manifest_still_verifies_its_tag(self) -> None:
+        assert historical_v01_checksums_match_tag() == ()
 
     @pytest.mark.parametrize("relative", FROZEN_SOURCE_FILES)
     def test_every_frozen_source_file_still_exists(self, relative: str) -> None:
