@@ -1,0 +1,23 @@
+[01] A backtest can be mathematically correct and still be wrong if its data knew the future. QuantCheck audits the data behind quantitative research before the result is trusted.
+
+[02] The issue is point-in-time truth. A reporting period ends March 31. The researcher decides on April 15. The actual filing arrives May 2. Those are three different dates.
+
+[03] If the filing is stamped as available on April 15, a future value becomes visible too early. The backtest can now use information that did not exist at the research cutoff.
+
+[04] That changes the controlled research decision: an unavailable observation can enter the screen, alter a ranking, and make the historical result look better than the information set allowed.
+
+[05] QuantCheck tests this by injecting a controlled fault, then passing only a sanitized audit snapshot to the detector. The detector cannot see the clean snapshot, the seed, the injector target, or the private manifest. Only after the audit is final does exact scoring compare findings with hidden truth.
+
+[06] The framework supports four narrow fault families: Look-Ahead Timestamp, Unit Drift, Duplicate Observations, and Revision Overwrite.
+
+[07] The rebuilt v0.1 evidence package contains 124 cases: 120 fault cases and four clean controls. Ninety-four cases succeeded. Thirty remained visible as structural no-eligible-target failures. None were incomplete.
+
+[08] Across successful scored cases, the saved benchmark recorded 130 injected faults and 208 findings: precision 0.625, recall 1.0, F1 0.769, and a false-positive rate of about 7.29 percent. The benchmark retained 78 strict cross-detector false-positive findings.
+
+[09] That limitation stays visible. In a controlled study on preserved SEC observations, all 120 manufactured faults were exactly matched, while Unit Drift also produced four correlated warnings on neighboring non-target records.
+
+[10] QuantCheck also ran a narrow real public-data study: 472 selected SEC Company Facts records from five issuers. Exact Duplicate found zero duplicate groups among 472 singleton fingerprints.
+
+[11] The other three detectors had zero eligible opportunities under this adapter’s data structure. That is evidence of real-source pipeline execution, not broad validation on natural SEC histories.
+
+[12] QuantCheck asks a prior question: whether the data beneath a backtest, ranking, or research conclusion had the right information, at the right time, in the right form. That is the question behind QuantCheck.

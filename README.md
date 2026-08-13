@@ -1,178 +1,139 @@
 # QuantCheck
 
-> **Can a historical financial research result be trusted if its input data could not have existed at the stated decision date?**
->
-> QuantCheck deterministically injects narrow point-in-time data faults, audits a sanitized manifest-blind view, and scores results against private truth only after detection is finalized.
+**Adversarial testing for point-in-time financial research data**
 
-![Hero timeline: a filing becomes available after the research decision, then a controlled mutation makes it appear early](docs/assets/lookahead-timeline.svg)
+> QuantCheck tests whether future information was made visible too early—and whether that changes a research result.
 
-Visual key: blue marks the public/audited path, rust marks a controlled mutation or warning, and slate marks a private or not-applicable state. Labels do not rely on color alone.
+[![A timeline shows quarter end on March 31, a research decision on April 15, and a later filing on May 10. A dashed rust path moves the filing value's apparent availability back to March 31, making it visible at the decision date. QuantCheck identifies the temporal violation.](docs/assets/quantcheck-hero-timeline.svg)](docs/assets/quantcheck-hero-timeline.svg)
 
-## One concrete point-in-time failure
+*Figure 1. A controlled look-ahead mutation moves a value's apparent availability before the research decision, even though the filing became public later. QuantCheck detects the detector-visible temporal contradiction. This is a conceptual illustration, not measured benchmark evidence.*
 
-**Illustrative controlled fault — not an observed SEC defect.**
+[Demo](#demo) · [Research paper](QUANTCHECK_RESEARCH_PAPER.md) · [Reproduce](#reproduce) · [Methodology](docs/METHODOLOGY.md) · [Evidence ledger](QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md)
 
-| Date | What should be true | What a contaminated dataset can claim |
-| --- | --- | --- |
-| Mar 31 | Quarter ends | — |
-| Apr 30 | Research decision date: the fact is not yet available | Fact appears available and enters the analysis |
-| May 5 | Fact is filed and becomes available | — |
-
-A result produced on Apr 30 may look plausible while depending on information that was not available until May 5. QuantCheck tests this kind of failure without giving detectors the hidden answer key.
-
-## Verified evidence at a glance
-
-| Evidence layer | Result | Interpretation |
-| --- | --- | --- |
-| **Frozen v0.1 held-out benchmark** | 124 configured synthetic cases; 94 succeeded, 30 remained visible as `no_eligible_targets` failures, 0 incomplete. Strict micro precision `0.625`, recall `1`, F1 `0.769230…`. | Controlled evidence on a small reviewed synthetic fixture—not a general performance estimate. |
-| **Failure honesty** | 78 strict false-positive findings were retained; all were cross-detector findings under primary-family scoring. | The benchmark does not tune away inconvenient behavior. |
-| **Controlled research sensitivity** | 90/90 successful fault cases changed the configured research output; 90/90 had manifest-assisted exact replay restoration. | Narrow sensitivity demonstrations—not returns, alpha, or automatic repair. |
-| **Real SEC substrate experiment** | Across nine prospectively frozen injected cases, all 120 manufactured fault instances matched; four Unit Drift warnings remained strict false positives. | Controlled faults on real-source observations—not natural SEC defects or broad real-world accuracy. |
-
-[Demo](#demo) · [Paper](#paper) · [Reproduce](#reproduce)
-
----
+- **Frozen v0.1 controlled benchmark:** 124 configured · 94 successful · 30 structural no-target · 0 incomplete. Synthetic fixture evidence, not production performance.
+- **Manifest-blind evaluation:** detectors see sanitized audit input; private truth enters only after findings are final.
+- **Real-source exposure:** 472 selected observations · 5 issuers · 0 emitted findings; only Exact Duplicate had opportunities. Pipeline execution, not natural-error validation.
 
 ## The problem
 
-Historical financial research is vulnerable to data states that are internally plausible but historically impossible:
+**What if your backtest's data knew something the researcher did not?**
 
-- a fact becomes visible before it was filed;
-- a value changes scale while its unit label remains unchanged;
-- one observation is counted twice; or
-- a later revision replaces an earlier historical state.
+A company can finish a quarter on March 31, a researcher can make a decision on April 15, and the filing can become public on May 10. If a dataset labels the filing value as available on March 31, the calculation may be mathematically correct while its historical state is impossible.
 
-QuantCheck treats the dataset as part of the experiment. It asks whether a specified research result can be manufactured by one of these controlled data-integrity failures.
+QuantCheck tests the data state before making any claim about prediction. It separates five concepts that research systems often blur: reporting period, filing date, availability date, research cutoff, and runtime.
 
-## Why backtests can be contaminated
+For v0.1, visibility is explicit and narrow:
 
-Point-in-time analysis needs distinct dates for the reporting period, filing, availability, research cutoff, and runtime. In QuantCheck’s v0.1 day-level contract, a fact is visible only when `available_on <= as_of_date`.
+```text
+visible ⇔ available_on <= as_of_date
+```
 
-A backtest can be mathematically correct and still be historically invalid if this boundary is wrong.
+The contract is day-level and end-of-day. It makes no intraday availability claim.
+
+## The temporal contradiction
+
+The signature Look-Ahead test changes one controlled field: an eligible fact's apparent `available_on` date becomes its `period_end`. Its filing date, value, unit, dimensions, and provenance remain unchanged.
+
+At the April 15 research decision in Figure 1, the clean history excludes the May 10 filing. The corrupted history includes it. The detector does not need the hidden original value to prove the visible contradiction `available_on == period_end < filed_on`.
 
 ## How QuantCheck works
 
-![Architecture and trust boundary: clean data, deterministic injection, sanitized audit input, detector, finalized findings, and post-audit scoring](docs/assets/quantcheck-hero.svg)
+[![A two-lane architecture diagram shows the primary public audit path from private clean data through deterministic fault injection, sanitized audit input, a detector, finalized findings, hidden-manifest scoring, and research-impact comparison. A separate hatched private lane carries the fault manifest from injection to scoring only after audit finalization. There is no connector from the manifest to the detector.](docs/assets/quantcheck-architecture.svg)](docs/assets/quantcheck-architecture.svg)
 
-The detector never receives the manifest, clean snapshot, target IDs, seed, severity, or injector-only metadata. The scorer can read private truth only after the audit report is finalized.
-
-## Four frozen v0.1 fault families
-
-| Family | Supported controlled subtype | Detector question |
-| --- | --- | --- |
-| Look-Ahead Timestamp | `period_end_substitution` | Did a period-end date make a fact visible before its filing? |
-| Unit Drift | `value_scaled_unit_unchanged` | Does an exact comparable series contain a scale discontinuity? |
-| Duplicate Observations | `exact_occurrence_copy` | Does an exact fingerprint occur more than once? |
-| Revision Overwrite | `later_vintage_in_earlier_state` | Does an earlier state contain a later declared revision? |
-
-These are deliberately narrow contracts, not universal anomaly detection, statement reconstruction, fuzzy deduplication, or restatement inference.
-
-## Manifest-blind evaluation
-
-QuantCheck separates generation from evaluation:
+*Figure 2. QuantCheck separates controlled corruption from manifest-blind detection. Private truth is used only after findings are finalized for exact scoring and controlled impact comparison.*
 
 1. Build a clean point-in-time snapshot.
-2. Inject one deterministic, configured fault and retain its truth privately.
-3. Sanitize the corrupted snapshot for audit.
-4. Run all detectors.
-5. Finalize findings.
-6. Score exact matches against the private manifest.
+2. Inject a deterministic, configured fault and retain its truth privately.
+3. Sanitize the corrupted snapshot into the detector's audit input.
+4. Run all detectors without the manifest, clean values, targets, seed, or injector metadata.
+5. Finalize every finding, including cross-detector warnings.
+6. Score exact one-to-one matches against the hidden manifest.
+7. Compare one narrow research output across clean, corrupted, and privately replayed states.
 
-Clean controls use the same detector and scoring contracts. Cross-detector findings remain visible; they are not suppressed to improve a headline metric.
+Clean controls use the same detector and scoring contracts. Public artifacts cannot address the private artifact tree.
 
-## Benchmark
+## Fault families
 
-The frozen v0.1 held-out benchmark contains four fault profiles, three severities, ten reserved final seeds, and four clean controls.
+The frozen v0.1 benchmark tests one deliberately narrow subtype in each family:
 
-| Metric | Saved v0.1 result |
+| Family | Controlled subtype | Detector question | Deliberate boundary |
+| --- | --- | --- | --- |
+| **Look-Ahead Timestamp** | `period_end_substitution` | Did a period-end date make a fact visible before filing? | Not arbitrary timestamp or intraday detection |
+| **Unit Drift** | `value_scaled_unit_unchanged` | Does an exact comparable series contain a scale discontinuity? | Not currency conversion or general anomaly detection |
+| **Duplicate Observations** | `exact_occurrence_copy` | Does one exact public fingerprint occur more than once? | Not fuzzy deduplication or entity resolution |
+| **Revision Overwrite** | `later_vintage_in_earlier_state` | Does an earlier state contain a later declared revision? | Requires source-declared lineage; not universal restatement detection |
+
+Missing Observations exists as separate post-MVP work. It is not part of the frozen four-family v0.1 result, and Entity Identity remains unimplemented.
+
+## Frozen v0.1 held-out benchmark
+
+[![A benchmark accounting diagram starts with 124 configured cases and separates 94 successful cases, 30 structural no-target cases, and zero incomplete cases. It then shows 130 injected faults, 130 exact matches, 78 strict false-positive findings, and zero false-negative faults among successful scored cases. Metrics are precision 0.625, recall 1.000, F1 0.769, and eligible-clean denominator 1,070.](docs/assets/quantcheck-benchmark-v01.svg)](docs/assets/quantcheck-benchmark-v01.svg)
+
+*Figure 3. Frozen v0.1 case and finding accounting. Strict primary-family scoring on a controlled synthetic fixture. Evidence: aggregate `agg_571aae0b7c60a4a5`, [canonical aggregate](release_evidence/final/public/aggregate_report.json). Not a production precision or recall estimate.*
+
+| Accounting | Exact saved value |
 | --- | ---: |
-| Configured / successful / failed / incomplete | 124 / 94 / 30 / 0 |
-| Injected faults / findings | 130 / 208 |
-| True positives / false negatives | 130 / 0 |
-| Strict false positives | 78 |
-| Strict micro precision / recall / F1 | 0.625 / 1 / 0.769230… |
-| Controlled output changed / replay restored | 90 / 90 |
+| Configured / successful / structural no-target / incomplete | 124 / 94 / 30 / 0 |
+| Injected faults / exact matches | 130 / 130 |
+| Strict false-positive findings | 78 |
+| False-negative faults among successful scored cases | 0 |
+| Eligible-clean denominator | 1,070 |
+| Strict micro precision / recall / F1 | 0.625 / 1.000 / 0.769 |
+| Controlled output changed / manifest-assisted replay restored | 90 / 90 |
 
-The complete breakdown, denominators, and exact Decimal values are in [Final benchmark results](docs/FINAL_BENCHMARK_RESULTS.md).
+The displayed F1 is rounded from the canonical Decimal value. The complete exact values, denominators, and profile breakdown are in [Final benchmark results](docs/FINAL_BENCHMARK_RESULTS.md).
 
-![Frozen v0.1 benchmark evidence summary](docs/assets/benchmark-results.svg)
+## What QuantCheck gets wrong
 
-## Failure analysis: what stays visible
+[![A failure-analysis diagram keeps four categories separate: 130 exact matches, 78 strict cross-detector false-positive findings, zero false-negative faults among successful scored cases, and 30 structural no-target cases. It lists the three no-target cells and explains that structural no-target is not a miss.](docs/assets/quantcheck-failure-analysis.svg)](docs/assets/quantcheck-failure-analysis.svg)
 
-The weak results are part of the result:
+*Figure 4. Exact matches, strict false positives, misses, and structural no-target cases remain separate because they have different meanings. Evidence: aggregate `agg_571aae0b7c60a4a5` and the frozen case matrix.*
 
-- 30 cases failed at injection with `no_eligible_targets`: Look-Ahead at high severity, and Revision Overwrite at medium and high severity.
-- All 78 strict false positives are cross-detector findings under the predeclared primary-family scoring rule.
-- Revision Overwrite has an eligible-clean denominator of 11; its false-positive rate must not be compared casually with the larger-denominator profiles.
-- Recall of 1 is measured on the specified synthetic fixture; it is not a general sensitivity claim.
+The benchmark keeps inconvenient outcomes visible:
 
-![Failure analysis: retained false positives, synthetic validation misses, and structural no-target cases kept separate](docs/assets/failure-analysis.svg)
+- **78 strict false-positive findings.** All are cross-detector findings under the predeclared primary-family score. A mechanically valid alert from another family still counts against strict precision.
+- **0 false-negative faults among successful scored cases.** This is fixture-bounded recall, not a general sensitivity claim.
+- **30 structural no-target cases.** No fault was injected, so these cells are not detector misses: Look-Ahead / high has no 30-day natural filing lag; Revision Overwrite / medium and high require 5% and 20% changes, while the declared history changes by 2%.
+- **A thin denominator.** Revision Overwrite has an eligible-clean denominator of 11. Its rates should not be compared casually with larger profiles.
 
-## Real-source studies
+## Real-source evidence
 
-Two evidence layers use selected SEC Company Facts histories and must not be conflated.
+The real-source work answers a different question from the synthetic benchmark: can the same bounded pipeline run on selected public SEC Company Facts histories, and which detector rules have an opportunity to apply?
 
-**Observational integration study.** QuantCheck accepted 472 selected observations from five issuers. Exact Duplicate had 472 singleton fingerprints and zero findings. Look-Ahead, Revision Overwrite, and Unit Drift had zero eligible opportunities under the selected adapter semantics. This establishes narrow real-source pipeline execution and an exact-duplicate null result—not broad detector validation. Because no findings were emitted, there was no finding-level human adjudication; zero findings are not a certification of the source data.
+[![An observational evidence table states 472 selected observations, five issuers, and zero emitted findings. Exact Duplicate has 472 singleton fingerprint groups and an applicable null result. Look-Ahead and Revision Overwrite each show N/A with zero opportunities, and Unit Drift shows N/A with zero comparable observations. The footer says no findings were available to adjudicate and this does not certify the data as correct.](docs/assets/quantcheck-real-source-evidence.svg)](docs/assets/quantcheck-real-source-evidence.svg)
 
-**Adversarial study on real-data substrate.** A separately Git-frozen study preserved the selected SEC values and provenance while applying existing deterministic injectors. Across nine seeded Look-Ahead, Duplicate, and Unit Drift cases, all 120 manufactured fault instances were exactly matched. Four additional Unit Drift warnings remain strict false positives. Revision Overwrite was not applicable.
+*Figure 5. Detector-specific applicability in the observational SEC run. Evidence: [applicability artifact](evidence/real_data_study/applicability.json) and [observational results](REAL_DATA_RESULTS.md). Real-source pipeline execution—not natural-error validation.*
 
-![Adversarial results on preserved SEC observations](docs/assets/real-substrate-results.svg)
+QuantCheck processed **472 selected observations from five issuers** and emitted **zero observational findings**. Only Exact Duplicate had applicable opportunities: all 472 fingerprint groups were singletons. The other families were `NOT_APPLICABLE`, not zero-valued performance tests. There were no findings to adjudicate, and the result does not certify the selected data as correct.
 
-Read the [observational results](REAL_DATA_RESULTS.md), [real-substrate adversarial results](REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md), and [study limitations](REAL_DATA_LIMITATIONS.md).
+### Controlled adversarial test on an SEC-derived substrate
 
-![Evidence layers: synthetic benchmark, observational SEC integration, and adversarial real-data substrate](docs/assets/evidence-layers.svg)
+This is separate from the observational run. QuantCheck introduced **120 manufactured faults** across nine seeded cases on preserved SEC-derived observations: 12 Look-Ahead, 72 Duplicate, and 36 Unit Drift. All 120 had exact matches; four additional Unit Drift warnings remain strict false positives. Revision Overwrite was not applicable because the adapter declared no revision lineage.
 
-## Research-impact experiment
+**120 injected faults—not 120 natural SEC defects.** The cases reuse one narrow substrate and do not estimate natural-error prevalence or general real-world accuracy.
 
-Each fault family has one deliberately narrow controlled comparison: availability count, exact aggregate, occurrence count, or frozen-vintage growth ranking. The question is whether the configured output changes under controlled corruption, then returns exactly after manifest-assisted replay.
+Read the [observational results](REAL_DATA_RESULTS.md), [adversarial results](REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md), [warning adjudication](REAL_DATA_SUBSTRATE_ADVERSARIAL_ADJUDICATION.md), and [real-source limitations](REAL_DATA_LIMITATIONS.md).
 
-This is evidence about data sensitivity—not investment performance, alpha, Sharpe, financial loss, or automated remediation.
+## Reproducibility
 
-## Architecture
+Logical artifacts use canonical JSON, exact `Decimal` serialization, and SHA-256 identities. With the same clean snapshot, configuration, seed, and code version, logical artifact bytes are designed to reproduce across output roots, reordered inputs, and tested `PYTHONHASHSEED` values. Runtime metadata and the index are intentionally environment-specific.
 
-- `src/quantcheck/` — typed deterministic core, fault contracts, audit boundary, scoring, and artifact model.
-- `docs/` — methodology, fault contracts, benchmark evidence, privacy boundary, reproducibility, and limitations.
-- `dashboard/` — local read-only Streamlit review surface.
-- `release_evidence/` — frozen v0.1 public evidence package.
-- `evidence/` — versioned synthetic, real-source, and supply-chain evidence artifacts.
-- `tests/` — offline deterministic and boundary-focused tests.
-
-## Quick start
+### Reproduce the offline smoke path
 
 Requires Python 3.12 and [`uv`](https://docs.astral.sh/uv/).
 
 ```bash
-uv sync --all-groups
+uv sync --frozen --all-groups
 uv run quantcheck benchmark smoke --output /tmp/qc-smoke
 uv run python scripts/render_html_summary.py /tmp/qc-smoke \
   --output /tmp/qc-smoke/summary.html
 ```
 
-The smoke benchmark is offline and produces 12 cases. See the [CLI contract](docs/CLI_CONTRACT.md) for the supported command surface.
+This produces 12 offline smoke cases. It does not reproduce the frozen held-out result.
 
-## Demo
+### Reproduce the frozen v0.1 evidence
 
-The demo reads saved public artifacts; it does not rerun science or access private manifests.
-
-```bash
-uv run quantcheck benchmark smoke --output /tmp/qc-demo
-uv run python scripts/render_html_summary.py /tmp/qc-demo \
-  --output /tmp/qc-demo/summary.html
-uv run --group dashboard streamlit run dashboard/app.py -- \
-  --artifacts /tmp/qc-demo
-```
-
-The local dashboard and generated HTML are public-artifact-only views. They continue to work with the entire private tree removed. See [Demo and presentation boundary](docs/DASHBOARD_AND_HTML.md).
-
-![Demo preview: public-only evidence review surface](docs/assets/demo-dashboard.svg)
-
-### Video upload placeholder
-
-The narrated demo is intentionally not linked yet. When the cut is ready, upload the final file at `video/QuantCheck_demo.mp4` and replace this note with its public GitHub or portfolio link.
-
-## Reproduce
-
-To reproduce the frozen v0.1 held-out evidence from the matching release checkout:
+From the matching `v0.1.0` release checkout:
 
 ```bash
 uv sync --frozen --all-groups
@@ -185,92 +146,46 @@ uv run python scripts/verify_release_evidence.py \
 uv run python scripts/release_checksums.py --check
 ```
 
-Logical artifacts are designed to be deterministic across output roots and tested hash seeds; runtime metadata is intentionally environment-specific. Read [Reproducibility](docs/REPRODUCIBILITY.md).
+See the full [reproducibility guide](docs/REPRODUCIBILITY.md) before interpreting byte-level comparisons.
 
-## Current implementation status
+## Demo
 
-The immutable `v0.1.0` tag remains the historical release baseline. The current worktree is `0.2.0.dev0`, a beta engineering candidate rather than a production release. It includes the typed `quantcheck` package, deterministic benchmark and artifact layers, the six root CLI command groups, public-only HTML and dashboard surfaces, a narrow SEC Company Facts adapter, additive external-dataset policy/execution paths, and synthetic development/validation evidence.
+[**Watch the 2:56 narrated project demo**](video/QuantCheck_demo.mp4) or review its [captions, evidence qualifiers, and production notes](video/PRODUCTION_PACKAGE.md).
 
-The current candidate has no completed customer pilot, customer adjudication, published OCI image, trusted release attestation, production deployment, or held-out v0.2 result. Local package and security evidence does not substitute for those external gates. See [IMPLEMENT.md](IMPLEMENT.md) for the operational record.
-
-The SEC adapter is intentionally narrow: one CIK at a time, explicit contact-bearing user-agent, cache-first exact-byte persistence, offline replay, allowlisted concepts/units/forms/date shapes, and day-level `available_on == filed_on` semantics. It does not reconstruct statements, harmonize concepts, convert currencies or scale, infer revisions, or make intraday claims.
-
-## CLI usage
+The demo uses saved public evidence and keeps synthetic, observational, and adversarial claims separate. The local review surfaces can also be generated without reading private artifacts:
 
 ```bash
-# Run the deterministic offline smoke benchmark.
-uv run quantcheck benchmark smoke --output /tmp/qc-smoke --json
-
-# Run one saved, fully expanded case through the staged workflow.
-uv run quantcheck inject --case case.json --output /tmp/qc-case
-uv run quantcheck audit --dir /tmp/qc-case
-uv run quantcheck evaluate --dir /tmp/qc-case
-
-# Explain one saved public finding.
-uv run quantcheck explain --dir /tmp/qc-case --finding <finding_id>
+uv run quantcheck benchmark smoke --output /tmp/qc-demo
+uv run python scripts/render_html_summary.py /tmp/qc-demo \
+  --output /tmp/qc-demo/summary.html
+uv run --group dashboard streamlit run dashboard/app.py -- \
+  --artifacts /tmp/qc-demo
 ```
 
-The supported surface is documented in the [CLI contract](docs/CLI_CONTRACT.md), including exit codes and privacy rules.
+## Research paper and methodology
 
-## Reproducing v0.2 synthetic engineering evidence
+[**QuantCheck: Adversarial Testing of Point-in-Time Financial Research Data**](QUANTCHECK_RESEARCH_PAPER.md) develops the threat model, manifest-blind evaluation design, benchmark, real-source evidence taxonomy, failure analysis, and limitations.
 
-The v0.2 runner keeps development and validation separate, pairs every fault case with a clean control, preserves failed/incomplete statuses, and rebuilds aggregates from public artifacts without private manifests or snapshots.
-
-```bash
-uv run python scripts/run_benchmark_v2_evidence.py \
-  --partition all --output benchmark_evidence_v0_2
-uv build --offline
-uv run python scripts/build_beta_evidence.py \
-  --benchmark-evidence benchmark_evidence_v0_2 \
-  --output evidence/design_partner_beta
-```
-
-This is synthetic engineering evidence only; it is not customer validation. The held-out v0.2 partition remains separately gated.
+For claim review, the [public evidence ledger](QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md) is the factual source of truth. For implementation semantics, begin with [Methodology](docs/METHODOLOGY.md), then follow the individual fault contracts.
 
 ## Limitations
 
-QuantCheck is not production ready, customer validated, or a complete financial-data platform. It does not claim natural-error prevalence, broad vendor-feed accuracy, investment performance, automatic repair, universal SEC coverage, statement reconstruction, or universal restatement detection.
+QuantCheck's primary v0.1 evidence is synthetic and fixture-bounded. The observational SEC study is narrow and has applicable opportunities for only one detector. The SEC-derived adversarial experiment uses manufactured faults, three deterministic seeds, and a reused substrate. The current `0.2.0.dev0` worktree has no completed customer pilot, customer adjudication, production deployment, published candidate image, trusted candidate attestation, or held-out v0.2 result.
 
-The primary v0.1 evidence is synthetic. The real-data studies are narrow and explicitly distinguish observed data from manufactured faults. Read the full [limitations](docs/LIMITATIONS.md).
-
-## Development checks
-
-Requires Python `>=3.12,<3.13` and `uv`.
-
-```bash
-uv python install 3.12
-uv sync --all-groups
-uv run ruff check .
-uv run ruff format --check .
-uv run mypy src tests
-uv run pytest
-uv run quantcheck --help
-```
-
-## Paper
-
-[**QuantCheck: Adversarial Testing of Point-in-Time Financial Research Data**](QUANTCHECK_RESEARCH_PAPER.md) explains the threat model, benchmark, real-data evidence layers, failure analysis, and limitations. The [public evidence ledger](QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md) is the canonical source for public claims and numbers.
+QuantCheck does not claim investment returns, alpha, financial losses prevented, automatic detector-only remediation, natural SEC defect discovery, vendor-scale coverage, universal restatement detection, or production accuracy. Read the [authoritative limitations](docs/LIMITATIONS.md).
 
 ## Documentation
 
-| Need | Start here |
+| Question | Start here |
 | --- | --- |
-| Method and audit boundary | [Methodology](docs/METHODOLOGY.md) |
-| Benchmark evidence | [Final benchmark results](docs/FINAL_BENCHMARK_RESULTS.md) |
-| Fault contracts | [Fault catalogue](docs/faults/) |
-| Public/private artifact boundary | [Artifacts and privacy](docs/ARTIFACTS_AND_PRIVACY.md) |
-| Reproducibility | [Reproducibility](docs/REPRODUCIBILITY.md) |
-| Visual system and evidence sources | [Visual source register](docs/assets/VISUAL_SOURCES.md) |
-| SEC and external data | [External datasets](docs/EXTERNAL_DATASETS.md) |
-| Current engineering status | [IMPLEMENT.md](IMPLEMENT.md) |
-| Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| What can be claimed publicly? | [Public evidence ledger](QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md) |
+| How is private truth isolated? | [Methodology](docs/METHODOLOGY.md) · [Threat model](docs/THREAT_MODEL.md) · [Artifacts and privacy](docs/ARTIFACTS_AND_PRIVACY.md) |
+| What exactly did v0.1 measure? | [Final benchmark results](docs/FINAL_BENCHMARK_RESULTS.md) |
+| What does each detector prove? | [Look-Ahead](docs/faults/LOOK_AHEAD.md) · [Unit Drift](docs/faults/UNIT_DRIFT.md) · [Duplicates](docs/faults/DUPLICATE_OBSERVATIONS.md) · [Revision Overwrite](docs/faults/REVISION_OVERWRITE.md) |
+| How do I reproduce it? | [Reproducibility](docs/REPRODUCIBILITY.md) · [CLI contract](docs/CLI_CONTRACT.md) |
+| What happened on public SEC histories? | [Observational protocol](REAL_DATA_STUDY_PROTOCOL.md) · [Results](REAL_DATA_RESULTS.md) · [Adversarial protocol](REAL_DATA_SUBSTRATE_ADVERSARIAL_PROTOCOL.md) |
+| What is implemented now? | [Implementation status](IMPLEMENT.md) · [Project scope](PROJECT_SCOPE.md) |
+| How were the figures sourced? | [Visual source register](docs/assets/VISUAL_SOURCES.md) |
+| How can I contribute? | [Contributing guide](CONTRIBUTING.md) |
 
-## Repository map
-
-- `src/quantcheck/` — package implementation.
-- `dashboard/` — standalone local read-only Streamlit app.
-- `scripts/` — repository development tools.
-- `tests/` — offline deterministic tests.
-- `docs/` — current method, contracts, evidence, and operations.
-- `reference/` — historical documents only; they do not describe current behavior.
-- `AGENTS.md`, `PROJECT_SCOPE.md`, `MVP_ACCEPTANCE_CRITERIA.md`, `IMPLEMENT.md` — governing instructions, scope, acceptance criteria, and operational status.
+The repository's `reference/` directory is historical evidence from the lost implementation. It does not override current contracts or saved artifacts.

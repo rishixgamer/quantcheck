@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Real-source observational evidence</title>
+  <desc id="desc">QuantCheck processed 472 selected SEC Company Facts observations from five issuers and emitted zero findings. Exact Duplicate had 472 fingerprint groups and an applicable null result because every group was a singleton. Look-Ahead had zero opportunities because filing equaled availability. Revision Overwrite had zero opportunities because there was no declared revision lineage. Unit Drift had zero comparable observations. No findings were available to adjudicate, and this does not certify the data as correct.</desc>
+  <defs>
+    <pattern id="slate-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="9" height="9" fill="#F2F4F7"/>
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#667085" stroke-width="3" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect x="1" y="1" width="1198" height="648" rx="22" fill="#FCFCFA" stroke="#D0D5DD" stroke-width="2"/>
+  <g font-family="Inter, 'Source Sans 3', Arial, sans-serif" fill="#17212B">
+    <text x="54" y="58" font-size="30" font-weight="700">Real-source observational evidence</text>
+    <rect x="761" y="26" width="385" height="40" rx="20" fill="#F8F9FB" stroke="#667085"/>
+    <text x="954" y="51" text-anchor="middle" font-size="13" font-weight="700" fill="#667085">PIPELINE EXECUTION · NOT NATURAL-ERROR VALIDATION</text>
+    <text x="54" y="97" font-size="20" font-weight="700">472 selected observations · 5 issuers · 0 emitted findings</text>
+    <text x="54" y="124" font-size="14" fill="#667085">The opportunity set differs by detector. N/A is a scientific state, not a zero-valued score.</text>
+
+    <rect x="54" y="153" width="1092" height="48" fill="#17212B" rx="9"/>
+    <text x="78" y="183" font-size="13" font-weight="700" fill="#FCFCFA">DETECTOR</text>
+    <text x="334" y="183" font-size="13" font-weight="700" fill="#FCFCFA">OPPORTUNITY STATUS</text>
+    <text x="690" y="183" font-size="13" font-weight="700" fill="#FCFCFA">FINDINGS</text>
+    <text x="810" y="183" font-size="13" font-weight="700" fill="#FCFCFA">INTERPRETATION</text>
+
+    <rect x="54" y="210" width="1092" height="79" fill="#F7FAFF" stroke="#D0D5DD"/>
+    <circle cx="80" cy="238" r="7" fill="#175CD3"/>
+    <text x="99" y="243" font-size="15" font-weight="700">Exact Duplicate</text>
+    <text x="334" y="243" font-size="15" font-weight="700" fill="#175CD3">Applicable · 472 fingerprint groups</text>
+    <text x="714" y="243" text-anchor="middle" font-size="22" font-weight="700">0</text>
+    <text x="810" y="234" font-size="14" font-weight="700">Applicable null</text>
+    <text x="810" y="255" font-size="13" fill="#667085">All 472 groups were singletons.</text>
+
+    <rect x="54" y="289" width="1092" height="79" fill="#FFFFFF" stroke="#D0D5DD"/>
+    <rect x="73" y="312" width="15" height="15" fill="url(#slate-hatch)" stroke="#667085"/>
+    <text x="99" y="326" font-size="15" font-weight="700">Look-Ahead</text>
+    <rect x="334" y="306" width="130" height="34" rx="17" fill="url(#slate-hatch)" stroke="#667085"/>
+    <text x="399" y="328" text-anchor="middle" font-size="13" font-weight="700" fill="#667085">N/A · 0</text>
+    <text x="714" y="326" text-anchor="middle" font-size="22" font-weight="700">0</text>
+    <text x="810" y="317" font-size="14" font-weight="700">No temporal opportunity</text>
+    <text x="810" y="338" font-size="13" fill="#667085">Filing equals availability.</text>
+
+    <rect x="54" y="368" width="1092" height="79" fill="#FFFFFF" stroke="#D0D5DD"/>
+    <rect x="73" y="391" width="15" height="15" fill="url(#slate-hatch)" stroke="#667085"/>
+    <text x="99" y="405" font-size="15" font-weight="700">Revision Overwrite</text>
+    <rect x="334" y="385" width="130" height="34" rx="17" fill="url(#slate-hatch)" stroke="#667085"/>
+    <text x="399" y="407" text-anchor="middle" font-size="13" font-weight="700" fill="#667085">N/A · 0</text>
+    <text x="714" y="405" text-anchor="middle" font-size="22" font-weight="700">0</text>
+    <text x="810" y="396" font-size="14" font-weight="700">No declared lineage</text>
+    <text x="810" y="417" font-size="13" fill="#667085">Independent source occurrences only.</text>
+
+    <rect x="54" y="447" width="1092" height="79" fill="#FFFFFF" stroke="#D0D5DD"/>
+    <rect x="73" y="470" width="15" height="15" fill="url(#slate-hatch)" stroke="#667085"/>
+    <text x="99" y="484" font-size="15" font-weight="700">Unit Drift</text>
+    <rect x="334" y="464" width="244" height="34" rx="17" fill="url(#slate-hatch)" stroke="#667085"/>
+    <text x="456" y="486" text-anchor="middle" font-size="13" font-weight="700" fill="#667085">N/A · 0 comparable observations</text>
+    <text x="714" y="484" text-anchor="middle" font-size="22" font-weight="700">0</text>
+    <text x="810" y="475" font-size="14" font-weight="700">No eligible comparable series</text>
+    <text x="810" y="496" font-size="13" fill="#667085">Repeated chronology coordinates excluded.</text>
+
+    <rect x="54" y="552" width="1092" height="50" rx="12" fill="#FFF8EB" stroke="#A15C00" stroke-width="1.5"/>
+    <text x="600" y="574" text-anchor="middle" font-size="14" font-weight="700" fill="#A15C00">No findings to adjudicate. This does not certify the data as correct.</text>
+    <text x="600" y="593" text-anchor="middle" font-size="12" fill="#A15C00">The 472 observations are not a common denominator for all four detectors.</text>
+    <text x="54" y="629" font-size="11" fill="#667085">Evidence: evidence/real_data_study/applicability.json · REAL_DATA_RESULTS.md</text>
+  </g>
+</svg>
