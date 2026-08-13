@@ -4,7 +4,9 @@
 >
 > QuantCheck deterministically injects narrow point-in-time data faults, audits a sanitized manifest-blind view, and scores results against private truth only after detection is finalized.
 
-![QuantCheck workflow: point-in-time snapshot, controlled injection, manifest-blind audit, and post-audit scoring](docs/assets/quantcheck-hero.svg)
+![Hero timeline: a filing becomes available after the research decision, then a controlled mutation makes it appear early](docs/assets/lookahead-timeline.svg)
+
+Visual key: blue marks the public/audited path, rust marks a controlled mutation or warning, and slate marks a private or not-applicable state. Labels do not rely on color alone.
 
 ## One concrete point-in-time failure
 
@@ -17,8 +19,6 @@
 | May 5 | Fact is filed and becomes available | — |
 
 A result produced on Apr 30 may look plausible while depending on information that was not available until May 5. QuantCheck tests this kind of failure without giving detectors the hidden answer key.
-
-![Controlled look-ahead timeline](docs/assets/lookahead-timeline.svg)
 
 ## Verified evidence at a glance
 
@@ -52,19 +52,7 @@ A backtest can be mathematically correct and still be historically invalid if th
 
 ## How QuantCheck works
 
-```text
-clean point-in-time snapshot
-        ↓
-deterministic controlled injection ──→ private fault manifest
-        ↓                                      │
-sanitized AuditInputSnapshot                    │
-        ↓                                      │
-manifest-blind detectors                        │
-        ↓                                      │
-finalized audit report ─────────────────────────┘
-        ↓
-exact matching, scoring, controlled sensitivity, manifest-assisted replay
-```
+![Architecture and trust boundary: clean data, deterministic injection, sanitized audit input, detector, finalized findings, and post-audit scoring](docs/assets/quantcheck-hero.svg)
 
 The detector never receives the manifest, clean snapshot, target IDs, seed, severity, or injector-only metadata. The scorer can read private truth only after the audit report is finalized.
 
@@ -109,7 +97,7 @@ The complete breakdown, denominators, and exact Decimal values are in [Final ben
 
 ![Frozen v0.1 benchmark evidence summary](docs/assets/benchmark-results.svg)
 
-## Failure analysis
+## Failure analysis: what stays visible
 
 The weak results are part of the result:
 
@@ -118,11 +106,13 @@ The weak results are part of the result:
 - Revision Overwrite has an eligible-clean denominator of 11; its false-positive rate must not be compared casually with the larger-denominator profiles.
 - Recall of 1 is measured on the specified synthetic fixture; it is not a general sensitivity claim.
 
-## Real-data validation
+![Failure analysis: retained false positives, synthetic validation misses, and structural no-target cases kept separate](docs/assets/failure-analysis.svg)
+
+## Real-source studies
 
 Two evidence layers use selected SEC Company Facts histories and must not be conflated.
 
-**Observational integration study.** QuantCheck accepted 472 selected observations from five issuers. Exact Duplicate had 472 singleton fingerprints and zero findings. Look-Ahead, Revision Overwrite, and Unit Drift had zero eligible opportunities under the selected adapter semantics. This establishes narrow real-source pipeline execution and an exact-duplicate null result—not broad detector validation.
+**Observational integration study.** QuantCheck accepted 472 selected observations from five issuers. Exact Duplicate had 472 singleton fingerprints and zero findings. Look-Ahead, Revision Overwrite, and Unit Drift had zero eligible opportunities under the selected adapter semantics. This establishes narrow real-source pipeline execution and an exact-duplicate null result—not broad detector validation. Because no findings were emitted, there was no finding-level human adjudication; zero findings are not a certification of the source data.
 
 **Adversarial study on real-data substrate.** A separately Git-frozen study preserved the selected SEC values and provenance while applying existing deterministic injectors. Across nine seeded Look-Ahead, Duplicate, and Unit Drift cases, all 120 manufactured fault instances were exactly matched. Four additional Unit Drift warnings remain strict false positives. Revision Overwrite was not applicable.
 
@@ -175,6 +165,10 @@ uv run --group dashboard streamlit run dashboard/app.py -- \
 The local dashboard and generated HTML are public-artifact-only views. They continue to work with the entire private tree removed. See [Demo and presentation boundary](docs/DASHBOARD_AND_HTML.md).
 
 ![Demo preview: public-only evidence review surface](docs/assets/demo-dashboard.svg)
+
+### Video upload placeholder
+
+The narrated demo is intentionally not linked yet. When the cut is ready, upload the final file at `video/QuantCheck_demo.mp4` and replace this note with its public GitHub or portfolio link.
 
 ## Reproduce
 
@@ -266,6 +260,7 @@ uv run quantcheck --help
 | Fault contracts | [Fault catalogue](docs/faults/) |
 | Public/private artifact boundary | [Artifacts and privacy](docs/ARTIFACTS_AND_PRIVACY.md) |
 | Reproducibility | [Reproducibility](docs/REPRODUCIBILITY.md) |
+| Visual system and evidence sources | [Visual source register](docs/assets/VISUAL_SOURCES.md) |
 | SEC and external data | [External datasets](docs/EXTERNAL_DATASETS.md) |
 | Current engineering status | [IMPLEMENT.md](IMPLEMENT.md) |
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
