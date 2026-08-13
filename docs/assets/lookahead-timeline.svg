@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 330" role="img" aria-labelledby="title desc">
+  <title id="title">Controlled look-ahead timeline</title>
+  <desc id="desc">A quarter ends on March 31, the research cutoff is April 30, and the filing arrives May 5. A controlled mutation makes the fact appear available at period end.</desc>
+  <rect width="1200" height="330" rx="24" fill="#f6f8fb"/>
+  <text x="60" y="58" font-family="Inter,Arial,sans-serif" font-size="28" font-weight="700" fill="#10243e">One date error can manufacture a historical state</text>
+  <text x="60" y="90" font-family="Inter,Arial,sans-serif" font-size="16" fill="#52657c">Controlled illustration — not an observed SEC defect.</text>
+  <line x1="100" y1="190" x2="1100" y2="190" stroke="#9db0c6" stroke-width="4"/>
+  <circle cx="210" cy="190" r="12" fill="#3b82f6"/><circle cx="600" cy="190" r="12" fill="#f59e0b"/><circle cx="990" cy="190" r="12" fill="#16a085"/>
+  <text x="165" y="230" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#10243e">Mar 31</text>
+  <text x="145" y="258" font-family="Inter,Arial,sans-serif" font-size="15" fill="#52657c">period ends</text>
+  <text x="540" y="230" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#10243e">Apr 30</text>
+  <text x="500" y="258" font-family="Inter,Arial,sans-serif" font-size="15" fill="#52657c">research cutoff</text>
+  <text x="930" y="230" font-family="Inter,Arial,sans-serif" font-size="18" font-weight="700" fill="#10243e">May 5</text>
+  <text x="900" y="258" font-family="Inter,Arial,sans-serif" font-size="15" fill="#52657c">filed / available</text>
+  <path d="M210 145V112H990V145" fill="none" stroke="#16a085" stroke-width="3"/>
+  <text x="440" y="125" font-family="Inter,Arial,sans-serif" font-size="15" fill="#147a66">correct historical availability window</text>
+  <path d="M210 177V145" stroke="#ef6c55" stroke-width="3" stroke-dasharray="6 6"/>
+  <text x="95" y="145" font-family="Inter,Arial,sans-serif" font-size="15" font-weight="700" fill="#c34d3d">controlled mutation: available_on = period_end</text>
+</svg>

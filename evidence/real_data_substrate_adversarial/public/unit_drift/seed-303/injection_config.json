@@ -1,0 +1,1 @@
+{"fault_subtype":"value_scaled_unit_unchanged","fault_type":"unit_drift","max_targets":100,"seed":303,"severity":"medium","spec_version":"quantcheck/unit-drift-value-scale/v1"}

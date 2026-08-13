@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">QuantCheck evidence layers</title>
+  <desc id="desc">Three separate evidence lanes: synthetic benchmark, observational SEC integration, and adversarial injected faults on real SEC substrate.</desc>
+  <rect width="1200" height="420" rx="24" fill="#0f1b2d"/>
+  <text x="60" y="62" font-family="Inter,Arial,sans-serif" font-size="30" font-weight="700" fill="#ffffff">Three evidence layers, three different questions</text>
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="60" y="110" width="330" height="245" rx="18" fill="#1e3a5f" stroke="#43b7ff" stroke-width="2"/>
+    <text x="90" y="150" font-size="15" font-weight="700" fill="#78e0d0">CONTROLLED SYNTHETIC</text>
+    <text x="90" y="190" font-size="24" font-weight="700" fill="#ffffff">v0.1 benchmark</text>
+    <text x="90" y="230" font-size="17" fill="#d0deee">124 configured cases</text>
+    <text x="90" y="258" font-size="17" fill="#d0deee">130 injected faults</text>
+    <text x="90" y="286" font-size="17" fill="#d0deee">strict precision 0.625</text>
+    <text x="90" y="326" font-size="14" fill="#9fb4ce">contract evidence on reviewed fixtures</text>
+    <rect x="435" y="110" width="330" height="245" rx="18" fill="#294036" stroke="#78e0d0" stroke-width="2"/>
+    <text x="465" y="150" font-size="15" font-weight="700" fill="#a9f4e2">OBSERVATIONAL</text>
+    <text x="465" y="190" font-size="24" font-weight="700" fill="#ffffff">SEC integration</text>
+    <text x="465" y="230" font-size="17" fill="#d1eee5">472 selected observations</text>
+    <text x="465" y="258" font-size="17" fill="#d1eee5">5 issuers · 0 duplicate groups</text>
+    <text x="465" y="286" font-size="17" fill="#d1eee5">3 families not applicable</text>
+    <text x="465" y="326" font-size="14" fill="#a9cfc2">pipeline execution and applicability</text>
+    <rect x="810" y="110" width="330" height="245" rx="18" fill="#553e28" stroke="#ffca6b" stroke-width="2"/>
+    <text x="840" y="150" font-size="15" font-weight="700" fill="#ffca6b">CONTROLLED REAL-SOURCE</text>
+    <text x="840" y="190" font-size="24" font-weight="700" fill="#ffffff">Adversarial substrate</text>
+    <text x="840" y="230" font-size="17" fill="#f7dfb0">120 injected faults matched</text>
+    <text x="840" y="258" font-size="17" fill="#f7dfb0">4 Unit Drift warnings retained</text>
+    <text x="840" y="286" font-size="17" fill="#f7dfb0">Revision not applicable</text>
+    <text x="840" y="326" font-size="14" fill="#e2c79a">manufactured faults, not natural defects</text>
+  </g>
+</svg>

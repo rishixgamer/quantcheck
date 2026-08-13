@@ -1,0 +1,1 @@
+{"fault_subtype":"exact_occurrence_copy","fault_type":"duplicate_observation","max_targets":100,"seed":303,"severity":"medium","spec_version":"quantcheck/duplicate-exact-occurrence-copy/v1"}
