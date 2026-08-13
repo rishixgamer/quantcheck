@@ -1,207 +1,205 @@
 # QuantCheck
 
-QuantCheck is a deterministic Python framework for testing whether
-point-in-time financial research data can manufacture misleading results
-through timestamp leakage, unit corruption, duplicate observations, or
-revision-history failure. See `PROJECT_SCOPE.md` for the full problem
-statement and `MVP_ACCEPTANCE_CRITERIA.md` for the target release criteria.
+> **Can a historical financial research result be trusted if its input data could not have existed at the stated decision date?**
+>
+> QuantCheck deterministically injects narrow point-in-time data faults, audits a sanitized manifest-blind view, and scores results against private truth only after detection is finalized.
 
-## Current implementation status
+![QuantCheck workflow: point-in-time snapshot, controlled injection, manifest-blind audit, and post-audit scoring](docs/assets/quantcheck-hero.svg)
 
-**Recovery Phases 0–11 are complete.** The immutable `v0.1.0` tag remains the
-historical release. The current worktree is version `0.2.0.dev0`, a
-design-partner beta-closure candidate rather than a production release. It has
-a typed `quantcheck` package, a `uv`-managed toolchain (Ruff, MyPy, pytest,
-Hypothesis), a
-deterministic benchmark layer over the four completed fault families, an
-installed `quantcheck` CLI (Typer) exposing `ingest sec`, `inject`, `audit`,
-`evaluate`, `benchmark run`, `benchmark smoke`, and `explain`, a public-only
-presentation layer (strict reader, one shared immutable model, a read-only
-Streamlit dashboard, and a deterministic self-contained HTML summary), and a CI
-workflow that runs the baseline quality gates.
+## One concrete point-in-time failure
 
-The implemented deterministic foundation includes:
+**Illustrative controlled fault — not an observed SEC defect.**
 
-- strict JSON-domain value types and exact `Decimal`/`date`/UTC-timestamp encodings;
-- immutable, strictly validated Pydantic v2 schemas (`FinancialFact`,
-  `SourceReference`, `Dimension`, `DatasetSnapshot`, `AuditInputRecord`,
-  `AuditInputSnapshot`, `CaseConfig`, `RuntimeMetadata`, `ArtifactIdentity`,
-  and the narrow Look-Ahead, Unit Drift, Duplicate Observations, and Revision
-  Overwrite evidence artifacts);
-- one canonical serialization path producing deterministic UTF-8 bytes;
-- SHA-256 content hashes and prefixed, row-order-independent stable identifiers.
-- a deterministic, reviewed 26-record synthetic fixture, explicit revision
-  lineages, end-of-day point-in-time snapshots, and `sanitize_for_audit`;
-- the complete `lookahead_timestamp` / `period_end_substitution` slice:
-  deterministic injection, private manifest, manifest-blind detection, exact
-  matching/scoring, controlled `availability_count_v0_1`, and private
-  manifest-assisted exact replay;
-- the complete `unit_drift` / `value_scaled_unit_unchanged` slice: exact
-  comparable-series grouping, deterministic value scaling with unchanged unit,
-  manifest-blind immediate-neighbor ratio detection, exact matching/scoring,
-  controlled `aggregate_value_v0_1`, and private manifest-assisted exact replay;
-- the complete `duplicate_observation` / `exact_occurrence_copy` slice: an
-  exact fingerprint shared by injection eligibility and detection, one
-  appended created copy per selected source (never a replacement), exact
-  fingerprint-group matching/scoring with a fixed `medium` finding severity,
-  controlled `record_count_v0_1` plus reuse of the existing
-  `aggregate_value_v0_1` for a double-counting demonstration, and private
-  manifest-assisted exact replay that removes only the injected copies;
-- the complete `revision_overwrite` / `later_vintage_in_earlier_state` slice:
-  explicit source-supported adjacent revision histories, deterministic
-  later-vintage substitution retaining historical availability, manifest-blind
-  temporal-contradiction detection, exact matching/scoring, private
-  manifest-assisted exact replay, and a controlled frozen-vintage
-  `growth_ranking_v0_1` sensitivity comparison;
-- a narrow synchronous SEC Company Facts adapter: one CIK at a time, explicit
-  contact-bearing user-agent, HTTPX-only requests, cache-first exact-byte
-  persistence, integrity-checked offline replay, and explicit
-  taxonomy/concept/unit/form/date/period-shape allowlists. Supported SEC facts
-  use the day-level rule `available_on == filed_on` and flow through the
-  existing point-in-time and audit-boundary code. Ordinary tests use HTTPX
-  mock transports and never call the live SEC service.
+| Date | What should be true | What a contaminated dataset can claim |
+| --- | --- | --- |
+| Mar 31 | Quarter ends | — |
+| Apr 30 | Research decision date: the fact is not yet available | Fact appears available and enters the analysis |
+| May 5 | Fact is filed and becomes available | — |
 
-The rules are documented in [`docs/SERIALIZATION_AND_HASHING.md`](docs/SERIALIZATION_AND_HASHING.md),
-[`docs/faults/LOOK_AHEAD.md`](docs/faults/LOOK_AHEAD.md),
-[`docs/faults/UNIT_DRIFT.md`](docs/faults/UNIT_DRIFT.md),
-[`docs/faults/DUPLICATE_OBSERVATIONS.md`](docs/faults/DUPLICATE_OBSERVATIONS.md), and
-[`docs/faults/REVISION_OVERWRITE.md`](docs/faults/REVISION_OVERWRITE.md); they are frozen by
-static golden vectors and focused tests.
+A result produced on Apr 30 may look plausible while depending on information that was not available until May 5. QuantCheck tests this kind of failure without giving detectors the hidden answer key.
 
-The SEC adapter does not reconstruct statements, harmonize concepts, convert
-currencies or scale, infer segments/amendments/revisions/duplicates, look up
-tickers, download multiple CIKs, expire caches, or make intraday availability
-claims.
+![Controlled look-ahead timeline](docs/assets/lookahead-timeline.svg)
 
-A deterministic benchmark layer (strict configuration/expansion, an
-all-four-detector dispatcher, public/private atomic artifact persistence,
-structured failures, safe resume, and public-only aggregation) and a saved-stage
-`inject`/`audit`/`evaluate` CLI workflow over it are documented in
-`docs/DECISIONS.md` (ADR-006, ADR-007) and `docs/CLI_CONTRACT.md`.
+## Verified evidence at a glance
 
-A public-only presentation layer reads those saved artifacts and nothing else:
-a strict reader with a role allowlist, path security, schema validation, and
-SHA-256 verification; one immutable model shared by both surfaces; a read-only
-Streamlit forensic dashboard; and a deterministic self-contained HTML summary.
-Both surfaces work with the entire `private/` tree deleted and execute no
-scientific logic. See [`docs/DASHBOARD_AND_HTML.md`](docs/DASHBOARD_AND_HTML.md)
-and ADR-008.
+| Evidence layer | Result | Interpretation |
+| --- | --- | --- |
+| **Frozen v0.1 held-out benchmark** | 124 configured synthetic cases; 94 succeeded, 30 remained visible as `no_eligible_targets` failures, 0 incomplete. Strict micro precision `0.625`, recall `1`, F1 `0.769230…`. | Controlled evidence on a small reviewed synthetic fixture—not a general performance estimate. |
+| **Failure honesty** | 78 strict false-positive findings were retained; all were cross-detector findings under primary-family scoring. | The benchmark does not tune away inconvenient behavior. |
+| **Controlled research sensitivity** | 90/90 successful fault cases changed the configured research output; 90/90 had manifest-assisted exact replay restoration. | Narrow sensitivity demonstrations—not returns, alpha, or automatic repair. |
+| **Real SEC substrate experiment** | Across nine prospectively frozen injected cases, all 120 manufactured fault instances matched; four Unit Drift warnings remained strict false positives. | Controlled faults on real-source observations—not natural SEC defects or broad real-world accuracy. |
 
-A release-evidence layer executes the held-out benchmark. Reserved final seeds
-`1000–1009` are rejected by every ordinary interface and are executable only
-through an explicit release path, guarded by a byte-verified frozen release
-candidate. See [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) and ADR-009/ADR-010.
+[Demo](#demo) · [Paper](#paper) · [Reproduce](#reproduce)
 
-No benchmark metric, hash, identifier, or test count from any prior
-implementation applies to this repository; every number below was measured by
-this code. `IMPLEMENT.md` is the authoritative operational record and next-task
-handoff.
+---
 
-## Final held-out benchmark result
+## The problem
 
-Release candidate `relc_2c6e945a71b85b39`, benchmark `bench_403a85e506ff66ea`,
-aggregate `agg_571aae0b7c60a4a5`. 4 fault profiles × 3 severities × 10 reserved
-final seeds = 120 held-out fault cases, plus 4 clean controls = **124 cases**.
+Historical financial research is vulnerable to data states that are internally plausible but historically impossible:
 
-| Metric | Exact saved value |
-| --- | --- |
-| Successful / failed / incomplete | 94 / 30 / 0 |
-| Injected faults / findings | 130 / 208 |
-| True positives / false negatives | 130 / 0 |
-| False-positive findings | 78 |
-| Eligible clean denominator | 1070 |
-| **Precision** | `0.625` |
-| **Recall** | `1` |
-| **F1** | `0.76923076923076923076923076923076923076923076923077` |
-| **False-positive rate** | `0.072897196261682242990654205607476635514018691588785` |
-| Research output changed | 90 / 90 |
-| Exact replay restored | 90 / 90 |
+- a fact becomes visible before it was filed;
+- a value changes scale while its unit label remains unchanged;
+- one observation is counted twice; or
+- a later revision replaces an earlier historical state.
 
-Read honestly: **30 cases failed** with `no_eligible_targets` because three
-profile/severity cells have no eligible target on the reviewed fixture
-(Look-Ahead at `high`, Revision Overwrite at `medium` and `high`). They were
-kept in the matrix rather than configured away. **All 78 false positives are
-cross-detector findings** under strict primary-label scoring, dominated by the
-reviewed fixture's documented natural duplicate pair — retained detector
-behaviour, not a defect, and not tuned. Recall of `1` is a measurement on a
-26-record synthetic fixture, not a general sensitivity claim.
+QuantCheck treats the dataset as part of the experiment. It asks whether a specified research result can be manufactured by one of these controlled data-integrity failures.
 
-Every number traces to `release_evidence/final/public/aggregate_report.json`.
-Full breakdown, per-seed metrics, and failure analysis:
-[`docs/FINAL_BENCHMARK_RESULTS.md`](docs/FINAL_BENCHMARK_RESULTS.md).
+## Why backtests can be contaminated
 
-**QuantCheck claims no** production readiness, completed design-partner pilot,
-customer validation, financial-data certification,
-automated remediation, loss prevention, trading alpha, universal SEC coverage,
-statement reconstruction, universal restatement detection, or vendor-wide
-reliability. See [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md).
+Point-in-time analysis needs distinct dates for the reporting period, filing, availability, research cutoff, and runtime. In QuantCheck’s v0.1 day-level contract, a fact is visible only when `available_on <= as_of_date`.
 
-## Installation and five-minute quick start
+A backtest can be mathematically correct and still be historically invalid if this boundary is wrong.
 
-```bash
-# 1. Install (Python 3.12).
-uv sync --all-groups          # from a checkout
-# or: pip install dist/quantcheck-0.2.0.dev0-py3-none-any.whl
+## How QuantCheck works
 
-# 2. Confirm the CLI works.
-uv run quantcheck --help
-
-# 3. Run the deterministic offline smoke benchmark (12 cases, no network).
-uv run quantcheck benchmark smoke --output /tmp/qc-smoke
-
-# 4. Render the self-contained HTML summary from public artifacts only.
-uv run python scripts/render_html_summary.py /tmp/qc-smoke \
-    --output /tmp/qc-smoke/summary.html
-
-# 5. Browse the same artifacts in the local read-only dashboard.
-uv run --group dashboard streamlit run dashboard/app.py -- --artifacts /tmp/qc-smoke
+```text
+clean point-in-time snapshot
+        ↓
+deterministic controlled injection ──→ private fault manifest
+        ↓                                      │
+sanitized AuditInputSnapshot                    │
+        ↓                                      │
+manifest-blind detectors                        │
+        ↓                                      │
+finalized audit report ─────────────────────────┘
+        ↓
+exact matching, scoring, controlled sensitivity, manifest-assisted replay
 ```
 
-## Reproducing the final benchmark
+The detector never receives the manifest, clean snapshot, target IDs, seed, severity, or injector-only metadata. The scorer can read private truth only after the audit report is finalized.
 
-The commands below reproduce the historical v0.1 held-out evidence. They are
-not the v0.2 development/validation evidence path.
+## Four frozen v0.1 fault families
+
+| Family | Supported controlled subtype | Detector question |
+| --- | --- | --- |
+| Look-Ahead Timestamp | `period_end_substitution` | Did a period-end date make a fact visible before its filing? |
+| Unit Drift | `value_scaled_unit_unchanged` | Does an exact comparable series contain a scale discontinuity? |
+| Duplicate Observations | `exact_occurrence_copy` | Does an exact fingerprint occur more than once? |
+| Revision Overwrite | `later_vintage_in_earlier_state` | Does an earlier state contain a later declared revision? |
+
+These are deliberately narrow contracts, not universal anomaly detection, statement reconstruction, fuzzy deduplication, or restatement inference.
+
+## Manifest-blind evaluation
+
+QuantCheck separates generation from evaluation:
+
+1. Build a clean point-in-time snapshot.
+2. Inject one deterministic, configured fault and retain its truth privately.
+3. Sanitize the corrupted snapshot for audit.
+4. Run all detectors.
+5. Finalize findings.
+6. Score exact matches against the private manifest.
+
+Clean controls use the same detector and scoring contracts. Cross-detector findings remain visible; they are not suppressed to improve a headline metric.
+
+## Benchmark
+
+The frozen v0.1 held-out benchmark contains four fault profiles, three severities, ten reserved final seeds, and four clean controls.
+
+| Metric | Saved v0.1 result |
+| --- | ---: |
+| Configured / successful / failed / incomplete | 124 / 94 / 30 / 0 |
+| Injected faults / findings | 130 / 208 |
+| True positives / false negatives | 130 / 0 |
+| Strict false positives | 78 |
+| Strict micro precision / recall / F1 | 0.625 / 1 / 0.769230… |
+| Controlled output changed / replay restored | 90 / 90 |
+
+The complete breakdown, denominators, and exact Decimal values are in [Final benchmark results](docs/FINAL_BENCHMARK_RESULTS.md).
+
+![Frozen v0.1 benchmark evidence summary](docs/assets/benchmark-results.svg)
+
+## Failure analysis
+
+The weak results are part of the result:
+
+- 30 cases failed at injection with `no_eligible_targets`: Look-Ahead at high severity, and Revision Overwrite at medium and high severity.
+- All 78 strict false positives are cross-detector findings under the predeclared primary-family scoring rule.
+- Revision Overwrite has an eligible-clean denominator of 11; its false-positive rate must not be compared casually with the larger-denominator profiles.
+- Recall of 1 is measured on the specified synthetic fixture; it is not a general sensitivity claim.
+
+## Real-data validation
+
+Two evidence layers use selected SEC Company Facts histories and must not be conflated.
+
+**Observational integration study.** QuantCheck accepted 472 selected observations from five issuers. Exact Duplicate had 472 singleton fingerprints and zero findings. Look-Ahead, Revision Overwrite, and Unit Drift had zero eligible opportunities under the selected adapter semantics. This establishes narrow real-source pipeline execution and an exact-duplicate null result—not broad detector validation.
+
+**Adversarial study on real-data substrate.** A separately Git-frozen study preserved the selected SEC values and provenance while applying existing deterministic injectors. Across nine seeded Look-Ahead, Duplicate, and Unit Drift cases, all 120 manufactured fault instances were exactly matched. Four additional Unit Drift warnings remain strict false positives. Revision Overwrite was not applicable.
+
+![Adversarial results on preserved SEC observations](docs/assets/real-substrate-results.svg)
+
+Read the [observational results](REAL_DATA_RESULTS.md), [real-substrate adversarial results](REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md), and [study limitations](REAL_DATA_LIMITATIONS.md).
+
+![Evidence layers: synthetic benchmark, observational SEC integration, and adversarial real-data substrate](docs/assets/evidence-layers.svg)
+
+## Research-impact experiment
+
+Each fault family has one deliberately narrow controlled comparison: availability count, exact aggregate, occurrence count, or frozen-vintage growth ranking. The question is whether the configured output changes under controlled corruption, then returns exactly after manifest-assisted replay.
+
+This is evidence about data sensitivity—not investment performance, alpha, Sharpe, financial loss, or automated remediation.
+
+## Architecture
+
+- `src/quantcheck/` — typed deterministic core, fault contracts, audit boundary, scoring, and artifact model.
+- `docs/` — methodology, fault contracts, benchmark evidence, privacy boundary, reproducibility, and limitations.
+- `dashboard/` — local read-only Streamlit review surface.
+- `release_evidence/` — frozen v0.1 public evidence package.
+- `evidence/` — versioned synthetic, real-source, and supply-chain evidence artifacts.
+- `tests/` — offline deterministic and boundary-focused tests.
+
+## Quick start
+
+Requires Python 3.12 and [`uv`](https://docs.astral.sh/uv/).
 
 ```bash
-uv run python scripts/release_freeze.py --check          # must pass first
+uv sync --all-groups
+uv run quantcheck benchmark smoke --output /tmp/qc-smoke
+uv run python scripts/render_html_summary.py /tmp/qc-smoke \
+  --output /tmp/qc-smoke/summary.html
+```
+
+The smoke benchmark is offline and produces 12 cases. See the [CLI contract](docs/CLI_CONTRACT.md) for the supported command surface.
+
+## Demo
+
+The demo reads saved public artifacts; it does not rerun science or access private manifests.
+
+```bash
+uv run quantcheck benchmark smoke --output /tmp/qc-demo
+uv run python scripts/render_html_summary.py /tmp/qc-demo \
+  --output /tmp/qc-demo/summary.html
+uv run --group dashboard streamlit run dashboard/app.py -- \
+  --artifacts /tmp/qc-demo
+```
+
+The local dashboard and generated HTML are public-artifact-only views. They continue to work with the entire private tree removed. See [Demo and presentation boundary](docs/DASHBOARD_AND_HTML.md).
+
+![Demo preview: public-only evidence review surface](docs/assets/demo-dashboard.svg)
+
+## Reproduce
+
+To reproduce the frozen v0.1 held-out evidence from the matching release checkout:
+
+```bash
+uv sync --frozen --all-groups
+uv run python scripts/release_freeze.py --check
 uv run python scripts/run_release_benchmark.py --output release_evidence/final
 uv run python scripts/verify_release_evidence.py \
-    --source release_evidence/final \
-    --public-only release_evidence/public_only \
-    --html release_evidence/public_only/summary.html
+  --source release_evidence/final \
+  --public-only release_evidence/public_only \
+  --html release_evidence/public_only/summary.html
 uv run python scripts/release_checksums.py --check
 ```
 
-Reserved seeds execute only through `scripts/run_release_benchmark.py`, and only
-after the frozen candidate verifies byte for byte against the working tree.
-See [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
+Logical artifacts are designed to be deterministic across output roots and tested hash seeds; runtime metadata is intentionally environment-specific. Read [Reproducibility](docs/REPRODUCIBILITY.md).
 
-## Reproducing the v0.2 beta-candidate evidence
+## Current implementation status
 
-The v0.2 runner preregisters separate 390-case development and validation
-matrices. It completes development first, writes a validation freeze over both
-matrices plus the development aggregate and science-source hashes, and only
-then unseals validation. Every case has a paired clean control. Failed and
-incomplete cases remain visible, and aggregates rebuild byte-for-byte from the
-public tree without the private manifests or snapshots.
+The immutable `v0.1.0` tag remains the historical release baseline. The current worktree is `0.2.0.dev0`, a beta engineering candidate rather than a production release. It includes the typed `quantcheck` package, deterministic benchmark and artifact layers, the six root CLI command groups, public-only HTML and dashboard surfaces, a narrow SEC Company Facts adapter, additive external-dataset policy/execution paths, and synthetic development/validation evidence.
 
-```bash
-uv run python scripts/run_benchmark_v2_evidence.py \
-  --partition all --output benchmark_evidence_v0_2
+The current candidate has no completed customer pilot, customer adjudication, published OCI image, trusted release attestation, production deployment, or held-out v0.2 result. Local package and security evidence does not substitute for those external gates. See [IMPLEMENT.md](IMPLEMENT.md) for the operational record.
 
-uv build --offline
-uv run python scripts/build_beta_evidence.py \
-  --benchmark-evidence benchmark_evidence_v0_2 \
-  --output evidence/design_partner_beta
-```
-
-`design_partner_beta_freeze.json` binds the current package, source-tree hash,
-corpus identities, development/validation aggregate identities, distributions,
-SBOM, provenance statement, OCI state, and attestation state. Generated bulky
-case evidence lives in the gitignored `benchmark_evidence_v0_2/` directory;
-compact aggregates and supply-chain records persist under
-`evidence/design_partner_beta/`. This is synthetic engineering evidence, not a
-design-partner result; held-out v0.2 execution remains separately gated.
+The SEC adapter is intentionally narrow: one CIK at a time, explicit contact-bearing user-agent, cache-first exact-byte persistence, offline replay, allowlisted concepts/units/forms/date shapes, and day-level `available_on == filed_on` semantics. It does not reconstruct statements, harmonize concepts, convert currencies or scale, infer revisions, or make intraday claims.
 
 ## CLI usage
 
@@ -209,7 +207,7 @@ design-partner result; held-out v0.2 execution remains separately gated.
 # Run the deterministic offline smoke benchmark.
 uv run quantcheck benchmark smoke --output /tmp/qc-smoke --json
 
-# Inject, audit, and evaluate one saved, fully expanded benchmark case.
+# Run one saved, fully expanded case through the staged workflow.
 uv run quantcheck inject --case case.json --output /tmp/qc-case
 uv run quantcheck audit --dir /tmp/qc-case
 uv run quantcheck evaluate --dir /tmp/qc-case
@@ -218,40 +216,32 @@ uv run quantcheck evaluate --dir /tmp/qc-case
 uv run quantcheck explain --dir /tmp/qc-case --finding <finding_id>
 ```
 
-See [`docs/CLI_CONTRACT.md`](docs/CLI_CONTRACT.md) for the full command
-surface, exit-code taxonomy, and privacy rules.
+The supported surface is documented in the [CLI contract](docs/CLI_CONTRACT.md), including exit codes and privacy rules.
 
-## Reviewing saved results
+## Reproducing v0.2 synthetic engineering evidence
 
-Both presentation surfaces read saved **public** artifacts only. Neither is a
-`quantcheck` CLI command — the root command surface stays exactly six.
+The v0.2 runner keeps development and validation separate, pairs every fault case with a clean control, preserves failed/incomplete statuses, and rebuilds aggregates from public artifacts without private manifests or snapshots.
 
 ```bash
-# 1. Produce artifacts with the existing offline smoke benchmark.
-uv run quantcheck benchmark smoke --output artifacts/smoke
-
-# 2. Launch the local read-only forensic dashboard.
-uv run --group dashboard streamlit run dashboard/app.py -- --artifacts artifacts/smoke
-
-# 3. Render the deterministic self-contained HTML summary.
-uv run python scripts/render_html_summary.py artifacts/smoke \
-  --output artifacts/smoke/summary.html
+uv run python scripts/run_benchmark_v2_evidence.py \
+  --partition all --output benchmark_evidence_v0_2
+uv build --offline
+uv run python scripts/build_beta_evidence.py \
+  --benchmark-evidence benchmark_evidence_v0_2 \
+  --output evidence/design_partner_beta
 ```
 
-The `--` separator is required so the arguments reach the app rather than
-Streamlit. Both surfaces work against a copy of `public/` alone, with the entire
-`private/` tree deleted, and neither runs injection, detection, scoring, replay,
-or private research logic. Streamlit lives in the optional `dashboard`
-dependency group, so an ordinary `import quantcheck` never imports it.
+This is synthetic engineering evidence only; it is not customer validation. The held-out v0.2 partition remains separately gated.
 
-[`docs/DASHBOARD_AND_HTML.md`](docs/DASHBOARD_AND_HTML.md) documents the reader
-trust boundary, path-security rules, privacy and determinism guarantees, the
-null-metric display policy, and how failed and incomplete cases are handled.
+## Limitations
 
-## Development setup
+QuantCheck is not production ready, customer validated, or a complete financial-data platform. It does not claim natural-error prevalence, broad vendor-feed accuracy, investment performance, automatic repair, universal SEC coverage, statement reconstruction, or universal restatement detection.
 
-Requires [`uv`](https://docs.astral.sh/uv/) and Python `>=3.12,<3.13` (uv can
-install the interpreter for you).
+The primary v0.1 evidence is synthetic. The real-data studies are narrow and explicitly distinguish observed data from manufactured faults. Read the full [limitations](docs/LIMITATIONS.md).
+
+## Development checks
+
+Requires Python `>=3.12,<3.13` and `uv`.
 
 ```bash
 uv python install 3.12
@@ -263,24 +253,29 @@ uv run pytest
 uv run quantcheck --help
 ```
 
-## Repository layout
+## Paper
 
-- `src/quantcheck/` — the package.
-- `dashboard/` — the standalone read-only Streamlit app (not distributed).
-- `scripts/` — repository development tools (not distributed).
-- `tests/` — unit and smoke tests.
-- `docs/` — current architecture and process documents, starting with
-  `docs/AUTHORITY_AND_READING_ORDER.md`. Release documents:
-  `METHODOLOGY.md`, `ARTIFACTS_AND_PRIVACY.md`, `THREAT_MODEL.md`,
-  `REPRODUCIBILITY.md`, `FINAL_BENCHMARK_RESULTS.md`, `LIMITATIONS.md`,
-  `RELEASE_CHECKLIST.md`, `RELEASE_NOTES_0.1.0.md`.
-- `CHANGELOG.md`, `CONTRIBUTING.md`, `CHECKSUMS.md`, `LICENSE`,
-  `release_freeze.json` — immutable v0.1 release surface.
-- `design_partner_beta_freeze.json` — current v0.2 beta-candidate identity and
-  references to generated engineering evidence.
-- `reference/` — historical documents describing the project concept and a
-  prior 0.1.0 implementation. They are specifications and historical
-  evidence only; they do not describe the current state of this repository.
-- `AGENTS.md`, `PROJECT_SCOPE.md`, `MVP_ACCEPTANCE_CRITERIA.md`,
-  `IMPLEMENT.md` — governing instructions, scope, acceptance criteria, and
-  the operational implementation log for agents working in this repository.
+[**QuantCheck: Adversarial Testing of Point-in-Time Financial Research Data**](QUANTCHECK_RESEARCH_PAPER.md) explains the threat model, benchmark, real-data evidence layers, failure analysis, and limitations. The [public evidence ledger](QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md) is the canonical source for public claims and numbers.
+
+## Documentation
+
+| Need | Start here |
+| --- | --- |
+| Method and audit boundary | [Methodology](docs/METHODOLOGY.md) |
+| Benchmark evidence | [Final benchmark results](docs/FINAL_BENCHMARK_RESULTS.md) |
+| Fault contracts | [Fault catalogue](docs/faults/) |
+| Public/private artifact boundary | [Artifacts and privacy](docs/ARTIFACTS_AND_PRIVACY.md) |
+| Reproducibility | [Reproducibility](docs/REPRODUCIBILITY.md) |
+| SEC and external data | [External datasets](docs/EXTERNAL_DATASETS.md) |
+| Current engineering status | [IMPLEMENT.md](IMPLEMENT.md) |
+| Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+## Repository map
+
+- `src/quantcheck/` — package implementation.
+- `dashboard/` — standalone local read-only Streamlit app.
+- `scripts/` — repository development tools.
+- `tests/` — offline deterministic tests.
+- `docs/` — current method, contracts, evidence, and operations.
+- `reference/` — historical documents only; they do not describe current behavior.
+- `AGENTS.md`, `PROJECT_SCOPE.md`, `MVP_ACCEPTANCE_CRITERIA.md`, `IMPLEMENT.md` — governing instructions, scope, acceptance criteria, and operational status.

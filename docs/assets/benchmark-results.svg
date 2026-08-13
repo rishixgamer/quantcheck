@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">
+  <title id="title">Frozen v0.1 benchmark evidence</title>
+  <desc id="desc">The frozen benchmark contains 124 configured cases, 94 successes, 30 retained ineligible failures, 130 injected faults, 78 strict false positives, and precision 0.625.</desc>
+  <rect width="1000" height="460" rx="24" fill="#f6f8fb"/>
+  <text x="54" y="58" font-family="Inter,Arial,sans-serif" font-size="30" font-weight="700" fill="#10243e">Frozen v0.1 held-out benchmark</text>
+  <text x="55" y="89" font-family="Inter,Arial,sans-serif" font-size="15" fill="#52657c">Saved evidence from a small reviewed synthetic fixture. Values are not production estimates.</text>
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="55" y="130" width="205" height="120" rx="16" fill="#1e3a5f"/><text x="80" y="174" font-size="16" fill="#9edcff">CONFIGURED</text><text x="80" y="218" font-size="40" font-weight="700" fill="#ffffff">124</text>
+    <rect x="280" y="130" width="205" height="120" rx="16" fill="#2d705f"/><text x="305" y="174" font-size="16" fill="#b9f5e7">SUCCEEDED</text><text x="305" y="218" font-size="40" font-weight="700" fill="#ffffff">94</text>
+    <rect x="505" y="130" width="205" height="120" rx="16" fill="#805a2c"/><text x="530" y="174" font-size="16" fill="#ffdda3">RETAINED FAILURES</text><text x="530" y="218" font-size="40" font-weight="700" fill="#ffffff">30</text>
+    <rect x="730" y="130" width="205" height="120" rx="16" fill="#713e4c"/><text x="755" y="174" font-size="16" fill="#ffc1ce">STRICT FP FINDINGS</text><text x="755" y="218" font-size="40" font-weight="700" fill="#ffffff">78</text>
+    <text x="55" y="310" font-size="18" font-weight="700" fill="#10243e">130 injected faults</text><text x="290" y="310" font-size="18" font-weight="700" fill="#10243e">precision 0.625</text><text x="510" y="310" font-size="18" font-weight="700" fill="#10243e">recall 1</text><text x="700" y="310" font-size="18" font-weight="700" fill="#10243e">F1 0.769230…</text>
+    <line x1="55" y1="350" x2="935" y2="350" stroke="#c5d1df"/>
+    <text x="55" y="388" font-size="15" fill="#52657c">All 30 failures are visible no_eligible_targets cells. All 78 false positives remain in strict primary-family scoring.</text>
+    <text x="55" y="416" font-size="15" fill="#52657c">Source: release_evidence/final/public/aggregate_report.json and docs/FINAL_BENCHMARK_RESULTS.md</text>
+  </g>
+</svg>

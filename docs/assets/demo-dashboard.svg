@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">QuantCheck public-only demo preview</title>
+  <desc id="desc">A static preview of the local read-only evidence review surface: benchmark status, detector findings, and a public-artifact-only notice.</desc>
+  <rect width="1200" height="650" rx="24" fill="#eef2f7"/>
+  <rect x="0" y="0" width="1200" height="78" rx="24" fill="#10243e"/>
+  <text x="48" y="49" font-family="Inter,Arial,sans-serif" font-size="27" font-weight="700" fill="#ffffff">QuantCheck · public evidence review</text>
+  <text x="970" y="48" font-family="Inter,Arial,sans-serif" font-size="15" fill="#b8c8df">READ-ONLY · OFFLINE</text>
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="48" y="115" width="1104" height="74" rx="14" fill="#ffffff" stroke="#d6e0eb"/>
+    <text x="76" y="145" font-size="14" font-weight="700" fill="#52657c">BENCHMARK</text><text x="76" y="173" font-size="21" font-weight="700" fill="#10243e">Frozen v0.1 held-out evidence</text>
+    <text x="800" y="153" font-size="14" fill="#52657c">124 configured</text><text x="940" y="153" font-size="14" fill="#52657c">94 succeeded</text><text x="1060" y="153" font-size="14" fill="#b15b2f">30 failed</text>
+    <rect x="48" y="220" width="350" height="260" rx="16" fill="#ffffff" stroke="#d6e0eb"/><text x="78" y="260" font-size="15" font-weight="700" fill="#52657c">PRIMARY METRICS</text><text x="78" y="316" font-size="45" font-weight="700" fill="#10243e">0.625</text><text x="78" y="344" font-size="15" fill="#52657c">strict micro precision</text><text x="78" y="402" font-size="45" font-weight="700" fill="#10243e">1</text><text x="78" y="430" font-size="15" fill="#52657c">recall on scored injected cases</text>
+    <rect x="425" y="220" width="350" height="260" rx="16" fill="#ffffff" stroke="#d6e0eb"/><text x="455" y="260" font-size="15" font-weight="700" fill="#52657c">FINDINGS BY RULE</text><rect x="455" y="294" width="240" height="20" rx="10" fill="#3b82f6"/><text x="710" y="310" font-size="14" fill="#52657c">duplicate · 133</text><rect x="455" y="342" width="150" height="20" rx="10" fill="#16a085"/><text x="620" y="358" font-size="14" fill="#52657c">unit drift · 45</text><rect x="455" y="390" width="100" height="20" rx="10" fill="#f59e0b"/><text x="570" y="406" font-size="14" fill="#52657c">look-ahead · 20</text><rect x="455" y="438" width="50" height="20" rx="10" fill="#ef6c55"/><text x="520" y="454" font-size="14" fill="#52657c">revision · 10</text>
+    <rect x="802" y="220" width="350" height="260" rx="16" fill="#ffffff" stroke="#d6e0eb"/><text x="832" y="260" font-size="15" font-weight="700" fill="#52657c">TRUST BOUNDARY</text><path d="M850 316H1080" stroke="#78e0d0" stroke-width="4"/><circle cx="850" cy="316" r="8" fill="#78e0d0"/><circle cx="1080" cy="316" r="8" fill="#78e0d0"/><text x="832" y="355" font-size="17" fill="#10243e">Public artifacts only</text><text x="832" y="386" font-size="15" fill="#52657c">No manifest, clean snapshot,</text><text x="832" y="410" font-size="15" fill="#52657c">private values, or scientific rerun.</text><rect x="832" y="440" width="245" height="28" rx="14" fill="#e2f4ef"/><text x="850" y="460" font-size="13" font-weight="700" fill="#167660">PRIVATE TREE NOT REQUIRED</text>
+  </g>
+  <text x="48" y="590" font-family="Inter,Arial,sans-serif" font-size="15" fill="#52657c">Static portfolio preview. The actual local dashboard and deterministic HTML are produced from saved public artifacts.</text>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="title desc">
+  <title id="title">Real SEC substrate adversarial study</title>
+  <desc id="desc">On nine seeded cases using preserved SEC observations, all 120 injected faults matched, four Unit Drift warnings remained strict false positives, and Revision Overwrite was not applicable.</desc>
+  <rect width="1000" height="400" rx="24" fill="#0f1b2d"/>
+  <text x="55" y="58" font-family="Inter,Arial,sans-serif" font-size="29" font-weight="700" fill="#ffffff">Adversarial study on preserved SEC observations</text>
+  <text x="55" y="90" font-family="Inter,Arial,sans-serif" font-size="15" fill="#b4c7dd">Nine seeded cases; manufactured faults are not natural SEC defects.</text>
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="55" y="135" width="270" height="150" rx="16" fill="#2d705f"/><text x="82" y="180" font-size="15" fill="#b9f5e7">INJECTED INSTANCES</text><text x="82" y="242" font-size="52" font-weight="700" fill="#ffffff">120</text><text x="82" y="270" font-size="15" fill="#d1eee5">exactly matched</text>
+    <rect x="365" y="135" width="270" height="150" rx="16" fill="#805a2c"/><text x="392" y="180" font-size="15" fill="#ffdda3">UNIT DRIFT WARNINGS</text><text x="392" y="242" font-size="52" font-weight="700" fill="#ffffff">4</text><text x="392" y="270" font-size="15" fill="#f7dfb0">strict false positives retained</text>
+    <rect x="675" y="135" width="270" height="150" rx="16" fill="#3d4a61"/><text x="702" y="180" font-size="15" fill="#c8d6e8">REVISION OVERWRITE</text><text x="702" y="242" font-size="38" font-weight="700" fill="#ffffff">N/A</text><text x="702" y="270" font-size="15" fill="#c8d6e8">no applicable lineage</text>
+    <text x="55" y="340" font-size="15" fill="#b4c7dd">Source: REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md and its frozen protocol/evidence artifacts.</text>
+  </g>
+</svg>

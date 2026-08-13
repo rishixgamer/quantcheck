@@ -232,8 +232,10 @@ usable without importing any dashboard code.
 - Case filters use only the public dimensions the saved artifacts already carry
   (fault profile, severity, status, seed class). No new scientific category was
   invented for the UI.
-- No benchmark truth is committed to the repository for the UI to display; both
-  surfaces require artifacts you produced yourself.
-- No final held-out benchmark, release evidence, or `CHECKSUMS.md` exists. Seeds
-  `1000–1009` remain prohibited and no historical 0.1.0 metric or hash is
-  reproduced or claimed.
+- The presentation surfaces do not assume a repository-specific benchmark root;
+  they display the public artifacts supplied by the operator. The repository
+  does retain the frozen v0.1 release evidence separately from the current
+  v0.2 candidate.
+- The frozen v0.1 held-out benchmark, release evidence, and `CHECKSUMS.md` are
+  present. The current v0.2 held-out result remains unrun, and reserved seeds
+  `1000–1009` remain prohibited outside the explicit v0.1 release path.
