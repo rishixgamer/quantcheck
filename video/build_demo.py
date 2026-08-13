@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: E501
 """Build the QuantCheck portfolio demo video on macOS.
 
 The builder intentionally uses only repository assets, macOS Quick Look,
@@ -16,7 +17,6 @@ import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 VIDEO_DIR = ROOT / "video"
@@ -145,15 +145,36 @@ def esc(value: str) -> str:
     return html.escape(value, quote=True)
 
 
-def text(x: int, y: int, value: str, size: int = 28, fill: str = "#ffffff", weight: int = 400, anchor: str = "start") -> str:
+def text(
+    x: int,
+    y: int,
+    value: str,
+    size: int = 28,
+    fill: str = "#ffffff",
+    weight: int = 400,
+    anchor: str = "start",
+) -> str:
     return f'<text x="{x}" y="{y}" font-family="Inter,Arial,sans-serif" font-size="{size}" font-weight="{weight}" fill="{fill}" text-anchor="{anchor}">{esc(value)}</text>'
 
 
-def multiline(x: int, y: int, lines: list[str], size: int = 28, fill: str = "#ffffff", weight: int = 400, leading: int = 38, anchor: str = "start") -> str:
-    return "".join(text(x, y + i * leading, line, size, fill, weight, anchor) for i, line in enumerate(lines))
+def multiline(
+    x: int,
+    y: int,
+    lines: list[str],
+    size: int = 28,
+    fill: str = "#ffffff",
+    weight: int = 400,
+    leading: int = 38,
+    anchor: str = "start",
+) -> str:
+    return "".join(
+        text(x, y + i * leading, line, size, fill, weight, anchor) for i, line in enumerate(lines)
+    )
 
 
-def panel(x: int, y: int, w: int, h: int, fill: str = "#162943", stroke: str = "#2e557f", radius: int = 20) -> str:
+def panel(
+    x: int, y: int, w: int, h: int, fill: str = "#162943", stroke: str = "#2e557f", radius: int = 20
+) -> str:
     return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{radius}" fill="{fill}" stroke="{stroke}" stroke-width="2"/>'
 
 
@@ -169,18 +190,39 @@ def custom_svg(kind: str) -> str:
             panel(70, 70, 1780, 940, "#0f1b2d", "#203b5f")
             + text(130, 190, "A backtest can be mathematically correct", 58, "#ffffff", 700)
             + text(130, 265, "and still be wrong if its data knew the future.", 58, "#ffca6b", 700)
-            + text(132, 335, "QuantCheck audits the data behind quantitative research.", 28, "#b8c8df", 400)
+            + text(
+                132,
+                335,
+                "QuantCheck audits the data behind quantitative research.",
+                28,
+                "#b8c8df",
+                400,
+            )
             + chart
             + future
             + text(1550, 145, "FUTURE", 22, "#ff8b7b", 700, "middle")
             + text(1530, 870, "historical research timeline", 22, "#8fa7c3", 400, "middle")
-            + text(132, 940, "Point-in-time integrity comes before performance claims.", 24, "#8fa7c3", 400),
+            + text(
+                132,
+                940,
+                "Point-in-time integrity comes before performance claims.",
+                24,
+                "#8fa7c3",
+                400,
+            ),
         )
     if kind == "timeline":
         return doc(
             panel(70, 70, 1780, 940, "#f6f8fb", "#d6e0eb")
             + text(130, 190, "Point-in-time truth uses three different dates", 52, "#10243e", 700)
-            + text(132, 245, "Period end, research date, and filing date are not interchangeable.", 25, "#52657c", 400)
+            + text(
+                132,
+                245,
+                "Period end, research date, and filing date are not interchangeable.",
+                25,
+                "#52657c",
+                400,
+            )
             + '<line x1="220" y1="550" x2="1700" y2="550" stroke="#9db0c6" stroke-width="8"/>'
             + '<circle cx="380" cy="550" r="22" fill="#3b82f6"/><circle cx="960" cy="550" r="22" fill="#f59e0b"/><circle cx="1540" cy="550" r="22" fill="#16a085"/>'
             + text(380, 465, "REPORTING PERIOD", 19, "#3b82f6", 700, "middle")
@@ -194,14 +236,30 @@ def custom_svg(kind: str) -> str:
             + text(1540, 658, "publication / availability", 22, "#52657c", 400, "middle")
             + '<path d="M380 500 V390 H1540 V500" fill="none" stroke="#16a085" stroke-width="6"/>'
             + text(960, 360, "correct historical availability window", 24, "#147a66", 700, "middle")
-            + text(132, 850, "The question is not when the value describes. It is when the researcher could know it.", 28, "#10243e", 600)
-            + text(132, 918, "Controlled illustration — not an observed SEC defect.", 20, "#52657c", 400),
+            + text(
+                132,
+                850,
+                "The question is not when the value describes. It is when the researcher could know it.",
+                28,
+                "#10243e",
+                600,
+            )
+            + text(
+                132,
+                918,
+                "Controlled illustration — not an observed SEC defect.",
+                20,
+                "#52657c",
+                400,
+            ),
             "#eef2f7",
         )
     if kind == "fault":
         return doc(
             panel(70, 70, 1780, 940, "#0f1b2d", "#203b5f")
-            + text(130, 180, "The fault: a future value becomes visible too early", 50, "#ffffff", 700)
+            + text(
+                130, 180, "The fault: a future value becomes visible too early", 50, "#ffffff", 700
+            )
             + text(132, 235, "Same reporting period. Wrong availability date.", 25, "#b8c8df", 400)
             + panel(130, 330, 760, 410, "#163a52", "#43b7ff")
             + text(180, 400, "CLEAN POINT-IN-TIME RECORD", 20, "#78e0d0", 700)
@@ -228,7 +286,14 @@ def custom_svg(kind: str) -> str:
         return doc(
             panel(70, 70, 1780, 940, "#f6f8fb", "#d6e0eb")
             + text(130, 180, "The controlled research decision changes", 52, "#10243e", 700)
-            + text(132, 235, "A single timestamp can change what enters the historical screen.", 25, "#52657c", 400)
+            + text(
+                132,
+                235,
+                "A single timestamp can change what enters the historical screen.",
+                25,
+                "#52657c",
+                400,
+            )
             + panel(130, 330, 760, 480, "#ffffff", "#d6e0eb")
             + text(180, 405, "CLEAN DATA", 20, "#147a66", 700)
             + text(180, 470, "April 15 cutoff", 25, "#10243e", 700)
@@ -248,24 +313,51 @@ def custom_svg(kind: str) -> str:
         )
     if kind == "families":
         colors = ["#3b82f6", "#16a085", "#f59e0b", "#ef6c55"]
-        titles = ["LOOK-AHEAD\nTIMESTAMP", "UNIT\nDRIFT", "DUPLICATE\nOBSERVATIONS", "REVISION\nOVERWRITE"]
+        titles = [
+            "LOOK-AHEAD\nTIMESTAMP",
+            "UNIT\nDRIFT",
+            "DUPLICATE\nOBSERVATIONS",
+            "REVISION\nOVERWRITE",
+        ]
         icons = ["↶", "×1000", "≡≡", "↔"]
         inner = panel(70, 70, 1780, 940, "#0f1b2d", "#203b5f")
         inner += text(130, 180, "Four supported fault families", 54, "#ffffff", 700)
-        inner += text(132, 235, "Each family has a controlled injector, an independent detector, and exact scoring.", 25, "#b8c8df", 400)
-        for i, (color, title, icon) in enumerate(zip(colors, titles, icons)):
+        inner += text(
+            132,
+            235,
+            "Each family has a controlled injector, an independent detector, and exact scoring.",
+            25,
+            "#b8c8df",
+            400,
+        )
+        for i, (color, title, icon) in enumerate(zip(colors, titles, icons, strict=True)):
             x = 130 + i * 420
             inner += panel(x, 360, 360, 400, "#162943", color)
             inner += text(x + 180, 485, icon, 58, color, 700, "middle")
             title_lines = title.split("\n")
             inner += multiline(x + 180, 575, title_lines, 24, "#ffffff", 700, 36, "middle")
-            inner += text(x + 180, 705, ["future visibility", "scale semantics", "repeated facts", "later vintage"][i], 19, "#b8c8df", 400, "middle")
+            inner += text(
+                x + 180,
+                705,
+                ["future visibility", "scale semantics", "repeated facts", "later vintage"][i],
+                19,
+                "#b8c8df",
+                400,
+                "middle",
+            )
         return doc(inner)
     if kind == "real_data":
         return doc(
             panel(70, 70, 1780, 940, "#0f1b2d", "#203b5f")
             + text(130, 180, "Narrow real public-data exposure", 54, "#ffffff", 700)
-            + text(132, 235, "SEC Company Facts · five issuers · one end-of-day cutoff", 25, "#b8c8df", 400)
+            + text(
+                132,
+                235,
+                "SEC Company Facts · five issuers · one end-of-day cutoff",
+                25,
+                "#b8c8df",
+                400,
+            )
             + panel(130, 340, 520, 390, "#1d3d63", "#43b7ff")
             + text(180, 420, "SELECTED RECORDS", 20, "#78e0d0", 700)
             + text(180, 535, "472", 92, "#ffffff", 700)
@@ -278,8 +370,23 @@ def custom_svg(kind: str) -> str:
             + text(750, 640, "472 singleton fingerprints", 24, "#d1eee5", 400)
             + panel(1270, 340, 520, 390, "#3d4a61", "#8fa7c3")
             + text(1320, 420, "COHORT", 20, "#c8d6e8", 700)
-            + multiline(1320, 525, ["Apple", "Microsoft", "Alphabet", "Amazon", "JPMorgan"], 27, "#ffffff", 600, 40)
-            + text(130, 870, "This demonstrates real-source ingestion and execution—not broad natural-data validation.", 26, "#ffca6b", 700),
+            + multiline(
+                1320,
+                525,
+                ["Apple", "Microsoft", "Alphabet", "Amazon", "JPMorgan"],
+                27,
+                "#ffffff",
+                600,
+                40,
+            )
+            + text(
+                130,
+                870,
+                "This demonstrates real-source ingestion and execution—not broad natural-data validation.",
+                26,
+                "#ffca6b",
+                700,
+            ),
         )
     if kind == "applicability":
         rows = [
@@ -290,17 +397,26 @@ def custom_svg(kind: str) -> str:
         ]
         inner = panel(70, 70, 1780, 940, "#f6f8fb", "#d6e0eb")
         inner += text(130, 180, "Applicability is part of the result", 52, "#10243e", 700)
-        inner += text(132, 235, "A zero finding count is not a detector validation result when there were no eligible opportunities.", 25, "#52657c", 400)
+        inner += text(
+            132,
+            235,
+            "A zero finding count is not a detector validation result when there were no eligible opportunities.",
+            25,
+            "#52657c",
+            400,
+        )
         inner += text(180, 355, "DETECTOR", 19, "#52657c", 700)
         inner += text(850, 355, "OPPORTUNITIES", 19, "#52657c", 700)
         inner += text(1120, 355, "INTERPRETATION", 19, "#52657c", 700)
         for i, (name, count, status, color) in enumerate(rows):
             y = 430 + i * 110
-            inner += '<line x1="150" y1="%d" x2="1770" y2="%d" stroke="#d6e0eb" stroke-width="2"/>' % (y - 48, y - 48)
+            inner += f'<line x1="150" y1="{y - 48}" x2="1770" y2="{y - 48}" stroke="#d6e0eb" stroke-width="2"/>'
             inner += text(180, y, name, 24, "#10243e", 600)
             inner += text(850, y, count, 28, "#10243e", 700)
             inner += text(1120, y, status, 23, color, 700)
-        inner += text(132, 930, "No common 472-record denominator for all four detectors.", 25, "#c34d3d", 700)
+        inner += text(
+            132, 930, "No common 472-record denominator for all four detectors.", 25, "#c34d3d", 700
+        )
         return doc(inner, "#eef2f7")
     if kind == "ending":
         return doc(
@@ -311,9 +427,25 @@ def custom_svg(kind: str) -> str:
             + text(135, 490, "Did the data have the right information", 42, "#ffffff", 600)
             + text(135, 560, "at the right time", 42, "#ffca6b", 600)
             + text(135, 630, "in the right form?", 42, "#78e0d0", 600)
-            + text(135, 790, "Before trusting a backtest, ranking, or research conclusion,", 27, "#b8c8df", 400)
-            + text(135, 835, "ask whether the data that produced it deserved to be trusted.", 27, "#b8c8df", 400)
-            + text(1785, 950, "DETERMINISTIC · POINT-IN-TIME · EVIDENCE-LED", 19, "#8fa7c3", 700, "end"),
+            + text(
+                135,
+                790,
+                "Before trusting a backtest, ranking, or research conclusion,",
+                27,
+                "#b8c8df",
+                400,
+            )
+            + text(
+                135,
+                835,
+                "ask whether the data that produced it deserved to be trusted.",
+                27,
+                "#b8c8df",
+                400,
+            )
+            + text(
+                1785, 950, "DETERMINISTIC · POINT-IN-TIME · EVIDENCE-LED", 19, "#8fa7c3", 700, "end"
+            ),
         )
     raise ValueError(kind)
 
@@ -347,7 +479,21 @@ def write_slides() -> None:
     svg_dir = BUILD_DIR / "svg"
     svg_dir.mkdir(parents=True, exist_ok=True)
     for scene in SCENES:
-        content = custom_svg(scene.visual) if scene.visual in {"hook", "timeline", "fault", "consequence", "families", "real_data", "applicability", "ending"} else embedded_asset(scene.visual)
+        content = (
+            custom_svg(scene.visual)
+            if scene.visual
+            in {
+                "hook",
+                "timeline",
+                "fault",
+                "consequence",
+                "families",
+                "real_data",
+                "applicability",
+                "ending",
+            }
+            else embedded_asset(scene.visual)
+        )
         path = svg_dir / f"{scene.number:02d}-{scene.slug}.svg"
         path.write_text(content, encoding="utf-8")
 
@@ -358,10 +504,26 @@ def render_pngs() -> None:
     png_dir.mkdir(parents=True, exist_ok=True)
     for scene in SCENES:
         svg_path = svg_dir / f"{scene.number:02d}-{scene.slug}.svg"
-        subprocess.run(["qlmanage", "-t", "-s", str(WIDTH), "-o", str(png_dir), str(svg_path)], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(
+            ["qlmanage", "-t", "-s", str(WIDTH), "-o", str(png_dir), str(svg_path)],
+            check=True,
+            stdout=subprocess.DEVNULL,
+        )
         rendered = png_dir / f"{svg_path.name}.png"
         cropped = png_dir / f"{scene.number:02d}-{scene.slug}.png"
-        subprocess.run(["sips", "--cropToHeightWidth", str(HEIGHT), str(WIDTH), str(rendered), "--out", str(cropped)], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(
+            [
+                "sips",
+                "--cropToHeightWidth",
+                str(HEIGHT),
+                str(WIDTH),
+                str(rendered),
+                "--out",
+                str(cropped),
+            ],
+            check=True,
+            stdout=subprocess.DEVNULL,
+        )
         rendered.unlink(missing_ok=True)
         scene.image = str(cropped)
 
@@ -379,7 +541,9 @@ def make_audio() -> None:
     audio_dir.mkdir(parents=True, exist_ok=True)
     for scene in SCENES:
         path = audio_dir / f"{scene.number:02d}-{scene.slug}.aiff"
-        subprocess.run(["say", "-v", "Samantha", "-r", "150", "-o", str(path), scene.narration], check=True)
+        subprocess.run(
+            ["say", "-v", "Samantha", "-r", "150", "-o", str(path), scene.narration], check=True
+        )
         scene.audio = str(path)
         scene.audio_seconds = afinfo_duration(path)
 
@@ -398,7 +562,9 @@ def make_audio() -> None:
 
 def write_captions_and_manifest() -> Path:
     manifest_path = BUILD_DIR / "manifest.json"
-    manifest_path.write_text(json.dumps([asdict(scene) for scene in SCENES], indent=2), encoding="utf-8")
+    manifest_path.write_text(
+        json.dumps([asdict(scene) for scene in SCENES], indent=2), encoding="utf-8"
+    )
     narration = "\n\n".join(f"[{scene.number:02d}] {scene.narration}" for scene in SCENES)
     (VIDEO_DIR / "narration.txt").write_text(narration + "\n", encoding="utf-8")
 
@@ -414,7 +580,13 @@ def write_captions_and_manifest() -> Path:
 
     vtt = ["WEBVTT", ""]
     for scene in SCENES:
-        vtt.extend([f"{ts(scene.start_seconds)} --> {ts(scene.start_seconds + scene.duration_seconds)}", scene.caption, ""])
+        vtt.extend(
+            [
+                f"{ts(scene.start_seconds)} --> {ts(scene.start_seconds + scene.duration_seconds)}",
+                scene.caption,
+                "",
+            ]
+        )
     (VIDEO_DIR / "captions.vtt").write_text("\n".join(vtt), encoding="utf-8")
     return manifest_path
 
@@ -423,12 +595,26 @@ def compile_and_run_swift(manifest_path: Path) -> None:
     swift_path = BUILD_DIR / "assemble_video.swift"
     binary_path = BUILD_DIR / "assemble_video"
     swift_path.write_text(SWIFT_SOURCE, encoding="utf-8")
-    subprocess.run(["swiftc", str(swift_path), "-o", str(binary_path), "-framework", "AVFoundation", "-framework", "AppKit", "-framework", "CoreGraphics"], check=True)
+    subprocess.run(
+        [
+            "swiftc",
+            str(swift_path),
+            "-o",
+            str(binary_path),
+            "-framework",
+            "AVFoundation",
+            "-framework",
+            "AppKit",
+            "-framework",
+            "CoreGraphics",
+        ],
+        check=True,
+    )
     output = VIDEO_DIR / "QuantCheck_demo.mp4"
     subprocess.run([str(binary_path), str(manifest_path), str(output)], check=True)
 
 
-SWIFT_SOURCE = r'''
+SWIFT_SOURCE = r"""
 import Foundation
 import AVFoundation
 import AppKit
@@ -543,7 +729,7 @@ let silentURL = manifestURL.deletingLastPathComponent().appendingPathComponent("
 try makeVideo(scenes, url: silentURL)
 try mux(scenes, videoURL: silentURL, outputURL: outputURL)
 print(outputURL.path)
-'''
+"""
 
 
 def main() -> int:
