@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Frozen v0.1 held-out benchmark</title>
+  <desc id="desc">The controlled synthetic benchmark contains 124 configured cases: 94 successful, 30 structural no-target, and zero incomplete. Among successful scored cases, 130 injected faults produced 130 exact matches, 78 strict false-positive findings, and zero false-negative faults. Strict micro precision is 0.625, recall 1.000, F1 0.769, and the eligible-clean denominator is 1,070. These are not production estimates.</desc>
+  <defs>
+    <marker id="blue-arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0L9 4.5L0 9Z" fill="#175CD3"/>
+    </marker>
+    <pattern id="slate-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="9" height="9" fill="#F2F4F7"/>
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#667085" stroke-width="3" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect x="1" y="1" width="1198" height="648" rx="22" fill="#FCFCFA" stroke="#D0D5DD" stroke-width="2"/>
+  <g font-family="Inter, 'Source Sans 3', Arial, sans-serif" fill="#17212B">
+    <text x="54" y="58" font-size="30" font-weight="700">Frozen v0.1 held-out benchmark</text>
+    <rect x="847" y="27" width="299" height="38" rx="19" fill="#EAF2FF" stroke="#175CD3"/>
+    <text x="997" y="51" text-anchor="middle" font-size="13" font-weight="700" fill="#175CD3">CONTROLLED SYNTHETIC EVIDENCE</text>
+    <text x="54" y="88" font-size="15" fill="#667085">Case accounting leads; no-target cells remain a structural state, not a detector miss.</text>
+
+    <text x="54" y="132" font-size="13" font-weight="700" fill="#667085">CASE STATUS</text>
+    <rect x="54" y="150" width="220" height="112" rx="14" fill="#FFFFFF" stroke="#175CD3" stroke-width="2"/>
+    <text x="78" y="181" font-size="13" font-weight="700" fill="#175CD3">CONFIGURED</text>
+    <text x="78" y="226" font-size="42" font-weight="700">124</text>
+    <text x="78" y="248" font-size="13" fill="#667085">120 fault cases + 4 controls</text>
+
+    <path d="M274 206H304" stroke="#175CD3" stroke-width="3" marker-end="url(#blue-arrow)"/>
+    <path d="M304 206V140H1017" fill="none" stroke="#667085" stroke-width="2"/>
+    <path d="M444 140V148" stroke="#175CD3" stroke-width="3"/>
+    <path d="M723 140V148" stroke="#667085" stroke-width="3"/>
+    <path d="M1017 140V148" stroke="#667085" stroke-width="3"/>
+
+    <rect x="330" y="150" width="228" height="112" rx="14" fill="#EAF2FF" stroke="#175CD3" stroke-width="2"/>
+    <circle cx="358" cy="180" r="7" fill="#175CD3"/>
+    <text x="376" y="185" font-size="13" font-weight="700" fill="#175CD3">SUCCESSFUL</text>
+    <text x="354" y="228" font-size="40" font-weight="700">94</text>
+
+    <rect x="582" y="150" width="282" height="112" rx="14" fill="url(#slate-hatch)" stroke="#667085" stroke-width="2"/>
+    <rect x="608" y="171" width="14" height="14" fill="#FCFCFA" stroke="#667085" stroke-width="2"/>
+    <text x="634" y="184" font-size="13" font-weight="700" fill="#667085">STRUCTURAL NO-TARGET</text>
+    <text x="608" y="228" font-size="40" font-weight="700">30</text>
+    <text x="674" y="226" font-size="13" fill="#667085">not a miss</text>
+
+    <rect x="888" y="150" width="258" height="112" rx="14" fill="#FFFFFF" stroke="#667085" stroke-width="2"/>
+    <path d="M914 172L928 186M928 172L914 186" stroke="#667085" stroke-width="2"/>
+    <text x="940" y="184" font-size="13" font-weight="700" fill="#667085">INCOMPLETE</text>
+    <text x="914" y="228" font-size="40" font-weight="700">0</text>
+
+    <text x="54" y="308" font-size="13" font-weight="700" fill="#667085">FINDING ACCOUNTING · SUCCESSFUL SCORED CASES</text>
+    <rect x="54" y="326" width="230" height="114" rx="14" fill="#FFFFFF" stroke="#175CD3" stroke-width="2"/>
+    <text x="78" y="358" font-size="13" font-weight="700" fill="#175CD3">INJECTED FAULTS</text>
+    <text x="78" y="407" font-size="40" font-weight="700">130</text>
+
+    <path d="M284 383H332" stroke="#175CD3" stroke-width="3" marker-end="url(#blue-arrow)"/>
+
+    <rect x="340" y="326" width="230" height="114" rx="14" fill="#EAF2FF" stroke="#175CD3" stroke-width="2"/>
+    <circle cx="366" cy="356" r="7" fill="#175CD3"/>
+    <text x="384" y="361" font-size="13" font-weight="700" fill="#175CD3">EXACT MATCHES</text>
+    <text x="364" y="407" font-size="40" font-weight="700">130</text>
+
+    <rect x="594" y="326" width="282" height="114" rx="14" fill="#FCFCFA" stroke="#B42318" stroke-width="3"/>
+    <rect x="620" y="349" width="15" height="15" fill="none" stroke="#B42318" stroke-width="2"/>
+    <text x="648" y="361" font-size="13" font-weight="700" fill="#B42318">STRICT FALSE-POSITIVE FINDINGS</text>
+    <text x="620" y="407" font-size="40" font-weight="700">78</text>
+
+    <rect x="900" y="326" width="246" height="114" rx="14" fill="#FFFFFF" stroke="#667085" stroke-width="2"/>
+    <path d="M926 349L940 363M940 349L926 363" stroke="#667085" stroke-width="2"/>
+    <text x="952" y="361" font-size="13" font-weight="700" fill="#667085">FALSE-NEGATIVE FAULTS</text>
+    <text x="926" y="407" font-size="40" font-weight="700">0</text>
+    <text x="974" y="397" font-size="12" fill="#667085">among successful</text>
+    <text x="974" y="415" font-size="12" fill="#667085">scored cases</text>
+
+    <text x="54" y="486" font-size="13" font-weight="700" fill="#667085">STRICT PRIMARY-FAMILY METRICS</text>
+    <g>
+      <rect x="54" y="503" width="248" height="78" rx="12" fill="#FFFFFF" stroke="#D0D5DD"/>
+      <text x="78" y="530" font-size="12" font-weight="700" fill="#667085">PRECISION</text>
+      <text x="78" y="564" font-size="28" font-weight="700">0.625</text>
+      <rect x="320" y="503" width="248" height="78" rx="12" fill="#FFFFFF" stroke="#D0D5DD"/>
+      <text x="344" y="530" font-size="12" font-weight="700" fill="#667085">RECALL</text>
+      <text x="344" y="564" font-size="28" font-weight="700">1.000</text>
+      <rect x="586" y="503" width="248" height="78" rx="12" fill="#FFFFFF" stroke="#D0D5DD"/>
+      <text x="610" y="530" font-size="12" font-weight="700" fill="#667085">F1</text>
+      <text x="610" y="564" font-size="28" font-weight="700">0.769</text>
+      <rect x="852" y="503" width="294" height="78" rx="12" fill="#FFFFFF" stroke="#D0D5DD"/>
+      <text x="876" y="530" font-size="12" font-weight="700" fill="#667085">ELIGIBLE-CLEAN DENOMINATOR</text>
+      <text x="876" y="564" font-size="28" font-weight="700">1,070</text>
+    </g>
+
+    <rect x="54" y="598" width="1092" height="30" rx="8" fill="#FFF8EB" stroke="#A15C00"/>
+    <text x="600" y="618" text-anchor="middle" font-size="13" font-weight="700" fill="#A15C00">Strict primary-family scoring · controlled synthetic fixture · not a production precision or recall estimate</text>
+    <text x="54" y="643" font-size="11" fill="#667085">Evidence: agg_571aae0b7c60a4a5 · release_evidence/final/public/aggregate_report.json</text>
+  </g>
+</svg>

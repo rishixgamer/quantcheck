@@ -69,6 +69,18 @@ or held-out v0.2 execution exists or is claimed.
 Overall classification: **PARTIAL for design-partner beta engineering closure;
 NOT READY for production v1.0**. A `1.0.0` version would overstate the evidence.
 
+### Demo video production package
+
+The requested portfolio demo is now rendered locally as `video/QuantCheck_demo.mp4`,
+a 1920×1080 narrated cut of 175.97 seconds (2:56). `video/PRODUCTION_PACKAGE.md`
+holds the timestamped shot list, exact narration reference, captions, visual
+asset list, recording/retake checklists, shortened version, and portfolio copy;
+`video/build_demo.py` regenerates the cut from repository assets. The current
+voice is a neutral macOS system voice and is explicitly replaceable with a
+human recording. The cut preserves the evidence boundary: saved fixture
+metrics are scoped as synthetic evidence, and the SEC study is described as
+narrow real-source pipeline exposure rather than broad natural-data validation.
+
 **Post-MVP Milestone H Missing Observations vertical slice complete locally — selected by the
 documented evidence-tie fallback, not by a customer-pain claim**
 

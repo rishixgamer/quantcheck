@@ -1,13 +1,23 @@
-# Visual source register
+# QuantCheck visual source register
 
-Every visual in this directory is explanatory or evidence-labeled. The SVGs do not introduce new measurements; displayed numbers are copied from the listed source artifacts and remain qualified in their captions.
+Every public figure uses the restrained forensic research palette defined for the repository: charcoal `#17212B`, audit blue `#175CD3`, controlled-corruption rust `#B42318`, caution ochre `#A15C00`, private slate `#667085`, and paper `#FCFCFA`. Color is always paired with labels, line styles, patterns, or shapes.
 
-| Asset | Purpose | Source of wording/numbers | Required caveat |
+| Asset | Purpose | Evidence / source | Claim boundary |
 | --- | --- | --- | --- |
-| `quantcheck-hero.svg` | First-screen method and trust boundary | `docs/METHODOLOGY.md`, `QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md` A-07–A-10 | Method diagram; no performance claim. |
-| `lookahead-timeline.svg` | Concrete point-in-time example | `reference/QUANT_DATA_CHAOS_LAB_CONCEPT.txt`, `docs/faults/LOOK_AHEAD.md` | Controlled illustration; not an observed SEC defect. |
-| `evidence-layers.svg` | Separate synthetic, observational, and real-substrate evidence | `QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md` C, G-14, G-15 | Evidence classes must not be merged. |
-| `benchmark-results.svg` | v0.1 benchmark summary | `release_evidence/final/public/aggregate_report.json`, `docs/FINAL_BENCHMARK_RESULTS.md` | Small reviewed synthetic fixture; retained failures and false positives are part of the result. |
-| `real-substrate-results.svg` | Real-data adversarial summary | `REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md`, `evidence/real_data_substrate_adversarial/study_run.json` | Manufactured faults on preserved SEC observations; not natural SEC defects. |
+| `quantcheck-hero-timeline.svg` | Signature “future arrives early” explanation | `docs/faults/LOOK_AHEAD.md`; `docs/METHODOLOGY.md` | Conceptual method illustration; dates are illustrative, not benchmark measurements. |
+| `quantcheck-architecture.svg` | Manifest-blind detector path and private scoring lane | `docs/METHODOLOGY.md`; `docs/ARTIFACTS_AND_PRIVACY.md`; public evidence ledger A-07–A-10 | Architecture diagram; no performance claim. There is intentionally no manifest-to-detector connector. |
+| `quantcheck-benchmark-v01.svg` | Frozen v0.1 case and finding accounting | `release_evidence/final/public/aggregate_report.json`, aggregate `agg_571aae0b7c60a4a5`; `docs/FINAL_BENCHMARK_RESULTS.md` | Controlled synthetic fixture; not a production precision or recall estimate. |
+| `quantcheck-failure-analysis.svg` | Exact matches, strict false positives, misses, and no-target cells kept separate | Same aggregate plus `release_evidence/final/public/case_matrix.json` | Structural no-target is not a miss. The zero false-negative count covers successful scored cases only. |
+| `quantcheck-real-source-evidence.svg` | Detector-specific observational SEC applicability | `evidence/real_data_study/applicability.json`; `REAL_DATA_RESULTS.md`; `REAL_DATA_ADJUDICATION.md` | Real-source pipeline execution; not natural-error validation or data certification. |
+| `demo-dashboard.svg` | Static preview of the local public-only review surface | `release_evidence/final/public/aggregate_report.json`; `docs/DASHBOARD_AND_HTML.md` | Interface preview; the actual local surfaces read saved public artifacts only. |
 
-No visual should be changed to improve a headline number. If a source artifact changes, regenerate or revise the asset and update this register in the same review.
+## Evidence sets intentionally not pooled
+
+- Frozen v0.1: 124 configured synthetic cases and aggregate `agg_571aae0b7c60a4a5`.
+- Observational SEC run: 472 selected observations from five issuers; detector-specific applicability; zero emitted findings.
+- Adversarial SEC-derived substrate: 120 injected faults across nine cases, 120 exact matches, four retained Unit Drift false positives; not natural SEC defects.
+- Synthetic v0.2 development/validation: separate engineering evidence; not held-out, customer, or production validation. It is not visualized on the landing page.
+
+The superseded SVGs retained in this directory are no longer referenced by `README.md`. They remain only to avoid deleting prior user-authored assets in a dirty worktree. Public README review should use the five `quantcheck-*` figures above.
+
+No visual should be changed to improve a headline number. If a source artifact changes, revise the figure and this register in the same review.
