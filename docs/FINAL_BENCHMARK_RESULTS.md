@@ -69,7 +69,7 @@ reviewed synthetic fixtures; no live SEC call was made.
 
 ## Overall result
 
-| Metric | Exact saved value |
+| Metric | Saved value |
 | --- | --- |
 | Configured cases | 124 |
 | Successful | 94 |
@@ -84,43 +84,44 @@ reviewed synthetic fixtures; no live SEC call was made.
 | Eligible clean denominator | 1070 |
 | **Precision** | `0.625` |
 | **Recall** | `1` |
-| **F1** | `0.76923076923076923076923076923076923076923076923077` |
-| **False-positive rate** | `0.072897196261682242990654205607476635514018691588785` |
+| **F1** | `0.769` |
+| **False-positive rate** | `0.073` |
 | Research output changed | 90 of 90 |
 | Exact replay restored | 90 of 90 |
+
+Counts are exact. Ratios are shown to three decimal places throughout this
+page; the saved artifacts hold them as full-precision `Decimal` strings, and
+`evidence/v0_1_release/aggregate_report.json` is the canonical source for every
+one of them. Each ratio is also recoverable from the integer counts beside it.
 
 ## By fault profile
 
 | Profile | Cases | OK | Failed | Faults | Findings | TP | FP | Denom | Precision | Recall |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `duplicate_observation` | 31 | 31 | 0 | 70 | 101 | 70 | 31 | 651 | `0.69306930693069306930693069306930693069306930693069` | `1` |
-| `unit_drift` | 31 | 31 | 0 | 30 | 45 | 30 | 15 | 155 | `0.66666666666666666666666666666666666666666666666667` | `1` |
-| `lookahead_timestamp` | 31 | 21 | 10 | 20 | 41 | 20 | 21 | 253 | `0.4878048780487804878048780487804878048780487804878` | `1` |
-| `revision_overwrite` | 31 | 11 | 20 | 10 | 21 | 10 | 11 | 11 | `0.47619047619047619047619047619047619047619047619048` | `1` |
+| `duplicate_observation` | 31 | 31 | 0 | 70 | 101 | 70 | 31 | 651 | `0.693` | `1` |
+| `unit_drift` | 31 | 31 | 0 | 30 | 45 | 30 | 15 | 155 | `0.667` | `1` |
+| `lookahead_timestamp` | 31 | 21 | 10 | 20 | 41 | 20 | 21 | 253 | `0.488` | `1` |
+| `revision_overwrite` | 31 | 11 | 20 | 10 | 21 | 10 | 11 | 11 | `0.476` | `1` |
 
-False-positive rate by profile: Duplicate `0.047619047619047619047619047619047619047619047619048`,
-Unit Drift `0.096774193548387096774193548387096774193548387096774`,
-Look-Ahead `0.08300395256916996047430830039525691699604743083004`,
-Revision Overwrite `1`.
+False-positive rate by profile: Duplicate `0.048`, Unit Drift `0.097`,
+Look-Ahead `0.083`, Revision Overwrite `1`.
 
 ## By severity
 
 | Severity | Cases | OK | Failed | Faults | Findings | TP | FP | Denom | Precision | Recall |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `high` | 40 | 20 | 20 | 50 | 65 | 50 | 15 | 260 | `0.76923076923076923076923076923076923076923076923077` | `1` |
-| `medium` | 43 | 33 | 10 | 40 | 67 | 40 | 27 | 419 | `0.59701492537313432835820895522388059701492537313433` | `1` |
-| `low` | 41 | 41 | 0 | 40 | 76 | 40 | 36 | 391 | `0.52631578947368421052631578947368421052631578947368` | `1` |
+| `high` | 40 | 20 | 20 | 50 | 65 | 50 | 15 | 260 | `0.769` | `1` |
+| `medium` | 43 | 33 | 10 | 40 | 67 | 40 | 27 | 419 | `0.597` | `1` |
+| `low` | 41 | 41 | 0 | 40 | 76 | 40 | 36 | 391 | `0.526` | `1` |
 
 ## By final seed
 
 Every one of the ten reserved seeds `1000` to `1009` ran. Nine of the ten produced
 12 configured cases; seed `1000` produced 16, because the four clean controls
 are pinned to the lowest reserved seed. Recall is `1` at every seed. Per-seed
-precision ranges from `0.52` (seed `1000`) to
-`0.68421052631578947368421052631578947368421052631579` (seeds `1001`, `1002`,
-`1007`, `1008`, `1009`), with seeds `1003` to `1006` at
-`0.59090909090909090909090909090909090909090909090909`. Full per-seed counts are
-in `evidence/v0_1_release/aggregate_report.json` under `by_seed`.
+precision ranges from `0.520` (seed `1000`) to `0.684` (seeds `1001`, `1002`,
+`1007`, `1008`, `1009`), with seeds `1003` to `1006` at `0.591`. Full per-seed
+counts are in `evidence/v0_1_release/aggregate_report.json` under `by_seed`.
 
 ## Honest failure analysis
 
@@ -144,8 +145,8 @@ pass would have been exactly the score tuning this milestone forbids.
 
 ### Best and worst
 
-* **Best precision:** `duplicate_observation` (`0.693…`). **Worst:**
-  `revision_overwrite` (`0.476…`).
+* **Best precision:** `duplicate_observation` (`0.693`). **Worst:**
+  `revision_overwrite` (`0.476`).
 * **Recall is `1` everywhere**, at every profile, every severity, and every seed. There
   is not a single false negative in the held-out matrix. This is a real result,
   but read it with the fixture's small size in mind, not as evidence of general
@@ -190,8 +191,8 @@ No fault family produced a legitimate zero research impact in this matrix. The
 | Control | Findings | FP | Denominator | FPR |
 | --- | --- | --- | --- | --- |
 | `unit_drift` | 0 | 0 | 5 | `0` |
-| `lookahead_timestamp` | 1 | 1 | 13 | `0.076923076923076923076923076923076923076923076923077` |
-| `duplicate_observation` | 1 | 1 | 21 | `0.047619047619047619047619047619047619047619047619048` |
+| `lookahead_timestamp` | 1 | 1 | 13 | `0.077` |
+| `duplicate_observation` | 1 | 1 | 21 | `0.048` |
 | `revision_overwrite` | 1 | 1 | 1 | `1` |
 
 Every control finding is the same documented natural exact-duplicate pair. No
