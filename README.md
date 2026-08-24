@@ -4,26 +4,31 @@
 [![Security](https://github.com/rishixgamer/quantcheck/actions/workflows/security.yml/badge.svg)](https://github.com/rishixgamer/quantcheck/actions/workflows/security.yml)
 [![Release v0.1.0](https://img.shields.io/github/v/release/rishixgamer/quantcheck?display_name=tag&sort=semver)](https://github.com/rishixgamer/quantcheck/releases/tag/v0.1.0)
 
-**Adversarial testing for point-in-time financial research data.** QuantCheck is a
-deterministic Python framework for testing whether timestamp leakage, unit drift,
-duplicate observations, or revision overwrites can manufacture a misleading
-research result. It is a research-integrity tool, not a trading system.
+A filing can become public on May 10 even though its quarter ended on March 31.
+If a dataset labels that value as available on March 31, a mathematically
+correct calculation can still run on a historical state that never existed.
+
+QuantCheck is a deterministic Python framework for testing whether timestamp
+leakage, unit drift, duplicate observations, or revision overwrites can
+manufacture a misleading research result. It is a research-integrity tool
+rather than a trading system.
 
 [Demo](#demo) · [Quick start](#quick-start) · [Benchmark](docs/FINAL_BENCHMARK_RESULTS.md) · [Evidence archive](evidence/) · [Research](#research)
 
-## Why this matters
+![The future arrives early: a corrupted availability date makes a May 10 filing visible to an April 15 research decision.](docs/assets/quantcheck-hero-timeline.svg)
 
-A filing can become public on May 10 even though its quarter ended on March 31.
-If a dataset labels the value as available on March 31, a mathematically correct
-calculation can still use an impossible historical state. QuantCheck keeps period,
-filing, availability, research as-of, and runtime dates distinct. Its v0.1
-visibility contract is deliberately narrow and day-level:
+QuantCheck keeps period, filing, availability, research as-of, and runtime
+dates distinct. The v0.1 visibility contract is deliberately narrow and
+day-level:
 
 ```text
 visible ⇔ available_on <= as_of_date
 ```
 
 ## How it works
+
+The design constraint is that a detector must never see the answer key. Truth
+about an injected fault stays private until findings are already final.
 
 1. Build a clean point-in-time snapshot.
 2. Inject one deterministic, configured fault and keep its truth private.
@@ -32,12 +37,17 @@ visible ⇔ available_on <= as_of_date
 5. Finalize findings, then score them against the private manifest.
 6. Compare one controlled research output across clean, corrupted, and replayed states.
 
+![Manifest-blind detector path with private scoring downstream of finalized findings.](docs/assets/quantcheck-architecture.svg)
+
 The public presentation layer reads public artifacts only. It does not rerun
 scientific logic or require the private artifact tree.
 
 ## Controlled fault families
 
-The frozen v0.1 benchmark covers one narrow subtype per family:
+The frozen v0.1 benchmark covers one narrow subtype per family. Each is a
+controlled contract, scoped to the question in the right-hand column, rather
+than general timestamp, anomaly, deduplication, entity-resolution, or
+restatement detection.
 
 | Family | Subtype | Detector question |
 | --- | --- | --- |
@@ -46,25 +56,35 @@ The frozen v0.1 benchmark covers one narrow subtype per family:
 | Duplicate Observations | `exact_occurrence_copy` | Does one exact public fingerprint occur more than once? |
 | Revision Overwrite | `later_vintage_in_earlier_state` | Does an earlier state contain a later declared revision? |
 
-These are controlled contracts, not universal timestamp, anomaly, deduplication,
-entity-resolution, or restatement detection.
-
 ## Evidence at a glance
 
-The immutable v0.1 controlled benchmark has **124 configured cases**: 94
+The immutable v0.1 controlled benchmark has 124 configured cases: 94
 successful, 30 structural no-target, and 0 incomplete. Among successful scored
 cases it recorded 130 injected faults, 130 exact matches, 78 strict
-cross-detector false-positive findings, precision **0.625**, recall **1.000**,
-and F1 **0.769**. This is synthetic fixture evidence, not production
-performance. See the [canonical aggregate report](evidence/v0_1_release/aggregate_report.json)
-and the [human-readable benchmark summary](docs/FINAL_BENCHMARK_RESULTS.md).
+cross-detector false-positive findings, precision 0.625, recall 1.000, and F1
+0.769.
 
-The separate observational SEC study processed **472 selected observations from
-five issuers** and emitted no findings. Only Exact Duplicate had applicable
-opportunities; the run demonstrates bounded public-source pipeline execution,
-not natural-error discovery or broad detector validation. The SEC-derived
-adversarial study manufactured 120 faults and is likewise not evidence of 120
-natural SEC defects.
+![Frozen v0.1 case and finding accounting: 124 configured, 94 successful, 30 structural no-target.](docs/assets/quantcheck-benchmark-v01.svg)
+
+These are synthetic fixture measurements. They characterise the framework on
+its reviewed fixture and say nothing about production performance. The numbers
+above are read back from the [canonical aggregate report](evidence/v0_1_release/aggregate_report.json);
+the [benchmark summary](docs/FINAL_BENCHMARK_RESULTS.md) walks through where
+every false positive comes from and why three profile/severity cells have no
+eligible target at all.
+
+Two smaller studies sit alongside it, and neither one generalises the
+benchmark:
+
+- The observational SEC study processed 472 selected observations from five
+  issuers and emitted no findings. Only Exact Duplicate had applicable
+  opportunities. It shows that the public-source pipeline runs end to end
+  under real constraints, which is a much narrower claim than natural-error
+  discovery or broad detector validation.
+- The SEC-derived adversarial study manufactured 120 faults on preserved SEC
+  observations. Those 120 faults were injected by design, so they are evidence
+  about detector behaviour on real-shaped data rather than a count of natural
+  SEC defects.
 
 ## Quick start
 
@@ -77,20 +97,23 @@ uv run python scripts/render_html_summary.py /tmp/qc-smoke \
   --output /tmp/qc-smoke/summary.html
 ```
 
-The smoke path runs 12 deterministic offline cases. For the read-only dashboard:
+The smoke path runs 12 deterministic offline cases. For the read-only
+dashboard:
 
 ```bash
 uv run --group dashboard streamlit run dashboard/app.py -- --artifacts /tmp/qc-smoke
 ```
 
-No ordinary test or quick-start command makes a live network request.
+Every ordinary test and quick-start command runs offline. None of them makes a
+live network request.
 
 ## Reproduce the frozen baseline
 
-Use the immutable [`v0.1.0` release](https://github.com/rishixgamer/quantcheck/releases/tag/v0.1.0)
-for the held-out baseline. The complete procedure is in
-[Reproducibility](docs/REPRODUCIBILITY.md); the current worktree is
-`0.2.0.dev0`, not a claim of a new production release.
+The held-out baseline lives in the immutable
+[`v0.1.0` release](https://github.com/rishixgamer/quantcheck/releases/tag/v0.1.0).
+The complete procedure is in [Reproducibility](docs/REPRODUCIBILITY.md). The
+current worktree is `0.2.0.dev0`, which is development state and carries no
+release claim of its own.
 
 ```bash
 uv sync --frozen --all-groups
@@ -102,37 +125,45 @@ uv run python scripts/verify_release_evidence.py \
   --html release_evidence/public_only/summary.html
 ```
 
+The freeze check has to pass before the benchmark will dispatch a single case.
+
 ## Demo
 
 Review the [production notes](video/PRODUCTION_PACKAGE.md). The immutable
 release-hosted narrated demo is available as the
 [QuantCheck_demo.mp4 release asset](https://github.com/rishixgamer/quantcheck/releases/download/portfolio-evidence-2026-08-24/QuantCheck_demo.mp4).
 The accompanying [real-data evidence archive](https://github.com/rishixgamer/quantcheck/releases/download/portfolio-evidence-2026-08-24/quantcheck-real-data-evidence-2026-08-13.tar.gz)
-contains the raw study payloads that are intentionally absent from this tip.
+contains the raw study payloads that are deliberately kept out of this tip.
 
 ## My role
 
-Rishi Haldar owned the problem framing, scientific contracts, evidence boundaries,
-verification gates, and final publication decisions. Implementation used
-**AI-assisted development** under explicit acceptance criteria, tests, and review;
-this is not a claim that every line was manually authored. The repository's
-contribution is the contract-and-verification design, with inconvenient outcomes
-and limitations retained in the evidence record.
+I framed the problem, defined the scientific contracts and evidence
+boundaries, set the verification gates, and made the final publication calls.
+Implementation used AI-assisted development under acceptance criteria, tests,
+and review that I wrote and enforced, so I am not claiming that every line was
+typed by hand. What the repository actually contributes is the
+contract-and-verification design: results that came out inconvenient are still
+in the evidence record, unedited.
 
 ## Limitations
 
-The primary benchmark is synthetic and fixture-bounded. The observational SEC run
-has no ground truth and only one detector with a nonzero opportunity denominator.
-The adversarial SEC-derived study uses manufactured faults on a reused substrate.
-The cited candidate source commit `3b47da9` has a green Security workflow run
-`32693592309`, including exact two-build OCI identity and dependency, secret,
-image, and SBOM gates. The current worktree still has no customer pilot,
-customer adjudication, production deployment, published image digest, trusted
-candidate attestation, or held-out v0.2 result. QuantCheck does not claim alpha, returns, prevented losses, natural
-SEC defect prevalence, vendor-scale coverage, or automatic remediation.
+The primary benchmark is synthetic and fixture-bounded. The observational SEC
+run has no ground truth, and only one detector there has a nonzero opportunity
+denominator. The adversarial SEC-derived study injects manufactured faults into
+a reused substrate.
 
-See the [current status](docs/STATUS.md)
-and [authoritative limitations](docs/LIMITATIONS.md).
+On the release side, candidate source commit `3b47da9` has a green Security
+workflow run `32693592309` covering exact two-build OCI identity plus
+dependency, secret, image, and SBOM gates. Still missing from the current
+worktree: a customer pilot, customer adjudication, production deployment, a
+published image digest, a trusted candidate attestation, and a held-out v0.2
+result.
+
+QuantCheck makes no claim about alpha, returns, prevented losses, natural SEC
+defect prevalence, vendor-scale coverage, or automatic remediation.
+
+See the [current status](docs/STATUS.md) and
+[authoritative limitations](docs/LIMITATIONS.md).
 
 ## Research
 
@@ -146,5 +177,6 @@ The research archive is retained in the current tree:
 - [Real-data limitations](docs/research/REAL_DATA_LIMITATIONS.md)
 
 For implementation semantics, start with [Methodology](docs/METHODOLOGY.md).
-The [evidence archive](evidence/) contains the saved public and study-scoped
-artifacts; private truth is not a public performance claim.
+The [evidence archive](evidence/) holds the saved public and study-scoped
+artifacts. Private truth stays private and is never presented as a public
+performance number.
