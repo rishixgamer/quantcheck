@@ -90,6 +90,8 @@ def test_container_context_and_reproducibility_script_are_bounded() -> None:
     dockerfile = (REPO_ROOT / "Dockerfile").read_text()
     for required in (
         'find /opt/quantcheck/.venv -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} +',
+        "-name uv_cache.json -delete",
+        "-name RECORD -exec sed -i '/uv_cache[.]json,/d' {} +",
         "COPY --from=builder --chown=65532:65532 /opt/quantcheck/.venv /opt/quantcheck/.venv",
     ):
         assert required in dockerfile

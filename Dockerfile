@@ -21,7 +21,11 @@ WORKDIR /build
 COPY --from=uv /uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock README.md LICENSE .python-version ./
 COPY src/ ./src/
+# uv's cache provenance contains wall-clock nanoseconds and is not needed at
+# runtime; remove it with its RECORD row before snapshotting the tree.
 RUN uv sync --frozen --no-dev --no-editable \
+    && find /opt/quantcheck/.venv -name uv_cache.json -delete \
+    && find /opt/quantcheck/.venv -name RECORD -exec sed -i '/uv_cache[.]json,/d' {} + \
     && find /opt/quantcheck/.venv -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} +
 
 FROM ${PYTHON_IMAGE} AS runtime
