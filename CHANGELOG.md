@@ -32,6 +32,10 @@ All notable changes to QuantCheck are recorded here. This project follows
   digest-addressed OCI manifest, config, and layer identity. Raw outer-tar
   archive bytes, headers, and member order remain diagnostics and do not fail
   the image-identity gate by themselves.
+* The cited candidate commit `3b47da9` has green Security workflow run
+  `32693592309`, including exact two-build OCI manifest/config/layer identity
+  and dependency, secret, image, and SBOM gates. This does not claim a published
+  image digest or trusted release attestation.
 
 ### Not claimed
 

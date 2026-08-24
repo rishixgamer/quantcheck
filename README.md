@@ -56,7 +56,7 @@ successful, 30 structural no-target, and 0 incomplete. Among successful scored
 cases it recorded 130 injected faults, 130 exact matches, 78 strict
 cross-detector false-positive findings, precision **0.625**, recall **1.000**,
 and F1 **0.769**. This is synthetic fixture evidence, not production
-performance. See the [canonical aggregate report](release_evidence/final/public/aggregate_report.json)
+performance. See the [canonical aggregate report](evidence/v0_1_release/aggregate_report.json)
 and the [human-readable benchmark summary](docs/FINAL_BENCHMARK_RESULTS.md).
 
 The separate observational SEC study processed **472 selected observations from
@@ -124,9 +124,11 @@ and limitations retained in the evidence record.
 The primary benchmark is synthetic and fixture-bounded. The observational SEC run
 has no ground truth and only one detector with a nonzero opportunity denominator.
 The adversarial SEC-derived study uses manufactured faults on a reused substrate.
-The current worktree has no customer pilot, customer adjudication, production
-deployment, published candidate image, trusted candidate attestation, or held-out
-v0.2 result. QuantCheck does not claim alpha, returns, prevented losses, natural
+The cited candidate source commit `3b47da9` has a green Security workflow run
+`32693592309`, including exact two-build OCI identity and dependency, secret,
+image, and SBOM gates. The current worktree still has no customer pilot,
+customer adjudication, production deployment, published image digest, trusted
+candidate attestation, or held-out v0.2 result. QuantCheck does not claim alpha, returns, prevented losses, natural
 SEC defect prevalence, vendor-scale coverage, or automatic remediation.
 
 See the [current status](docs/STATUS.md)

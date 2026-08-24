@@ -43,7 +43,7 @@ reader; professor/research reviewer.
 | Claim area | Primary source of truth | Secondary reading aid | Do not substitute |
 | --- | --- | --- | --- |
 | Current implementation and status | docs/STATUS.md, current source, current contracts | README.md | archived release prose |
-| v0.1 held-out numbers | release_evidence/final/public/aggregate_report.json | docs/FINAL_BENCHMARK_RESULTS.md | historical 132-case metrics |
+| v0.1 held-out numbers | evidence/v0_1_release/aggregate_report.json | docs/FINAL_BENCHMARK_RESULTS.md | historical 132-case metrics |
 | v0.1 release identity and freeze | release_freeze.json, CHECKSUMS.md, Git tag v0.1.0 | docs/REPRODUCIBILITY.md, docs/RELEASE_CHECKLIST.md | mutable current worktree as if it were the tag |
 | v0.2 corpus and development/validation evidence | corpus_freeze_v0_2.json, design_partner_beta_freeze.json, evidence/design_partner_beta/development_aggregate.json, evidence/design_partner_beta/validation_aggregate.json, evidence/design_partner_beta/validation_freeze.json | docs/CORPUS_V0_2.md, docs/BENCHMARK_V0_2.md | treating synthetic evidence as customer or production evidence |
 | Missing Observations evidence | missing_observation_evaluation_v1.json | docs/faults/MISSING_OBSERVATIONS.md | claiming customer demand or real-feed performance |
@@ -88,25 +88,25 @@ family is implemented. The table below is the safe wording.
 ### C. v0.1 final held-out benchmark evidence
 
 All values in this section are read from
-release_evidence/final/public/aggregate_report.json, whose saved identity is
+evidence/v0_1_release/aggregate_report.json, whose saved identity is
 agg_571aae0b7c60a4a5. They are the current source of truth for the v0.1
 numbers.
 
 | ID | Claim | Exact measured value | Supporting source/artifact | Class | Audience | Publish confidence | Important caveat |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| C-01 | v0.1 benchmark size | 124 configured cases = 120 fault cases + 4 clean controls. | release_freeze.json; release_evidence/final/public/aggregate_report.json; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured | All four | High | This is not the historical 132-case target described in archived release material; see X-01. |
+| C-01 | v0.1 benchmark size | 124 configured cases = 120 fault cases + 4 clean controls. | release_freeze.json; evidence/v0_1_release/aggregate_report.json; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured | All four | High | This is not the historical 132-case target described in archived release material; see X-01. |
 | C-02 | v0.1 final seeds | Reserved final seeds 1000 through 1009; all ten seed values executed through the release-only path. | release_freeze.json; docs/REPRODUCIBILITY.md; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured / design fact | Technical interviewer; professor/research reviewer | High | Reserved seeds are release evidence for this frozen candidate, not a general user-facing execution mode. |
-| C-03 | v0.1 status totals | 94 successful, 30 failed, 0 incomplete. | release_evidence/final/public/aggregate_report.json | Directly measured | All four | High | The 30 failures are retained structural ineligibility cases, not successful benchmark cases. |
-| C-04 | v0.1 injected fault count | 130 injected fault units. | release_evidence/final/public/aggregate_report.json | Directly measured | All four | High | This is the pooled count among successful injected cases; 30 cases injected no target because they failed at injection. |
-| C-05 | v0.1 findings | 208 total findings: 130 true-positive findings and 78 false-positive findings under strict primary-family scoring. | release_evidence/final/public/aggregate_report.json | Directly measured | All four | High | “False positive” here means false relative to the case’s primary family, not necessarily an invalid detector observation. |
-| C-06 | v0.1 false negatives | 0 false-negative faults among the injected faults in the successful scored cases. | release_evidence/final/public/aggregate_report.json | Directly measured | All four | High | This does not measure the 30 failed no-target cells and is not general sensitivity. |
-| C-07 | v0.1 precision | 0.625. | release_evidence/final/public/aggregate_report.json | Directly measured | All four | High | Micro-pooled strict primary-label precision; not a per-detector production precision estimate. |
-| C-08 | v0.1 recall | 1. | release_evidence/final/public/aggregate_report.json | Directly measured | All four | High | Measured on a 26-record reviewed synthetic fixture plus a five-observation Unit Drift series and successful injected cases only. |
-| C-09 | v0.1 F1 | 0.76923076923076923076923076923076923076923076923077. | release_evidence/final/public/aggregate_report.json | Directly measured | Technical interviewer; professor/research reviewer | High | Exact Decimal F1 under the same strict micro-pooled convention as C-07 and C-08. |
-| C-10 | v0.1 false-positive rate | 0.072897196261682242990654205607476635514018691588785, with eligible-clean denominator 1070. | release_evidence/final/public/aggregate_report.json | Directly measured | Technical interviewer; professor/research reviewer | High | The denominator is a contract-specific eligible-clean denominator, not total rows or total findings. |
-| C-11 | v0.1 research-output change | 90 / 90 successful fault cases changed the configured controlled research output. | release_evidence/final/public/aggregate_report.json; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured | All four | High | The outputs are narrow sensitivity demonstrations, not returns, alpha, Sharpe, portfolio results, or loss estimates. |
-| C-12 | v0.1 replay restoration | 90 / 90 successful fault cases had exact manifest-assisted replay restoration. | release_evidence/final/public/aggregate_report.json; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured | All four | High | Replay uses private answer-key truth; it is not detector-only or automatic remediation. |
-| C-13 | v0.1 failure cause | All 30 failures are stage=injection, category=no_eligible_targets, in three cells: Look-Ahead high (30 day lag), Revision Overwrite medium (5% revision), and Revision Overwrite high (20% revision). | docs/FINAL_BENCHMARK_RESULTS.md; release_evidence/final/public/case_matrix.json; docs/STATUS.md | Directly measured plus interpretation | All four | High | The cells were retained rather than configured away; they were not measured for recall because no target existed. |
+| C-03 | v0.1 status totals | 94 successful, 30 failed, 0 incomplete. | evidence/v0_1_release/aggregate_report.json | Directly measured | All four | High | The 30 failures are retained structural ineligibility cases, not successful benchmark cases. |
+| C-04 | v0.1 injected fault count | 130 injected fault units. | evidence/v0_1_release/aggregate_report.json | Directly measured | All four | High | This is the pooled count among successful injected cases; 30 cases injected no target because they failed at injection. |
+| C-05 | v0.1 findings | 208 total findings: 130 true-positive findings and 78 false-positive findings under strict primary-family scoring. | evidence/v0_1_release/aggregate_report.json | Directly measured | All four | High | “False positive” here means false relative to the case’s primary family, not necessarily an invalid detector observation. |
+| C-06 | v0.1 false negatives | 0 false-negative faults among the injected faults in the successful scored cases. | evidence/v0_1_release/aggregate_report.json | Directly measured | All four | High | This does not measure the 30 failed no-target cells and is not general sensitivity. |
+| C-07 | v0.1 precision | 0.625. | evidence/v0_1_release/aggregate_report.json | Directly measured | All four | High | Micro-pooled strict primary-label precision; not a per-detector production precision estimate. |
+| C-08 | v0.1 recall | 1. | evidence/v0_1_release/aggregate_report.json | Directly measured | All four | High | Measured on a 26-record reviewed synthetic fixture plus a five-observation Unit Drift series and successful injected cases only. |
+| C-09 | v0.1 F1 | 0.76923076923076923076923076923076923076923076923077. | evidence/v0_1_release/aggregate_report.json | Directly measured | Technical interviewer; professor/research reviewer | High | Exact Decimal F1 under the same strict micro-pooled convention as C-07 and C-08. |
+| C-10 | v0.1 false-positive rate | 0.072897196261682242990654205607476635514018691588785, with eligible-clean denominator 1070. | evidence/v0_1_release/aggregate_report.json | Directly measured | Technical interviewer; professor/research reviewer | High | The denominator is a contract-specific eligible-clean denominator, not total rows or total findings. |
+| C-11 | v0.1 research-output change | 90 / 90 successful fault cases changed the configured controlled research output. | evidence/v0_1_release/aggregate_report.json; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured | All four | High | The outputs are narrow sensitivity demonstrations, not returns, alpha, Sharpe, portfolio results, or loss estimates. |
+| C-12 | v0.1 replay restoration | 90 / 90 successful fault cases had exact manifest-assisted replay restoration. | evidence/v0_1_release/aggregate_report.json; docs/FINAL_BENCHMARK_RESULTS.md | Directly measured | All four | High | Replay uses private answer-key truth; it is not detector-only or automatic remediation. |
+| C-13 | v0.1 failure cause | All 30 failures are stage=injection, category=no_eligible_targets, in three cells: Look-Ahead high (30 day lag), Revision Overwrite medium (5% revision), and Revision Overwrite high (20% revision). | docs/FINAL_BENCHMARK_RESULTS.md; evidence/v0_1_release/case_matrix.json; docs/STATUS.md | Directly measured plus interpretation | All four | High | The cells were retained rather than configured away; they were not measured for recall because no target existed. |
 | C-14 | v0.1 false-positive behavior | All 78 false positives are cross-detector findings under strict primary-label scoring. The dominant source is the documented natural exact-duplicate pair; a Revision Overwrite corruption also creates a valid Duplicate signal. | docs/FINAL_BENCHMARK_RESULTS.md; docs/METHODOLOGY.md; docs/faults/DUPLICATE_OBSERVATIONS.md | Directly measured plus interpretation | Technical interviewer; professor/research reviewer | High | This explains the metric; it does not prove that every cross-detector finding is useful in production. |
 
 #### v0.1 by-fault-profile breakdown
@@ -118,7 +118,7 @@ numbers.
 | revision_overwrite | 31 / 11 / 20 | 10 | 21 | 10 / 11 | 11 | 0.47619047619047619047619047619047619047619047619048 | 1 | 0.64516129032258064516129032258064516129032258064516 | 1 | 10 / 10 |
 | unit_drift | 31 / 31 / 0 | 30 | 45 | 30 / 15 | 155 | 0.66666666666666666666666666666666666666666666666667 | 1 | 0.79999999999999999999999999999999999999999999999996 | 0.096774193548387096774193548387096774193548387096774 | 30 / 30 |
 
-Source: release_evidence/final/public/aggregate_report.json and
+Source: evidence/v0_1_release/aggregate_report.json and
 docs/FINAL_BENCHMARK_RESULTS.md. The Revision Overwrite rate of 1 is
 arithmetically correct but has denominator 11, so it is statistically thin.
 
@@ -130,7 +130,7 @@ arithmetically correct but has denominator 11, so it is statistically thin.
 | medium | 43 / 33 / 10 | 40 | 67 | 40 / 27 | 419 | 0.59701492537313432835820895522388059701492537313433 | 1 | 0.74766355140186915887850467289719626168224299065425 | 0.064439140811455847255369928400954653937947494033413 |
 | high | 40 / 20 / 20 | 50 | 65 | 50 / 15 | 260 | 0.76923076923076923076923076923076923076923076923077 | 1 | 0.86956521739130434782608695652173913043478260869562 | 0.057692307692307692307692307692307692307692307692308 |
 
-Source: release_evidence/final/public/aggregate_report.json.
+Source: evidence/v0_1_release/aggregate_report.json.
 
 ### D. v0.2 corpus and development/validation evidence
 
@@ -172,7 +172,7 @@ the frozen v0.1 result and not customer evidence.
 | F-04 | Current test-count status | Direct collection on 2026-08-13 collected 2,257 tests. The attempted full run was interrupted before completion. The last full-suite pass recorded for the Missing Observations milestone is 2,245 tests in 67.82s. | uv run pytest --collect-only -q output; interrupted uv run pytest -q; archived run notes | Directly measured status | Technical interviewer; professor/research reviewer | High if phrased exactly | Do not claim “2,257 tests passed.” The current full-suite result was not completed in this review. |
 | F-05 | Earlier recorded full suites | Archived implementation notes record milestone-specific totals including 1,595 at v0.1 release, 2,021 at v0.2 detector execution, 2,140 after policy work, 2,157 after performance work, 2,245 after Missing Observations. | archived run notes | Historical/current milestone evidence | Technical interviewer; professor/research reviewer | Medium | Every number is tied to a different repository state and command; no generic “total tests” claim is safe without a commit and command. |
 | F-06 | Package build and clean installation | Offline wheel/sdist builds and clean Python 3.12 installs are repeatedly recorded as passing; the beta closure records 38 focused package/format/integrity tests after PyArrow became a direct dependency. | docs/STATUS.md; design_partner_beta_freeze.json; evidence/design_partner_beta/* | Directly measured, version-scoped | Technical interviewer; professor/research reviewer | Medium | The exact current full build/test evidence must be rerun for a new release; do not infer it from archived run notes. |
-| F-07 | Public artifact privacy | Release evidence scans report no manifest/private-only keys, local paths, secrets, tracebacks, or traversable private references in public artifacts. | docs/ARTIFACTS_AND_PRIVACY.md; docs/THREAT_MODEL.md; release_evidence/final/public/ | Directly measured tests | Technical interviewer; professor/research reviewer | High | Privacy minimization is not anonymization; stable hashes can remain linkable and customer/operator retention controls remain outside the application. |
+| F-07 | Public artifact privacy | Release evidence scans report no manifest/private-only keys, local paths, secrets, tracebacks, or traversable private references in public artifacts. | docs/ARTIFACTS_AND_PRIVACY.md; docs/THREAT_MODEL.md; evidence/v0_1_release/ and the complete v0.1 release archive | Directly measured tests | Technical interviewer; professor/research reviewer | High | Privacy minimization is not anonymization; stable hashes can remain linkable and customer/operator retention controls remain outside the application. |
 | F-08 | v0.1 release reproducibility identity | Freeze record SHA-256 7584be72c2fa3882c3a61c0ba47354cd3e45f53cd1f4d0bb70f9a012e59f42eb; release config SHA-256 a29c131b83d85323b379436e674efbadff7e382f5e0ca09c7dd3e3bef46e6f3c; case matrix SHA-256 2a1ffbc7d2ff32a0965ccfea3076ac17f46a20d2de6c0d9fc6590799e629cc13. | docs/FINAL_BENCHMARK_RESULTS.md; release_freeze.json | Directly measured | Technical interviewer; professor/research reviewer | High | These authenticate the frozen v0.1 evidence package, not the mutable current worktree. |
 
 ### G. SEC, external data, CLI, dashboard, and performance surfaces
@@ -189,9 +189,9 @@ the frozen v0.1 result and not customer evidence.
 | G-08 | Dashboard/HTML privacy behavior | Presentation reads public artifacts only, does not run injection/detection/scoring/replay/research, and renders with the private tree deleted. | docs/DASHBOARD_AND_HTML.md; presentation isolation tests | Directly measured tests | Technical interviewer; professor/research reviewer | High | It presents saved evidence; it does not independently validate scientific truth. |
 | G-09 | Measured local performance envelope | On the checked-in deterministic corpus: 1,000 records total runtime 0.349605250s; 10,000 3.434787625s; 50,000 17.915681750s with one worker. The 50,000-record run was 9.725262708s at two workers and 6.436192375s at four workers; traced largest-partition Python allocation 36,325,079 bytes. | performance_baseline_v1.json; docs/PERFORMANCE_AND_EXECUTION.md | Directly measured | Technical interviewer; professor/research reviewer | Medium | macOS arm64, Python 3.12.13, one deterministic synthetic corpus; peak measure excludes native PyArrow memory and aggregate worker RSS. |
 | G-10 | Performance logical determinism | The 50,000-record 1/2/4-worker runs share logical artifact hash 42f05328cdcda08e0882415197f8dde62bc71c591412e31e37abb6387c76203e. | performance_baseline_v1.json | Directly measured | Technical interviewer; professor/research reviewer | High | This proves the recorded local worker-count comparison, not a universal throughput guarantee. |
-| G-11 | Self-hosted distribution status | A digest-pinned non-root container, bounded mounts, no-network configuration, security workflows, SBOM/provenance path, and reproducibility script are implemented. | Dockerfile; docs/SELF_HOSTED_DEPLOYMENT.md; docs/SUPPLY_CHAIN_SECURITY.md; docs/STATUS.md | Design/implementation fact | Technical interviewer; professor/research reviewer | Medium | The current candidate has no verified OCI digest, published image, registry push, trusted attestation, pulled-image smoke, or exact two-build OCI proof. |
+| G-11 | Self-hosted distribution status | A digest-pinned non-root container, bounded mounts, no-network configuration, security workflows, SBOM/provenance path, and reproducibility script are implemented. | Dockerfile; docs/SELF_HOSTED_DEPLOYMENT.md; docs/SUPPLY_CHAIN_SECURITY.md; docs/STATUS.md | Design/implementation fact | Technical interviewer; professor/research reviewer | Medium | The cited candidate commit `3b47da9` has green Security run `32693592309` with exact two-build OCI manifest/config/layer identity and security scans; no published image digest, trusted attestation, pulled-image smoke, or production deployment exists. |
 | G-12 | Local security scan status | Candidate-local Trivy 0.73.0 reports 0 fixable high/critical locked-dependency findings and 0 scanned repository secrets; Syft 1.50.0 emitted an SPDX 2.3 package SBOM. | design_partner_beta_freeze.json; evidence/design_partner_beta/trivy-*.json; evidence/design_partner_beta/quantcheck-wheel.syft.spdx.json | Directly measured | Technical interviewer; professor/research reviewer | Medium | These are local/package-scope results; they do not include a candidate container image and do not establish certification or security. |
-| G-13 | Current OCI and trusted-attestation status | OCI archive/config/layer digests are null/not verified for the candidate; candidate source Security run is not_run; trusted attestation is not_created. | design_partner_beta_freeze.json fields oci, security_workflow, supply_chain | Directly measured limitation | All four | High | Never convert configured workflow files or historical run 31368451109 into current candidate completion evidence. |
+| G-13 | Current OCI and trusted-attestation status | The cited candidate Security run is green with exact OCI identity, but no published image digest or trusted release attestation is recorded. | docs/STATUS.md; docs/SUPPLY_CHAIN_SECURITY.md | Directly measured limitation | All four | High | Never convert the green candidate CI run into a published image or trusted attestation claim. |
 | G-14 | Observational SEC result | QuantCheck accepted 472 selected records: 180 Assets and 292 NetIncomeLoss. Exact Duplicate had 472 singleton fingerprint groups and zero findings; Look-Ahead, Revision Overwrite, and Unit Drift had zero eligible opportunities. | docs/research/REAL_DATA_RESULTS.md; evidence/real_data_study/applicability.json | Directly measured, retrospective applicability correction | All four | High if detector-specific denominators remain attached | The protocol was not independently timestamped or committed before execution; do not call it preregistered. |
 | G-15 | Real-data-substrate adversarial result | Under a protocol committed before outcomes, nine seeded cases contained 120 injected fault instances. All 120 were exactly matched; Unit Drift also emitted four strict false-positive warnings. | docs/research/REAL_DATA_SUBSTRATE_ADVERSARIAL_PROTOCOL.md; docs/research/REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md; evidence/real_data_substrate_adversarial/study_run.json | Directly measured controlled evidence on real SEC substrate | All four | High if the injected-fault boundary remains attached | These are manufactured faults on preserved real observations, not natural SEC defects or population performance. Revision Overwrite was not applicable. |
 
@@ -199,10 +199,10 @@ the frozen v0.1 result and not customer evidence.
 
 | ID | Discrepancy | Artifacts showing each side | Resolution before publication |
 | --- | --- | --- | --- |
-| X-01 | Archived release materials describe 120 fault cases + 12 controls = 132 cases, while the rebuilt v0.1 release artifact is 120 + 4 = 124. | Archived release material; current: release_freeze.json, release_evidence/final/public/aggregate_report.json, docs/FINAL_BENCHMARK_RESULTS.md | Use 124 for the rebuilt v0.1 evidence. Mention 132 only as an archived target/discrepancy, never as the measured current result. |
-| X-02 | Archived metric set conflicts with rebuilt v0.1 artifact: historical precision 0.668..., recall 0.970..., F1 0.791..., 170 injected faults, 5 false negatives, 82 false positives; current artifact is 0.625, 1, 0.769..., 130, 0, 78. | Archived release material; current release_evidence/final/public/aggregate_report.json | Use only the current saved artifact for rebuilt v0.1 claims. Label archived values as historical/outdated and unsafe as current metrics. |
+| X-01 | Archived release materials describe 120 fault cases + 12 controls = 132 cases, while the rebuilt v0.1 release artifact is 120 + 4 = 124. | Archived release material; current: release_freeze.json, evidence/v0_1_release/aggregate_report.json, docs/FINAL_BENCHMARK_RESULTS.md | Use 124 for the rebuilt v0.1 evidence. Mention 132 only as an archived target/discrepancy, never as the measured current result. |
+| X-02 | Archived metric set conflicts with rebuilt v0.1 artifact: historical precision 0.668..., recall 0.970..., F1 0.791..., 170 injected faults, 5 false negatives, 82 false positives; current artifact is 0.625, 1, 0.769..., 130, 0, 78. | Archived release material; current evidence/v0_1_release/aggregate_report.json | Use only the current saved artifact for rebuilt v0.1 claims. Label archived values as historical/outdated and unsafe as current metrics. |
 | X-03 | docs/RELEASE_NOTES_0.1.0.md says the release was not published and had no tag, GitHub release, or CI run; docs/RELEASE_CHECKLIST.md records GitHub Actions run 31293937904, tag v0.1.0, and a GitHub release. | docs/RELEASE_NOTES_0.1.0.md; docs/RELEASE_CHECKLIST.md; Git tag | Treat the release notes as stale historical prose. For release-status claims, use the checklist, Git tag, and exact release artifacts. |
-| X-04 | docs/DASHBOARD_AND_HTML.md contains a stale limitation saying no final held-out benchmark, release evidence, or CHECKSUMS.md exists, while those artifacts exist and are used by the current release evidence. | docs/DASHBOARD_AND_HTML.md; release_evidence/final/; release_freeze.json; CHECKSUMS.md | Do not quote that stale sentence. Resolve the document before any portfolio publication or use the artifact-backed current status. |
+| X-04 | docs/DASHBOARD_AND_HTML.md contains a stale limitation saying no final held-out benchmark, release evidence, or CHECKSUMS.md exists, while the standalone summaries and complete archive now provide the current release evidence. | docs/DASHBOARD_AND_HTML.md; evidence/v0_1_release/; release_freeze.json; CHECKSUMS.md | Do not quote that stale sentence. Resolve the document before any portfolio publication or use the artifact-backed current status. |
 | X-05 | README/release prose calls the interface a “six-command CLI” while the concrete list includes ingest sec, inject, audit, evaluate, benchmark run, benchmark smoke, and explain. | README.md; docs/CLI_CONTRACT.md | Use the precise wording “six root command groups; nested invocations include …” until the prose is harmonized. |
 | X-06 | Test counts vary by milestone and repository state: current collection 2,257; interrupted current full run; last recorded full pass 2,245; v0.1 milestone record 1,595; stale release prose says approximately 1,600. | uv run pytest --collect-only -q; interrupted uv run pytest -q; archived run notes | Publish a test count only with a named commit/state and exact command. Do not use “2,257 tests passed” or “approximately 1,600 tests” as a timeless claim. |
 | X-07 | Current 0.2.0.dev0 docs scope PyArrow differently by version: immutable v0.1 wheel metadata did not declare it, while current 0.2.0.dev0 metadata declares pyarrow>=24,<25, locked at 24.0.0. | docs/LIMITATIONS.md; docs/EXTERNAL_DATASETS.md; pyproject.toml | Always version the statement: v0.1 wheel versus current 0.2.0.dev0 distribution. |
@@ -240,8 +240,9 @@ caveats remain attached.
 9. QuantCheck’s current product surfaces include an offline CLI workflow, a
    public-only artifact reader, deterministic HTML rendering, a local read-only
    dashboard, and a narrow SEC Company Facts adapter.
-10. The current 0.2.0.dev0 candidate has local package/security evidence but
-    remains not ready to claim a published OCI image, trusted attestation,
+10. The current 0.2.0.dev0 candidate has local package/security evidence and
+    a cited green candidate Security run with exact OCI identity, but remains
+    not ready to claim a published OCI image digest, trusted attestation,
     production deployment, or completed design-partner pilot.
 
 ## B. Ten claims that must NOT be made
@@ -290,8 +291,8 @@ caveats remain attached.
    denominator is only 11, producing a false-positive rate of exactly 1; it
    must not be compared with large-denominator profiles without the denominator.
 5. **External and operational evidence is incomplete.** No real customer/vendor
-   file, approved customer policy, adjudicated pilot, candidate OCI proof,
-   published image digest, trusted attestation, or third-party security audit is
+   file, approved customer policy, adjudicated pilot, published image digest,
+   trusted attestation, or third-party security audit is
    present.
 
 ## D. Exact source-of-truth artifacts for future portfolio work
@@ -301,9 +302,9 @@ Use these artifacts directly, preserving their version labels and caveats.
 ### Frozen v0.1 benchmark
 
 - release_freeze.json
-- release_evidence/final/public/aggregate_report.json
-- release_evidence/final/public/case_matrix.json
-- release_evidence/final/public/index.json
+- evidence/v0_1_release/aggregate_report.json
+- evidence/v0_1_release/case_matrix.json
+- Complete 595-file tree: [v0.1 public evidence archive](https://github.com/rishixgamer/quantcheck/releases/download/v0.1.0/quantcheck-v0.1.0-public-evidence.tar.gz)
 - docs/FINAL_BENCHMARK_RESULTS.md
 - docs/METHODOLOGY.md
 - docs/REPRODUCIBILITY.md

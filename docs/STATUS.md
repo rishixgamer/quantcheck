@@ -34,8 +34,10 @@ design-partner beta candidate; it is **not production-ready**.
 
 ## Open gates and limitations
 
-- There is no exact candidate release commit/tag, published image digest,
-  trusted attestation, or candidate-specific two-build OCI proof.
+- The cited candidate source commit `3b47da9` has a green Security workflow run
+  `32693592309`, including exact two-build OCI manifest/config/layer identity,
+  dependency, secret, image, and SBOM gates. There is still no published image
+  digest or trusted release attestation for deployment.
 - No held-out v0.2 execution, customer file, design-partner adjudication,
   pilot result, confirmed research impact, or production deployment exists.
 - The SEC adapter is narrow: one CIK at a time, explicit concept/unit/form/date
