@@ -1,8 +1,10 @@
 # QuantCheck 0.1.0 release notes
 
-**Status: release candidate, prepared locally. Not published.** No Git tag,
-GitHub release, PyPI upload, hosted dashboard, or CI run exists. See
-[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for the external gates.
+**Status: published on GitHub as [`v0.1.0`](https://github.com/rishixgamer/quantcheck/releases/tag/v0.1.0).**
+The annotated tag, wheel, source distribution, and complete public evidence
+archive are available from that release. QuantCheck is not published to PyPI,
+a container registry, or a hosted dashboard. See
+[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for the recorded release gates.
 
 ## What this is
 
@@ -30,7 +32,7 @@ the findings exactly against the manifest only after the audit is finalised.
 * **Read-only presentation.** A strict public artifact reader, one immutable
   shared model, a deterministic self-contained HTML summary, and a local
   Streamlit dashboard — none of which executes any scientific logic.
-* **A six-command Typer CLI** with stable exit codes and a saved-stage
+* **Six Typer root command groups** with stable exit codes and a saved-stage
   `inject` → `audit` → `evaluate` workflow that is byte-equivalent to a direct
   dispatch.
 

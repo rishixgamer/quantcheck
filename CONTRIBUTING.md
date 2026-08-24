@@ -100,6 +100,6 @@ public bytes, also assert it is present in the private tree.
 
 ## Handoff
 
-`IMPLEMENT.md` is the operational source of truth between sessions. Record the
-milestone completed, files changed, commands run with exact outcomes, decisions
-added, known limitations, and the exact next task.
+`docs/STATUS.md` is the concise public status source of truth. Record exact
+commands and outcomes in the relevant gate or release evidence, and keep
+known limitations and claims scoped to the artifact or run that supports them.

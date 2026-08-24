@@ -12,21 +12,21 @@ identities. The provenance builder ID is deliberately
 attestation. It proves what the local script recorded, not who operated the
 builder.
 
-The most recent historical Security workflow run (`31368451109`) passed locked
-dependency scanning, secret scanning, the local image build, the image
-vulnerability scan, and SPDX SBOM generation, but failed the exact OCI
-reproducibility step. That run predates this candidate. A green workflow run
-for the exact candidate source, a verified byte-identical OCI result and image
-digest, and trusted release attestations remain external gates until they
-actually exist. Workflow configuration is not completion evidence.
+The cited candidate source commit (`3b47da9`) has a green Security workflow run
+(`32693592309`). It includes identical digest-addressed OCI
+manifest/config/layer identity across two builds plus dependency, secret, image,
+and SPDX SBOM gates. The older historical run (`31368451109`) predates this
+candidate and failed the exact OCI reproducibility step. This CI result is not a
+published image digest or a trusted GitHub/Sigstore release attestation;
+workflow configuration remains non-evidence of completion by itself.
 
 For the local candidate closure, checksum-verified workflow-pinned Trivy 0.73.0
 reported zero fixable high/critical production dependency vulnerabilities in
 `uv.lock` and zero secrets in the scanned repository source scope. A
 checksum-verified Syft 1.50.0 run emitted SPDX 2.3 for the exact candidate wheel
 hash. Their JSON reports are persisted beside the beta evidence. These local
-checks do not include the unavailable candidate container image and do not make
-the remote workflow green.
+checks do not substitute for a published image digest or trusted release
+attestation; the cited Security run is the remote candidate scan.
 
 ## What is implemented
 
@@ -43,10 +43,13 @@ The self-hosted release workflow publishes these versioned artifacts from one re
 Python dependencies are resolved through the checked-in `uv.lock`. The build uses Python 3.12,
 Hatchling, a digest-pinned Python base, a digest-pinned `uv` builder, a fixed Buildx version, and a
 digest-pinned BuildKit worker. `SOURCE_DATE_EPOCH` is the source commit time; the reproducibility
-gate performs two no-cache BuildKit exports with timestamp rewriting and requires byte-identical OCI
-archives. This is a scoped Linux/amd64 reproducibility claim for the same source, build arguments,
-BuildKit behavior, and reachable locked dependencies, not a claim that arbitrary builders or
-platforms produce the same digest.
+gate performs two no-cache BuildKit exports with timestamp rewriting and
+requires identical digest-addressed OCI manifest, config, and layer identity.
+Raw outer-tar header/order or archive-byte differences are reported as
+diagnostics and do not fail image identity when those OCI digests match. This
+is a scoped Linux/amd64 reproducibility claim for the same source, build
+arguments, BuildKit behavior, and reachable locked dependencies, not a claim
+that arbitrary builders or platforms produce the same digest.
 
 All workflow actions are pinned to full commit SHAs. CI separately scans repository content for
 secrets, scans locked library dependencies, scans the built image, generates an SBOM, and reruns the

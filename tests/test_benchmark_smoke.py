@@ -3,7 +3,7 @@
 No headline metric is asserted as a literal. These tests check the smoke's
 *shape* and its invariants; the actual precision, recall, F1, and
 false-positive rate are whatever the rebuilt implementation produces and are
-recorded in ``IMPLEMENT.md`` from a real run.
+recorded in the saved benchmark artifacts and current status notes.
 """
 
 from __future__ import annotations

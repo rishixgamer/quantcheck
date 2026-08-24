@@ -145,8 +145,12 @@ def test_a_released_case_config_stays_readable_with_the_gate_closed() -> None:
 def test_the_released_public_evidence_loads_with_the_gate_closed(tmp_path: Path) -> None:
     """The whole public tree, not just one artifact, must load unauthorized."""
     saved = Path("release_evidence/public_only")
-    if not saved.is_dir():
-        pytest.skip("no released public evidence tree in this working copy")
+    case_statuses = saved / "public/cases"
+    if (
+        not saved.is_dir()
+        or len(list(case_statuses.glob("*/status.json"))) < q.RELEASE_TOTAL_CASE_COUNT
+    ):
+        pytest.skip("complete released public evidence tree is not checked in")
     assert_gate_closed()
     artifacts = q.read_public_benchmark(saved)
     assert artifacts.aggregate.overall.configured_case_count == q.RELEASE_TOTAL_CASE_COUNT

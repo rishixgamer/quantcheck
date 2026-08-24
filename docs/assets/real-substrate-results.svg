@@ -8,6 +8,6 @@
     <rect x="55" y="135" width="270" height="150" rx="16" fill="#2d705f"/><text x="82" y="180" font-size="15" fill="#b9f5e7">INJECTED INSTANCES</text><text x="82" y="242" font-size="52" font-weight="700" fill="#ffffff">120</text><text x="82" y="270" font-size="15" fill="#d1eee5">exactly matched</text>
     <rect x="365" y="135" width="270" height="150" rx="16" fill="#805a2c"/><text x="392" y="180" font-size="15" fill="#ffdda3">UNIT DRIFT WARNINGS</text><text x="392" y="242" font-size="52" font-weight="700" fill="#ffffff">4</text><text x="392" y="270" font-size="15" fill="#f7dfb0">strict false positives retained</text>
     <rect x="675" y="135" width="270" height="150" rx="16" fill="#3d4a61"/><text x="702" y="180" font-size="15" fill="#c8d6e8">REVISION OVERWRITE</text><text x="702" y="242" font-size="38" font-weight="700" fill="#ffffff">N/A</text><text x="702" y="270" font-size="15" fill="#c8d6e8">no applicable lineage</text>
-    <text x="55" y="340" font-size="15" fill="#b4c7dd">Source: REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md and its frozen protocol/evidence artifacts.</text>
+    <text x="55" y="340" font-size="15" fill="#b4c7dd">Source: docs/research/REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md and its frozen protocol/evidence artifacts.</text>
   </g>
 </svg>

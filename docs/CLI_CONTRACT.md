@@ -6,10 +6,10 @@ the rebuilt v1 Typer command surface, the saved-stage `inject`/`audit`/
 taxonomy. It is a thin interface over existing implementation, described
 elsewhere: this document adds no scientific behavior of its own.
 
-`RECOVERY_SEQUENCE.md` fixes Phase 9's scope in one sentence and names no
+The project scope fixes Phase 9's scope in one sentence and names no
 concrete command, flag, or exit code. The lost historical release referenced
 a `docs/CLI_CONTRACT.md`, but that file did not survive; historical evidence
-under `reference/` describes a six-command Typer CLI with exit codes
+The archived design describes a six-command Typer CLI with exit codes
 `0/2/3/4/5/10`, used here as design inspiration only. No historical flag
 syntax, JSON field name, or exit-code assignment is claimed to be
 byte-identical to the lost release. The reconstruction decisions are recorded

@@ -6,6 +6,9 @@ import hashlib
 import re
 from pathlib import Path
 
+import pytest
+from scripts import build_beta_evidence
+
 from quantcheck.hashing import sha256_hex_of_bytes, stable_id
 from quantcheck.serialization import canonical_json_bytes, parse_canonical_json
 
@@ -18,6 +21,21 @@ def _object(path: Path) -> dict[str, object]:
     value = parse_canonical_json(path.read_bytes())
     assert isinstance(value, dict)
     return value
+
+
+def test_source_state_ignores_excluded_only_modifications(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    status = " M design_partner_beta_freeze.json\n M evidence/design_partner_beta/run.json\n"
+
+    def fake_run(*arguments: str, strip_output: bool = True) -> str:
+        del arguments
+        assert strip_output is False
+        return status
+
+    monkeypatch.setattr(build_beta_evidence, "_run", fake_run)
+
+    assert build_beta_evidence._source_state() == "clean_commit"
 
 
 def test_beta_freeze_identity_source_hashes_and_claim_boundaries() -> None:

@@ -26,7 +26,7 @@ Status recorded against release candidate `relc_2c6e945a71b85b39`.
 | 18 | Package contents clean | PASS — no artifacts, manifests, caches, reference material, or real paths |
 | 19 | Fresh wheel installation works | PASS — Python 3.12 clean venv, CLI, smoke, HTML, no Streamlit |
 | 20 | Prior completed behaviour remains green | PASS — full suite |
-| 21 | `IMPLEMENT.md` updated factually | PASS |
+| 21 | `docs/STATUS.md` updated factually | PASS |
 | 22 | Release checksums current | PASS — `scripts/release_checksums.py --check` |
 
 ## External gates

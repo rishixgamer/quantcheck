@@ -29,7 +29,7 @@ EXCLUDED_SOURCE_FILES = {FREEZE_NAME}
 EXCLUDED_SOURCE_PREFIXES = ("evidence/design_partner_beta/",)
 
 
-def _run(*arguments: str) -> str:
+def _run(*arguments: str, strip_output: bool = True) -> str:
     completed = subprocess.run(
         arguments,
         cwd=REPO_ROOT,
@@ -37,7 +37,7 @@ def _run(*arguments: str) -> str:
         capture_output=True,
         text=True,
     )
-    return completed.stdout.strip()
+    return completed.stdout.strip() if strip_output else completed.stdout
 
 
 def _source_files() -> tuple[Path, ...]:
@@ -71,7 +71,13 @@ def _source_manifest() -> tuple[tuple[dict[str, object], ...], str]:
 
 
 def _source_state() -> str:
-    status = _run("git", "status", "--porcelain=v1", "--untracked-files=all")
+    status = _run(
+        "git",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all",
+        strip_output=False,
+    )
     for line in status.splitlines():
         path = line[3:]
         if path in EXCLUDED_SOURCE_FILES or path.startswith(EXCLUDED_SOURCE_PREFIXES):

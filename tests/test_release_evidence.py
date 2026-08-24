@@ -8,13 +8,22 @@ unusable to anyone but its author.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
 
 import quantcheck as q
 from tests.benchmark_support import FIXED_RUNTIME
+
+V01_RELEASE_ROOT = Path(__file__).resolve().parents[1] / "evidence/v0_1_release"
+V01_ARCHIVE_URL = (
+    "https://github.com/rishixgamer/quantcheck/releases/download/"
+    "v0.1.0/quantcheck-v0.1.0-public-evidence.tar.gz"
+)
+V01_ARCHIVE_SHA256 = "da778f05f4f27d1fa314046ddbd8f4616b0460d13b7c06374060d639410f2fcf"
 
 
 @pytest.fixture(scope="module")
@@ -44,6 +53,77 @@ def public_only(executed: Path, tmp_path: Path) -> Path:
 def test_the_copy_contains_no_private_tree(public_only: Path) -> None:
     assert not (public_only / "private").exists()
     assert list(public_only.iterdir()) == [public_only / "public"]
+
+
+def test_repository_does_not_track_private_evidence_paths() -> None:
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--", "evidence/**/private/**"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout == ""
+
+
+def test_repository_does_not_track_incomplete_release_evidence_tree() -> None:
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--", "release_evidence/**"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout == ""
+
+
+def test_tracked_markdown_does_not_publish_personal_worktree_metadata() -> None:
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--", "*.md"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    for relative_path in result.stdout.splitlines():
+        text = Path(relative_path).read_text()
+        assert "/Users/" not in text, relative_path
+        assert ".claude-flow" not in text, relative_path
+
+
+def test_curated_v01_summaries_bind_to_release_freeze_without_index() -> None:
+    """The compact checked-in set is canonical, not a partial fake evidence tree."""
+    freeze = json.loads((V01_RELEASE_ROOT.parents[1] / "release_freeze.json").read_text())
+    aggregate = json.loads((V01_RELEASE_ROOT / "aggregate_report.json").read_text())
+    config = json.loads((V01_RELEASE_ROOT / "benchmark_config.json").read_text())
+    case_matrix = json.loads((V01_RELEASE_ROOT / "case_matrix.json").read_text())
+    runtime = json.loads((V01_RELEASE_ROOT / "runtime_metadata.json").read_text())
+
+    assert {path.name for path in V01_RELEASE_ROOT.glob("*.json")} == {
+        "aggregate_report.json",
+        "benchmark_config.json",
+        "case_matrix.json",
+        "runtime_metadata.json",
+    }
+    assert aggregate["aggregate_report_id"] == "agg_571aae0b7c60a4a5"
+    assert aggregate["benchmark_id"] == freeze["benchmark_id"]
+    assert config["benchmark_id"] == freeze["benchmark_id"]
+    assert case_matrix["benchmark_id"] == freeze["benchmark_id"]
+    assert runtime["benchmark_id"] == freeze["benchmark_id"]
+    config_hash = hashlib.sha256(
+        (V01_RELEASE_ROOT / "benchmark_config.json").read_bytes()
+    ).hexdigest()
+    assert config_hash == freeze["release_config_sha256"]
+    assert (
+        hashlib.sha256((V01_RELEASE_ROOT / "case_matrix.json").read_bytes()).hexdigest()
+        == (freeze["case_matrix_sha256"])
+    )
+
+    readme = (V01_RELEASE_ROOT / "README.md").read_text()
+    assert V01_ARCHIVE_URL in readme
+    assert V01_ARCHIVE_SHA256 in readme
+    for path in V01_RELEASE_ROOT.glob("*.json"):
+        text = path.read_text()
+        assert "/Users/" not in text
+        assert "/home/" not in text
+        assert "private/" not in text
 
 
 def test_the_copy_contains_no_manifest_anywhere(public_only: Path) -> None:

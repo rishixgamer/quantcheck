@@ -50,10 +50,8 @@ then
   echo "container reproducibility check failed: OCI identities differ" >&2
   exit 1
 fi
-if [ "$first" != "$second" ]; then
-  cat "$comparison" >&2
-  echo "container reproducibility check failed: raw OCI archives differ" >&2
-  exit 1
-fi
 cat "$comparison"
+if [ "$first" != "$second" ]; then
+  echo "container reproducibility note: raw OCI archives differ; canonical OCI identity matches" >&2
+fi
 printf '%s  %s\n' "$first" "quantcheck-linux-amd64.oci.tar"

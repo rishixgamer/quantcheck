@@ -22,16 +22,25 @@ def _json(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
 
 
-def _oci_archive(path: Path, *, config_marker: str) -> None:
+def _oci_archive(
+    path: Path,
+    *,
+    config_marker: str,
+    layer_payload: bytes = b"deterministic-layer",
+    manifest_marker: str | None = None,
+    member_order: tuple[str, ...] | None = None,
+    header_mtime: int = 0,
+) -> None:
     config = _json({"marker": config_marker})
-    layer = b"deterministic-layer"
-    manifest = _json(
-        {
-            "schemaVersion": 2,
-            "config": {"digest": _digest(config), "size": len(config)},
-            "layers": ({"digest": _digest(layer), "size": len(layer)},),
-        }
-    )
+    layer = layer_payload
+    manifest_value: dict[str, object] = {
+        "schemaVersion": 2,
+        "config": {"digest": _digest(config), "size": len(config)},
+        "layers": ({"digest": _digest(layer), "size": len(layer)},),
+    }
+    if manifest_marker is not None:
+        manifest_value["annotations"] = {"marker": manifest_marker}
+    manifest = _json(manifest_value)
     index = _json(
         {
             "schemaVersion": 2,
@@ -45,12 +54,13 @@ def _oci_archive(path: Path, *, config_marker: str) -> None:
         f"blobs/sha256/{_digest(manifest).split(':')[1]}": manifest,
     }
     with tarfile.open(path, "w") as archive:
-        for name, payload in sorted(members.items()):
+        names = member_order or tuple(sorted(members))
+        for name in names:
             info = tarfile.TarInfo(name)
-            info.mtime = 0
+            info.mtime = header_mtime
             info.mode = 0o644
-            info.size = len(payload)
-            archive.addfile(info, io.BytesIO(payload))
+            info.size = len(members[name])
+            archive.addfile(info, io.BytesIO(members[name]))
 
 
 def test_identical_oci_archives_report_every_matching_identity(tmp_path: Path) -> None:
@@ -88,3 +98,70 @@ def test_changed_oci_config_is_a_nonzero_reproducibility_failure(tmp_path: Path)
     report = json.loads(completed.stdout)
     assert report["identical"] is False
     assert report["first"]["config_digest"] != report["second"]["config_digest"]
+
+
+def test_tar_headers_and_member_order_do_not_change_oci_identity(
+    tmp_path: Path,
+) -> None:
+    first = tmp_path / "first.tar"
+    second = tmp_path / "second.tar"
+    _oci_archive(first, config_marker="same")
+    with tarfile.open(first, mode="r") as archive:
+        names = tuple(member.name for member in archive.getmembers())
+    # Rebuild the second archive with the same content and a different tar
+    # header/order using the exact member names from the first archive.
+    _oci_archive(
+        second,
+        config_marker="same",
+        member_order=tuple(reversed(names)),
+        header_mtime=123,
+    )
+
+    completed = subprocess.run(
+        (sys.executable, str(INSPECTOR), str(first), str(second)),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    report = json.loads(completed.stdout)
+    assert report["identical"] is True
+    assert report["raw_archive_identical"] is False
+    assert report["first"]["canonical_identity"] == report["second"]["canonical_identity"]
+
+
+def test_changed_oci_layer_is_a_nonzero_reproducibility_failure(
+    tmp_path: Path,
+) -> None:
+    first = tmp_path / "first.tar"
+    second = tmp_path / "second.tar"
+    _oci_archive(first, config_marker="same")
+    _oci_archive(second, config_marker="same", layer_payload=b"changed-layer")
+    completed = subprocess.run(
+        (sys.executable, str(INSPECTOR), str(first), str(second)),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 1
+    report = json.loads(completed.stdout)
+    assert report["identical"] is False
+    assert report["first"]["layer_digests"] != report["second"]["layer_digests"]
+
+
+def test_changed_oci_manifest_is_a_nonzero_reproducibility_failure(
+    tmp_path: Path,
+) -> None:
+    first = tmp_path / "first.tar"
+    second = tmp_path / "second.tar"
+    _oci_archive(first, config_marker="same", manifest_marker="first")
+    _oci_archive(second, config_marker="same", manifest_marker="second")
+    completed = subprocess.run(
+        (sys.executable, str(INSPECTOR), str(first), str(second)),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 1
+    report = json.loads(completed.stdout)
+    assert report["identical"] is False
+    assert report["first"]["manifest_digest"] != report["second"]["manifest_digest"]

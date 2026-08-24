@@ -40,7 +40,7 @@ from quantcheck.unit_drift_series import (
     comparable_series_key,
 )
 
-PROTOCOL = Path("REAL_DATA_SUBSTRATE_ADVERSARIAL_PROTOCOL.md")
+PROTOCOL = Path("docs/research/REAL_DATA_SUBSTRATE_ADVERSARIAL_PROTOCOL.md")
 FREEZE = Path("evidence/real_data_substrate_adversarial_protocol_freeze.json")
 SOURCE_ROOT = Path("evidence/real_data_study/companies")
 OUTPUT_ROOT = Path("evidence/real_data_substrate_adversarial")

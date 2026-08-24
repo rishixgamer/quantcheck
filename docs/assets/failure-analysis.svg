@@ -30,5 +30,5 @@
     <text x="652" y="407" font-size="14" fill="#52657c">All values are from the saved validation aggregate.</text>
   </g>
   <line x1="56" y1="454" x2="1144" y2="454" stroke="#c5d1df"/>
-  <text x="56" y="484" font-family="Inter,Arial,sans-serif" font-size="14" fill="#52657c">Sources: release_evidence/final/public/aggregate_report.json and evidence/design_partner_beta/validation_aggregate.json.</text>
+  <text x="56" y="484" font-family="Inter,Arial,sans-serif" font-size="14" fill="#52657c">Sources: evidence/v0_1_release/aggregate_report.json and evidence/design_partner_beta/validation_aggregate.json.</text>
 </svg>

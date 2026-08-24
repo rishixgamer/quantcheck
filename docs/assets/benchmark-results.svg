@@ -12,6 +12,6 @@
     <text x="55" y="310" font-size="18" font-weight="700" fill="#10243e">130 injected faults</text><text x="290" y="310" font-size="18" font-weight="700" fill="#10243e">precision 0.625</text><text x="510" y="310" font-size="18" font-weight="700" fill="#10243e">recall 1</text><text x="700" y="310" font-size="18" font-weight="700" fill="#10243e">F1 0.769230…</text>
     <line x1="55" y1="350" x2="935" y2="350" stroke="#c5d1df"/>
     <text x="55" y="388" font-size="15" fill="#52657c">All 30 failures are visible no_eligible_targets cells. All 78 false positives remain in strict primary-family scoring.</text>
-    <text x="55" y="416" font-size="15" fill="#52657c">Source: release_evidence/final/public/aggregate_report.json and docs/FINAL_BENCHMARK_RESULTS.md</text>
+    <text x="55" y="416" font-size="15" fill="#52657c">Source: evidence/v0_1_release/aggregate_report.json and docs/FINAL_BENCHMARK_RESULTS.md</text>
   </g>
 </svg>

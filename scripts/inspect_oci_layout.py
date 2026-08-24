@@ -15,6 +15,17 @@ def _sha256(payload: bytes) -> str:
     return f"sha256:{hashlib.sha256(payload).hexdigest()}"
 
 
+def _canonical_json_bytes(value: Any) -> bytes:
+    """Encode JSON semantics independently of object-key or whitespace order."""
+
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
 def _member_bytes(archive: tarfile.TarFile, name: str) -> bytes:
     member = archive.getmember(name)
     extracted = archive.extractfile(member)
@@ -48,8 +59,18 @@ def inspect(path: Path) -> dict[str, Any]:
         layer_digests = [layer["digest"] for layer in manifest.get("layers", [])]
         for digest in layer_digests:
             _blob_bytes(archive, digest)
+    canonical_identity = {
+        # The raw archive and index hashes remain useful diagnostics, but the
+        # OCI layout tar can legitimately vary in member order/header bytes.
+        # Digest-addressed manifest/config/layer content is the image identity.
+        "config_digest": config_digest,
+        "index_canonical_sha256": _sha256(_canonical_json_bytes(index)),
+        "layer_digests": layer_digests,
+        "manifest_digest": manifest_digest,
+    }
     return {
         "archive_sha256": archive_sha256,
+        "canonical_identity": canonical_identity,
         "config_digest": config_digest,
         "index_sha256": _sha256(index_bytes),
         "layer_digests": layer_digests,
@@ -69,13 +90,15 @@ def main() -> int:
         return 0
 
     second = inspect(args.second)
+    raw_archive_identical = first["archive_sha256"] == second["archive_sha256"]
     report = {
         "first": first,
-        "identical": first == second,
+        "identical": (first["canonical_identity"] == second["canonical_identity"]),
+        "raw_archive_identical": raw_archive_identical,
         "second": second,
     }
     print(json.dumps(report, indent=2, sort_keys=True))
-    return 0 if first == second else 1
+    return 0 if report["identical"] else 1
 
 
 if __name__ == "__main__":

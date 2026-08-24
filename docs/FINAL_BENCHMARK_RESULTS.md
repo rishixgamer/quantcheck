@@ -1,7 +1,8 @@
 # QuantCheck 0.1.0 final held-out benchmark results
 
-Every number on this page was read back out of the saved public artifacts under
-`release_evidence/final/public/`. None is copied from the historical 0.1.0
+Every number on this page was read back out of the saved standalone summaries under
+`evidence/v0_1_release/`, reproduced from the complete public evidence archive.
+None is copied from the historical 0.1.0
 documentation, and none was produced by tuning anything after the results were
 seen.
 
@@ -119,7 +120,7 @@ precision ranges from `0.52` (seed `1000`) to
 `0.68421052631578947368421052631578947368421052631579` (seeds `1001`, `1002`,
 `1007`, `1008`, `1009`), with seeds `1003`–`1006` at
 `0.59090909090909090909090909090909090909090909090909`. Full per-seed counts are
-in `public/aggregate_report.json` under `by_seed`.
+in `evidence/v0_1_release/aggregate_report.json` under `by_seed`.
 
 ## Honest failure analysis
 
