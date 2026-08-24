@@ -84,16 +84,16 @@ def test_container_context_and_reproducibility_script_are_bounded() -> None:
     assert "first" in text and "second" in text
     assert "inspect_oci_layout.py" in text
     assert "raw OCI archives differ" in text
+    assert "canonical OCI identity matches" in text
+    assert 'raw OCI archives differ" >&2\n  exit 1' not in text
 
     dockerfile = (REPO_ROOT / "Dockerfile").read_text()
     for required in (
-        "--sort=name",
-        '--mtime="@${SOURCE_DATE_EPOCH}"',
-        "--numeric-owner",
-        "--pax-option=delete=atime,delete=ctime",
-        "source=/opt/quantcheck/venv.tar",
+        'find /opt/quantcheck/.venv -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} +',
+        "COPY --from=builder --chown=65532:65532 /opt/quantcheck/.venv /opt/quantcheck/.venv",
     ):
         assert required in dockerfile
+    assert "venv.tar" not in dockerfile
 
 
 def test_all_github_actions_are_pinned_to_full_commit_shas() -> None:

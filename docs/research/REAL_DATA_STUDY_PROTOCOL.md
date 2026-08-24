@@ -90,7 +90,7 @@ each detector using its frozen prerequisites:
   subset with group size greater than one.
 
 The machine-readable retrospective applicability audit is
-`evidence/real_data_study/applicability.json`.
+`../../evidence/real_data_study/applicability.json`.
 
 ## Cache-first collection provenance
 

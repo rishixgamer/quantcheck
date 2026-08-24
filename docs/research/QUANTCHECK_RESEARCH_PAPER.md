@@ -430,17 +430,17 @@ or production readiness.
 ## Evidence references
 
 1. [QuantCheck public evidence ledger](QUANTCHECK_PUBLIC_EVIDENCE_LEDGER.md).
-2. [Methodology](docs/METHODOLOGY.md).
-3. [Final held-out benchmark results](docs/FINAL_BENCHMARK_RESULTS.md).
-4. [Look-Ahead fault contract](docs/faults/LOOK_AHEAD.md).
-5. [Unit Drift fault contract](docs/faults/UNIT_DRIFT.md).
-6. [Revision Overwrite fault contract](docs/faults/REVISION_OVERWRITE.md).
+2. [Methodology](../METHODOLOGY.md).
+3. [Final held-out benchmark results](../FINAL_BENCHMARK_RESULTS.md).
+4. [Look-Ahead fault contract](../faults/LOOK_AHEAD.md).
+5. [Unit Drift fault contract](../faults/UNIT_DRIFT.md).
+6. [Revision Overwrite fault contract](../faults/REVISION_OVERWRITE.md).
 7. [Observational SEC protocol](REAL_DATA_STUDY_PROTOCOL.md).
 8. [Observational SEC results](REAL_DATA_RESULTS.md).
 9. [Observational SEC limitations](REAL_DATA_LIMITATIONS.md).
 10. [Adversarial protocol](REAL_DATA_SUBSTRATE_ADVERSARIAL_PROTOCOL.md) and
-    [freeze record](evidence/real_data_substrate_adversarial_protocol_freeze.json).
+    [freeze record](../../evidence/real_data_substrate_adversarial_protocol_freeze.json).
 11. [Adversarial results](REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md) and
-    [run record](evidence/real_data_substrate_adversarial/study_run.json).
+    [run record](../../evidence/real_data_substrate_adversarial/study_run.json).
 12. [Unit Drift warning adjudication](REAL_DATA_SUBSTRATE_ADVERSARIAL_ADJUDICATION.md).
-13. [Reproducibility](docs/REPRODUCIBILITY.md).
+13. [Reproducibility](../REPRODUCIBILITY.md).

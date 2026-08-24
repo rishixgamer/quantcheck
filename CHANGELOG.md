@@ -28,8 +28,10 @@ All notable changes to QuantCheck are recorded here. This project follows
   Arrow IPC are supported production inputs. Imports remain lazy for CSV and
   Python-row use.
 * Container assembly canonicalizes virtual-environment entry order, ownership,
-  and timestamps before extraction. The reproducibility gate reports and
-  compares raw OCI archives plus index, manifest, config, and layer digests.
+  and timestamps before extraction. The reproducibility gate requires identical
+  digest-addressed OCI manifest, config, and layer identity. Raw outer-tar
+  archive bytes, headers, and member order remain diagnostics and do not fail
+  the image-identity gate by themselves.
 
 ### Not claimed
 
@@ -39,8 +41,9 @@ All notable changes to QuantCheck are recorded here. This project follows
 
 ## [0.1.0] — 2026-08-08
 
-First release candidate. Prepared locally; **not published**. No Git tag,
-GitHub release, PyPI upload, or CI run exists.
+Immutable historical baseline, published from the `v0.1.0` tag as a GitHub
+release. It has no PyPI upload; install from its attached wheel, sdist, or
+source checkout.
 
 ### Added
 

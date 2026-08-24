@@ -610,7 +610,7 @@ def compile_and_run_swift(manifest_path: Path) -> None:
         ],
         check=True,
     )
-    output = VIDEO_DIR / "QuantCheck_demo.mp4"
+    output = BUILD_DIR / "QuantCheck_demo.mp4"
     subprocess.run([str(binary_path), str(manifest_path), str(output)], check=True)
 
 
@@ -743,7 +743,7 @@ def main() -> int:
     make_audio()
     manifest = write_captions_and_manifest()
     compile_and_run_swift(manifest)
-    print(f"Built {VIDEO_DIR / 'QuantCheck_demo.mp4'}")
+    print(f"Built {BUILD_DIR / 'QuantCheck_demo.mp4'}")
     print(f"Duration target: {sum(scene.duration_seconds for scene in SCENES):.2f}s")
     return 0
 

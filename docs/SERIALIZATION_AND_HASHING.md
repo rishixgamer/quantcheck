@@ -5,14 +5,11 @@ authoritative for the rebuilt repository.
 
 ## Provenance of this document
 
-`reference/AGENTS_ORIGINAL.md` invariant 8 points at a file of this name in
-the lost repository. That file did **not** survive; no copy exists under
-`reference/`. The surviving historical documents state only that Decimal is
-serialized as a JSON string and that hashes are SHA-256. Everything more
-specific below — trailing-zero handling, exponent form, negative zero, key
-ordering, identifier prefixes, and digest truncation — is **defined here for
-the rebuild**, not recovered. No historical hash or identifier can therefore
-be reproduced, and none is treated as a compatibility target.
+Earlier project notes described this contract but did not survive as an
+implementation. Everything specific below — trailing-zero handling, exponent
+form, negative zero, key ordering, identifier prefixes, and digest truncation —
+is **defined here for the rebuild**, not treated as recovered compatibility.
+No historical hash or identifier is therefore a compatibility target.
 
 ## Value domain
 

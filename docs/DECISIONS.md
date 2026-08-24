@@ -483,12 +483,12 @@ property, and subprocess hash-seed tests freeze the decision.
 
 **Status:** accepted for Recovery Phase 9
 
-**Context.** `RECOVERY_SEQUENCE.md` fixes Phase 9's scope in one sentence —
+**Context.** The project scope fixes Phase 9's scope in one sentence —
 "Add the contracted command surface and saved-stage workflow with canonical
 JSON output, stable exit codes, and privacy-safe rendering" — and names no
 concrete command, flag, or exit code. No current `docs/CLI_CONTRACT.md`
 exists, and none of `PROJECT_SCOPE.md`, `MVP_ACCEPTANCE_CRITERIA.md`, or the
-prior ADRs fixes CLI syntax. Historical evidence under `reference/` describes
+prior ADRs fixes CLI syntax. Archived historical evidence describes
 a lost six-command Typer CLI (`ingest`, `inject`, `audit`, `evaluate`,
 `benchmark`, `explain`) with exit codes `0/2/3/4/5/10`, but per the repo's
 authority order this is evidence of scale and intent only, not a byte- or
@@ -623,14 +623,14 @@ determinism across the full saved-stage workflow all freeze the decision.
 
 **Status:** accepted for Recovery Phase 10
 
-**Context.** `RECOVERY_SEQUENCE.md` fixes Phase 10's scope in one sentence —
+**Context.** The project scope fixes Phase 10's scope in one sentence —
 "Add a strict public reader, shared immutable presentation model, read-only
 Streamlit app, and deterministic self-contained HTML" — and names no artifact
 format, path rule, null policy, or launch command. `PROJECT_SCOPE.md` lists
 the dashboard and HTML summary as v0.1 surfaces, and
 `MVP_ACCEPTANCE_CRITERIA.md` item 10 requires that both "read public artifacts
 only and do not execute scientific logic". Historical evidence under
-`reference/` describes a lost `public_artifact_reader.py` /
+Archived historical notes describe a lost `public_artifact_reader.py` /
 `presentation.py` / `html_summary.py` / `dashboard/app.py` set keyed on a
 `public/artifact_index.json` entry point and a `streamlit>=1.60,<2` runtime
 range. Per the repository's authority order that is evidence of shape and

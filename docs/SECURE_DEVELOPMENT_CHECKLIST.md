@@ -49,7 +49,7 @@ a compliance claim.
 - [ ] Release notes state security-relevant changes, limitations, known vulnerabilities/exceptions,
   migration needs, and exact fixed digests without claiming an unearned certification.
 - [ ] Patch instructions and customer retirement/deletion steps are current.
-- [ ] `IMPLEMENT.md` records factual local/CI evidence and explicitly separates configured gates
+- [ ] `docs/STATUS.md` records factual local/CI evidence and explicitly separates configured gates
   from gates actually observed green.
 
 References: [NIST SP 800-218 SSDF](https://csrc.nist.gov/pubs/sp/800/218/final),

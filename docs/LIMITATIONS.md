@@ -1,7 +1,8 @@
 # QuantCheck limitations
 
-This is the authoritative public list. `IMPLEMENT.md` keeps the internal
-handoff's own longer list; anything here is stated for users of the release.
+This is the authoritative public limitations list; current release posture is
+summarized in [STATUS.md](STATUS.md). Anything here is stated for users of the
+release.
 
 The immutable v0.1 limitations below remain historical truth. The current
 `0.2.0.dev0` worktree adds synthetic development/validation evidence,
@@ -97,8 +98,9 @@ candidate attestation, or held-out v0.2 result.
   SBOM and in-toto/SLSA provenance statement are machine-readable and
   hash-bound to package artifacts, but the provenance uses an untrusted local
   builder identity and is unsigned. A candidate-source security workflow,
-  byte-identical OCI proof, registry digest, and trusted CI attestations must be
-  verified before deployment-grade release claims.
+  identical digest-addressed OCI manifest/config/layer proof, registry digest,
+  and trusted CI attestations must be verified before deployment-grade release
+  claims.
 * **The design-partner workflow is a protocol, not completed evidence.** No
   customer input, disposition, confirmed research impact, pilot metric, or
   testimonial is present. Synthetic development/validation performance cannot

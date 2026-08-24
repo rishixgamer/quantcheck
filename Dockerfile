@@ -22,17 +22,7 @@ COPY --from=uv /uv /usr/local/bin/uv
 COPY pyproject.toml uv.lock README.md LICENSE .python-version ./
 COPY src/ ./src/
 RUN uv sync --frozen --no-dev --no-editable \
-    && find /opt/quantcheck/.venv -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} + \
-    && tar \
-        --sort=name \
-        --mtime="@${SOURCE_DATE_EPOCH}" \
-        --owner=65532 \
-        --group=65532 \
-        --numeric-owner \
-        --pax-option=delete=atime,delete=ctime \
-        -C /opt/quantcheck \
-        -cf /opt/quantcheck/venv.tar \
-        .venv
+    && find /opt/quantcheck/.venv -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} +
 
 FROM ${PYTHON_IMAGE} AS runtime
 
@@ -60,8 +50,9 @@ ENV PATH="/opt/quantcheck/.venv/bin:${PATH}" \
     HOME=/nonexistent
 
 WORKDIR /opt/quantcheck
-RUN --mount=type=bind,from=builder,source=/opt/quantcheck/venv.tar,target=/tmp/venv.tar \
-    tar -xf /tmp/venv.tar -C /opt/quantcheck
+# Copy the normalized tree directly.  An intermediate tar/untar snapshot made
+# BuildKit's runtime layer vary between otherwise identical no-cache builds.
+COPY --from=builder --chown=65532:65532 /opt/quantcheck/.venv /opt/quantcheck/.venv
 COPY --chown=65532:65532 deploy/smoke /opt/quantcheck/smoke
 
 # /config and /input are mount points for read-only customer material.

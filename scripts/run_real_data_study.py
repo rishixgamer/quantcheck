@@ -1,6 +1,6 @@
 """Run the frozen real-public-data study without changing QuantCheck behavior.
 
-The protocol is ``REAL_DATA_STUDY_PROTOCOL.md``.  This script only orchestrates
+The protocol is ``docs/research/REAL_DATA_STUDY_PROTOCOL.md``.  This script only orchestrates
 existing SEC normalization, point-in-time selection, audit-boundary, and
 detector-execution APIs; it does not construct a manifest or run a benchmark.
 """
@@ -26,6 +26,9 @@ from quantcheck.sec_adapter import (
 from quantcheck.serialization import canonical_json_bytes
 
 STUDY_ROOT = Path("evidence/real_data_study")
+RESEARCH_ROOT = Path("docs/research")
+PROTOCOL_PATH = RESEARCH_ROOT / "REAL_DATA_STUDY_PROTOCOL.md"
+FINDINGS_PATH = RESEARCH_ROOT / "REAL_DATA_FINDINGS.csv"
 USER_AGENT = "QuantCheck-real-data-validation/0.2 rishihaldar@umass.edu"
 FILED_FROM = date(2021, 1, 1)
 FILED_THROUGH = date(2024, 12, 31)
@@ -66,11 +69,11 @@ def git_revision() -> str:
 def protocol_sha256() -> str:
     import hashlib
 
-    return hashlib.sha256(Path("REAL_DATA_STUDY_PROTOCOL.md").read_bytes()).hexdigest()
+    return hashlib.sha256(PROTOCOL_PATH.read_bytes()).hexdigest()
 
 
 def main() -> None:
-    if (STUDY_ROOT / "study_run.json").exists() or Path("REAL_DATA_FINDINGS.csv").exists():
+    if (STUDY_ROOT / "study_run.json").exists() or FINDINGS_PATH.exists():
         raise SystemExit("refusing to overwrite a completed or findings-bearing study")
     cache_dir = STUDY_ROOT / "sec_cache"
     adapter = SecCompanyFactsAdapter(SecClientConfig(user_agent=USER_AGENT, cache_dir=cache_dir))
@@ -173,7 +176,7 @@ def main() -> None:
         "affected_record_ids",
         "evidence_json",
     )
-    with Path("REAL_DATA_FINDINGS.csv").open("x", newline="", encoding="utf-8") as stream:
+    with FINDINGS_PATH.open("x", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(sorted(all_findings, key=lambda row: row["finding_id"]))

@@ -2,9 +2,10 @@
 
 ## Finished cut
 
-`QuantCheck_demo.mp4` is the finished 2:56 portfolio cut. The system voice is
-replaceable: record a human version against `narration.txt` and keep the timing
-from `captions.vtt`.
+The optional 2:56 portfolio cut is generated locally by `build_demo.py` and is
+not committed to the public source tree. The system voice is replaceable:
+record a human version against `narration.txt` and keep the timing from
+`captions.vtt`.
 
 ## Timestamped shot list
 
