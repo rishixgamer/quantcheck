@@ -5,15 +5,9 @@ evidence register, not marketing copy. It records what can be said, under which
 version and artifact boundary, and what must remain qualified or unpublished.
 
 Review date: 2026-08-13
-Reviewed worktree: /Users/rishihaldar/Downloads/quantcheck-recovery-harness
-Reviewed commit: 4bc3c2598b913a2b757b51082035ffa2a9ece4b1
+Historical evidence baseline: 4bc3c2598b913a2b757b51082035ffa2a9ece4b1
 Current package version: 0.2.0.dev0
 Immutable v0.1 tag: v0.1.0 at 46c5a989045099d2cbe66eb873969a4e32b5fc69
-
-The only pre-existing Git worktree change observed before this ledger was an
-untracked .claude-flow/ directory. It was not inspected, changed, staged, or
-removed. No code, test, configuration, release, or external resource was
-modified for this ledger.
 
 ## Reading and publication rules
 
@@ -195,15 +189,15 @@ the frozen v0.1 result and not customer evidence.
 | G-14 | Observational SEC result | QuantCheck accepted 472 selected records: 180 Assets and 292 NetIncomeLoss. Exact Duplicate had 472 singleton fingerprint groups and zero findings; Look-Ahead, Revision Overwrite, and Unit Drift had zero eligible opportunities. | docs/research/REAL_DATA_RESULTS.md; evidence/real_data_study/applicability.json | Directly measured, retrospective applicability correction | All four | High if detector-specific denominators remain attached | The protocol was not independently timestamped or committed before execution; do not call it preregistered. |
 | G-15 | Real-data-substrate adversarial result | Under a protocol committed before outcomes, nine seeded cases contained 120 injected fault instances. All 120 were exactly matched; Unit Drift also emitted four strict false-positive warnings. | docs/research/REAL_DATA_SUBSTRATE_ADVERSARIAL_PROTOCOL.md; docs/research/REAL_DATA_SUBSTRATE_ADVERSARIAL_RESULTS.md; evidence/real_data_substrate_adversarial/study_run.json | Directly measured controlled evidence on real SEC substrate | All four | High if the injected-fault boundary remains attached | These are manufactured faults on preserved real observations, not natural SEC defects or population performance. Revision Overwrite was not applicable. |
 
-## Important discrepancies and required resolutions
+## Historical discrepancies and publication rules
 
-| ID | Discrepancy | Artifacts showing each side | Resolution before publication |
+| ID | Discrepancy or boundary | Artifacts showing each side | Publication rule |
 | --- | --- | --- | --- |
 | X-01 | Archived release materials describe 120 fault cases + 12 controls = 132 cases, while the rebuilt v0.1 release artifact is 120 + 4 = 124. | Archived release material; current: release_freeze.json, evidence/v0_1_release/aggregate_report.json, docs/FINAL_BENCHMARK_RESULTS.md | Use 124 for the rebuilt v0.1 evidence. Mention 132 only as an archived target/discrepancy, never as the measured current result. |
 | X-02 | Archived metric set conflicts with rebuilt v0.1 artifact: historical precision 0.668..., recall 0.970..., F1 0.791..., 170 injected faults, 5 false negatives, 82 false positives; current artifact is 0.625, 1, 0.769..., 130, 0, 78. | Archived release material; current evidence/v0_1_release/aggregate_report.json | Use only the current saved artifact for rebuilt v0.1 claims. Label archived values as historical/outdated and unsafe as current metrics. |
-| X-03 | docs/RELEASE_NOTES_0.1.0.md says the release was not published and had no tag, GitHub release, or CI run; docs/RELEASE_CHECKLIST.md records GitHub Actions run 31293937904, tag v0.1.0, and a GitHub release. | docs/RELEASE_NOTES_0.1.0.md; docs/RELEASE_CHECKLIST.md; Git tag | Treat the release notes as stale historical prose. For release-status claims, use the checklist, Git tag, and exact release artifacts. |
-| X-04 | docs/DASHBOARD_AND_HTML.md contains a stale limitation saying no final held-out benchmark, release evidence, or CHECKSUMS.md exists, while the standalone summaries and complete archive now provide the current release evidence. | docs/DASHBOARD_AND_HTML.md; evidence/v0_1_release/; release_freeze.json; CHECKSUMS.md | Do not quote that stale sentence. Resolve the document before any portfolio publication or use the artifact-backed current status. |
-| X-05 | README/release prose calls the interface a “six-command CLI” while the concrete list includes ingest sec, inject, audit, evaluate, benchmark run, benchmark smoke, and explain. | README.md; docs/CLI_CONTRACT.md | Use the precise wording “six root command groups; nested invocations include …” until the prose is harmonized. |
+| X-03 | The v0.1 release was first documented as a local candidate and was subsequently published as an annotated tag and GitHub release. | docs/RELEASE_NOTES_0.1.0.md; docs/RELEASE_CHECKLIST.md; Git tag | Cite the current release page and exact artifacts for publication status. |
+| X-04 | Early dashboard prose predated the final held-out benchmark and release evidence. The current dashboard documentation now reflects the saved evidence. | docs/DASHBOARD_AND_HTML.md; evidence/v0_1_release/; release_freeze.json; CHECKSUMS.md | Use the current artifact-backed status rather than superseded historical prose. |
+| X-05 | The CLI has six root command groups; nested invocations include `ingest sec`, `benchmark run`, and `benchmark smoke`. | README.md; docs/CLI_CONTRACT.md; docs/RELEASE_NOTES_0.1.0.md | Describe it as “six root command groups” and name nested invocations separately. |
 | X-06 | Test counts vary by milestone and repository state: current collection 2,257; interrupted current full run; last recorded full pass 2,245; v0.1 milestone record 1,595; stale release prose says approximately 1,600. | uv run pytest --collect-only -q; interrupted uv run pytest -q; archived run notes | Publish a test count only with a named commit/state and exact command. Do not use “2,257 tests passed” or “approximately 1,600 tests” as a timeless claim. |
 | X-07 | Current 0.2.0.dev0 docs scope PyArrow differently by version: immutable v0.1 wheel metadata did not declare it, while current 0.2.0.dev0 metadata declares pyarrow>=24,<25, locked at 24.0.0. | docs/LIMITATIONS.md; docs/EXTERNAL_DATASETS.md; pyproject.toml | Always version the statement: v0.1 wheel versus current 0.2.0.dev0 distribution. |
 | X-08 | The current beta freeze claims synthetic evidence only and no customer/production validation, while “design-partner beta” wording could be read as completed pilot evidence. | design_partner_beta_freeze.json; README.md; docs/STATUS.md; docs/DESIGN_PARTNER_SHADOW_MODE.md | Use “beta engineering candidate” or “synthetic engineering evidence”; do not use “design-partner result,” “pilot,” or “customer validation.” |
@@ -356,9 +350,6 @@ Use these artifacts directly, preserving their version labels and caveats.
 ### Artifacts not safe as current numeric sources
 
 - Archived release metrics and IDs: historical evidence only.
-- docs/RELEASE_NOTES_0.1.0.md until X-03 is resolved.
-- The stale “no final held-out benchmark” sentence in
-  docs/DASHBOARD_AND_HTML.md until X-04 is resolved.
 - Any test count without a named commit/state and exact command.
 - Any rounded v0.2 Decimal metric copied from prose rather than the aggregate
   JSON.
@@ -366,7 +357,7 @@ Use these artifacts directly, preserving their version labels and caveats.
 ## Final publication gate
 
 Before turning this ledger into a public presentation, re-read the exact saved
-JSON artifacts, resolve X-01 through X-09, rerun the intended current quality
-gates, and attach a version/commit identity to every number. Preserve the
+JSON artifacts, apply the X-01 through X-09 publication rules, rerun the
+intended current quality gates, and attach a version/commit identity to every number. Preserve the
 distinction among rebuilt v0.1 release evidence, current synthetic v0.2
 engineering evidence, real-data capability, and customer/production evidence.

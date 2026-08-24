@@ -75,6 +75,19 @@ def test_repository_does_not_track_incomplete_release_evidence_tree() -> None:
     assert result.stdout == ""
 
 
+def test_tracked_markdown_does_not_publish_personal_worktree_metadata() -> None:
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--", "*.md"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    for relative_path in result.stdout.splitlines():
+        text = Path(relative_path).read_text()
+        assert "/Users/" not in text, relative_path
+        assert ".claude-flow" not in text, relative_path
+
+
 def test_curated_v01_summaries_bind_to_release_freeze_without_index() -> None:
     """The compact checked-in set is canonical, not a partial fake evidence tree."""
     freeze = json.loads((V01_RELEASE_ROOT.parents[1] / "release_freeze.json").read_text())
