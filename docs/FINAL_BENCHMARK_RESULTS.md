@@ -27,7 +27,7 @@ then **invalidated by a release-plumbing defect, not by its detector
 performance**: the schema refused to *deserialize* a reserved final seed at all,
 which meant the strict public reader could not load the released
 `benchmark_config.json`, and the public evidence package could not be
-aggregated, presented, or rendered — the package was unreadable by the very
+aggregated, presented, or rendered. The package was unreadable by the very
 surfaces built to present it.
 
 The fix draws the boundary at **execution** rather than **representation**
@@ -113,12 +113,12 @@ Revision Overwrite `1`.
 
 ## By final seed
 
-Every one of the ten reserved seeds `1000`–`1009` ran. Nine of the ten produced
+Every one of the ten reserved seeds `1000` to `1009` ran. Nine of the ten produced
 12 configured cases; seed `1000` produced 16, because the four clean controls
 are pinned to the lowest reserved seed. Recall is `1` at every seed. Per-seed
 precision ranges from `0.52` (seed `1000`) to
 `0.68421052631578947368421052631578947368421052631579` (seeds `1001`, `1002`,
-`1007`, `1008`, `1009`), with seeds `1003`–`1006` at
+`1007`, `1008`, `1009`), with seeds `1003` to `1006` at
 `0.59090909090909090909090909090909090909090909090909`. Full per-seed counts are
 in `evidence/v0_1_release/aggregate_report.json` under `by_seed`.
 
@@ -146,7 +146,7 @@ pass would have been exactly the score tuning this milestone forbids.
 
 * **Best precision:** `duplicate_observation` (`0.693…`). **Worst:**
   `revision_overwrite` (`0.476…`).
-* **Recall is `1` everywhere** — every profile, every severity, every seed. There
+* **Recall is `1` everywhere**, at every profile, every severity, and every seed. There
   is not a single false negative in the held-out matrix. This is a real result,
   but read it with the fixture's small size in mind, not as evidence of general
   detector sensitivity.
