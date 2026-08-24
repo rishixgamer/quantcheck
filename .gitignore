@@ -13,6 +13,11 @@ dist/
 htmlcov/
 .DS_Store
 .serena/
-release_evidence/
+release_evidence/*
+!release_evidence/final/
+release_evidence/final/*
+!release_evidence/final/public/
+release_evidence/final/public/*
+!release_evidence/final/public/*.json
 benchmark_evidence_v0_2*/
 beta_evidence/

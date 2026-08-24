@@ -9,6 +9,7 @@ unusable to anyone but its author.
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -44,6 +45,16 @@ def public_only(executed: Path, tmp_path: Path) -> Path:
 def test_the_copy_contains_no_private_tree(public_only: Path) -> None:
     assert not (public_only / "private").exists()
     assert list(public_only.iterdir()) == [public_only / "public"]
+
+
+def test_repository_does_not_track_private_evidence_paths() -> None:
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--", "evidence/**/private/**"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert result.stdout == ""
 
 
 def test_the_copy_contains_no_manifest_anywhere(public_only: Path) -> None:

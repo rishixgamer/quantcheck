@@ -18,14 +18,15 @@ appeared in the injected case; it is not a claim about a natural SEC defect.
 
 For each row, the public audit report preserves the detector-visible record,
 exact series key, observed value, candidate correction, local ratios, and
-neighbor IDs. The private manifest preserves the original and corrupted target
-records, exact mutation, series record IDs, and eligible neighbor IDs.
+neighbor IDs. The private-manifest release asset preserves the original and
+corrupted target records, exact mutation, series record IDs, and eligible
+neighbor IDs. Those answer-key files are not tracked in the public repository.
 
 | Seed | Public audit report | Public strict score | Private relationship evidence |
 | ---: | --- | --- | --- |
-| 101 | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-101/audit_report.json` | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-101/score_report.json` | `evidence/real_data_substrate_adversarial/private/unit_drift/seed-101/manifest.json` |
-| 202 | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-202/audit_report.json` | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-202/score_report.json` | `evidence/real_data_substrate_adversarial/private/unit_drift/seed-202/manifest.json` |
-| 303 | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-303/audit_report.json` | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-303/score_report.json` | `evidence/real_data_substrate_adversarial/private/unit_drift/seed-303/manifest.json` |
+| 101 | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-101/audit_report.json` | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-101/score_report.json` | Release private-manifest archive, seed `101` |
+| 202 | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-202/audit_report.json` | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-202/score_report.json` | Release private-manifest archive, seed `202` |
+| 303 | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-303/audit_report.json` | `evidence/real_data_substrate_adversarial/public/unit_drift/seed-303/score_report.json` | Release private-manifest archive, seed `303` |
 
 ## Evidentiary separation
 

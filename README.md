@@ -56,7 +56,8 @@ successful, 30 structural no-target, and 0 incomplete. Among successful scored
 cases it recorded 130 injected faults, 130 exact matches, 78 strict
 cross-detector false-positive findings, precision **0.625**, recall **1.000**,
 and F1 **0.769**. This is synthetic fixture evidence, not production
-performance. See the [canonical aggregate summary](docs/FINAL_BENCHMARK_RESULTS.md).
+performance. See the [canonical aggregate report](release_evidence/final/public/aggregate_report.json)
+and the [human-readable benchmark summary](docs/FINAL_BENCHMARK_RESULTS.md).
 
 The separate observational SEC study processed **472 selected observations from
 five issuers** and emitted no findings. Only Exact Duplicate had applicable
