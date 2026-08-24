@@ -5,8 +5,8 @@ from __future__ import annotations
 import hashlib
 import re
 from pathlib import Path
-from types import SimpleNamespace
 
+import pytest
 from scripts import build_beta_evidence
 
 from quantcheck.hashing import sha256_hex_of_bytes, stable_id
@@ -23,13 +23,17 @@ def _object(path: Path) -> dict[str, object]:
     return value
 
 
-def test_source_state_ignores_excluded_only_modifications(monkeypatch) -> None:
+def test_source_state_ignores_excluded_only_modifications(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     status = " M design_partner_beta_freeze.json\n M evidence/design_partner_beta/run.json\n"
-    monkeypatch.setattr(
-        build_beta_evidence.subprocess,
-        "run",
-        lambda *args, **kwargs: SimpleNamespace(stdout=status),
-    )
+
+    def fake_run(*arguments: str, strip_output: bool = True) -> str:
+        del arguments
+        assert strip_output is False
+        return status
+
+    monkeypatch.setattr(build_beta_evidence, "_run", fake_run)
 
     assert build_beta_evidence._source_state() == "clean_commit"
 
